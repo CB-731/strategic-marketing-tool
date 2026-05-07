@@ -1,0 +1,4013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Marketing Bootcamp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --left-sidebar: #141414;
+            --right-sidebar: #141414;
+            --center-panel: #1a1a1a;
+            --card: #1e1e1e;
+            --accent: #d4a843;
+            --text-primary: #f0f0f0;
+            --text-secondary: #9a9a9a;
+            --border: #2a2a2a;
+            --hover: rgba(255, 255, 255, 0.04);
+            --shadow: rgba(0, 0, 0, 0.32);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body,
+        #root {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .auth-shell {
+            width: 100%;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background:
+                radial-gradient(circle at top left, rgba(212, 168, 67, 0.14), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(212, 168, 67, 0.08), transparent 32%),
+                var(--bg);
+        }
+
+        .auth-card {
+            width: min(460px, 100%);
+            padding: 34px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(18, 18, 18, 0.98));
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
+            display: grid;
+            gap: 18px;
+        }
+
+        .auth-kicker {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border: 1px solid rgba(212, 168, 67, 0.28);
+            border-radius: 999px;
+            background: rgba(212, 168, 67, 0.08);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .auth-card h1 {
+            margin: 0;
+            font-size: clamp(34px, 6vw, 54px);
+            line-height: 0.98;
+            letter-spacing: -0.06em;
+        }
+
+        .auth-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        .auth-message {
+            padding: 13px 14px;
+            border: 1px solid rgba(212, 168, 67, 0.22);
+            border-radius: 14px;
+            background: rgba(212, 168, 67, 0.06);
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .google-auth-button {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(212, 168, 67, 0.42);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.2), rgba(212, 168, 67, 0.1));
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .google-auth-button:hover {
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.26), rgba(212, 168, 67, 0.14));
+            border-color: rgba(212, 168, 67, 0.56);
+            transform: translateY(-1px);
+        }
+
+        .google-auth-button:disabled,
+        .mini-button:disabled,
+        .task-pill:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: none;
+        }
+
+        .new-project-button {
+            cursor: pointer;
+        }
+
+        .scope-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(10px);
+        }
+
+        .onboarding-modal {
+            width: min(480px, 100%);
+            padding: 28px;
+            border: 1px solid rgba(212, 168, 67, 0.28);
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(18, 18, 18, 0.98));
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+            display: grid;
+            gap: 16px;
+        }
+
+        .onboarding-modal h2 {
+            margin: 0;
+            font-size: 24px;
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+        }
+
+        .onboarding-modal p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .delete-modal {
+            max-width: 480px;
+        }
+
+        .delete-modal-warning {
+            padding: 13px 14px;
+            border: 1px solid rgba(255, 120, 120, 0.24);
+            border-radius: 14px;
+            background: rgba(255, 120, 120, 0.08);
+            color: #ffd1d1;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .danger-action {
+            border-color: rgba(255, 120, 120, 0.4);
+            background: linear-gradient(180deg, rgba(255, 120, 120, 0.24), rgba(255, 120, 120, 0.1));
+            color: #ffe1e1;
+        }
+
+        .danger-action:hover {
+            border-color: rgba(255, 120, 120, 0.58);
+            background: rgba(255, 120, 120, 0.16);
+        }
+
+        .modal-actions button:disabled {
+            cursor: not-allowed;
+            opacity: 0.62;
+        }
+
+        .project-name-input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            font: inherit;
+        }
+
+        .project-name-input:focus {
+            border-color: rgba(212, 168, 67, 0.6);
+            box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .primary-action,
+        .secondary-action {
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .primary-action {
+            border: 1px solid rgba(212, 168, 67, 0.5);
+            background: rgba(212, 168, 67, 0.18);
+            color: var(--text-primary);
+        }
+
+        .secondary-action {
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+        }
+
+        .primary-action:hover,
+        .secondary-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-action:disabled,
+        .secondary-action:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: none;
+        }
+
+        .creation-status {
+            display: grid;
+            gap: 12px;
+            justify-items: center;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 38px;
+            height: 38px;
+            border: 3px solid rgba(212, 168, 67, 0.18);
+            border-top-color: var(--accent);
+            border-radius: 999px;
+            animation: spin 800ms linear infinite;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: inherit;
+            background: var(--accent);
+            transition: width 180ms ease;
+        }
+
+        .error-box {
+            padding: 12px 13px;
+            border: 1px solid rgba(244, 67, 54, 0.36);
+            border-radius: 12px;
+            background: rgba(244, 67, 54, 0.08);
+            color: #ffb4ae;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr) 320px;
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg);
+        }
+
+        .app-shell * {
+            min-width: 0;
+        }
+
+        .left-sidebar,
+        .right-sidebar,
+        .center-panel {
+            min-height: 0;
+        }
+
+        .left-sidebar,
+        .right-sidebar {
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #313131 transparent;
+        }
+
+        .left-sidebar::-webkit-scrollbar,
+        .right-sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .left-sidebar::-webkit-scrollbar-thumb,
+        .right-sidebar::-webkit-scrollbar-thumb {
+            background: #313131;
+            border-radius: 999px;
+        }
+
+        .left-sidebar {
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            gap: 16px;
+            padding: 24px 18px;
+            background: var(--left-sidebar);
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .brand-block {
+            display: grid;
+            gap: 12px;
+        }
+
+        .brand-label {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+        }
+
+        .new-project-button {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(212, 168, 67, 0.35);
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.18), rgba(212, 168, 67, 0.08));
+            color: var(--text-primary);
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .new-project-button:hover {
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.24), rgba(212, 168, 67, 0.1));
+            border-color: rgba(212, 168, 67, 0.5);
+        }
+
+        .project-section {
+            display: grid;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .project-navigation-section {
+            grid-template-rows: auto minmax(0, 1fr);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 2px;
+            scrollbar-width: thin;
+            scrollbar-color: #313131 transparent;
+        }
+
+        .project-navigation-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .project-navigation-section::-webkit-scrollbar-thumb {
+            background: #313131;
+            border-radius: 999px;
+        }
+
+        .auth-section {
+            align-self: end;
+            min-height: 0;
+        }
+
+        .auth-section .section-heading {
+            display: none;
+        }
+
+        .section-heading {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .project-list-placeholder {
+            padding: 16px;
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .project-accordion-list {
+            display: grid;
+            gap: 10px;
+            align-content: start;
+            align-items: start;
+        }
+
+        .project-accordion {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .project-accordion.is-current {
+            border-color: rgba(212, 168, 67, 0.32);
+            background: rgba(212, 168, 67, 0.045);
+        }
+
+        .project-accordion-header {
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 12px;
+            border: 0;
+            background: transparent;
+            color: var(--text-primary);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .project-accordion-header:hover {
+            background: var(--hover);
+        }
+
+        .project-title {
+            display: block;
+            overflow: hidden;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .project-meta {
+            display: block;
+            margin-top: 3px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .project-toggle {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .project-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 0 10px 10px;
+        }
+
+        .project-action-button {
+            width: 34px;
+            height: 34px;
+            display: inline-grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .project-action-button:hover,
+        .project-action-button:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.4);
+            outline: none;
+        }
+
+        .project-action-button.is-danger {
+            color: #ffb8b8;
+        }
+
+        .project-action-button.is-danger:hover,
+        .project-action-button.is-danger:focus-visible {
+            border-color: rgba(255, 120, 120, 0.45);
+            background: rgba(255, 120, 120, 0.08);
+        }
+
+        .project-phases {
+            display: grid;
+            gap: 12px;
+            padding: 0 10px 12px;
+        }
+
+        .phase-group {
+            display: grid;
+            gap: 6px;
+        }
+
+        .phase-label {
+            margin: 0;
+            padding: 2px 4px;
+            color: var(--text-secondary);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .task-nav-button {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 9px;
+            align-items: start;
+            padding: 9px 10px 9px 12px;
+            border: 1px solid transparent;
+            border-left: 3px solid transparent;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.025);
+            color: var(--text-primary);
+            text-align: left;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .task-nav-button:hover {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.24);
+        }
+
+        .task-nav-button.is-active {
+            border-left-color: var(--accent);
+            background: rgba(212, 168, 67, 0.1);
+        }
+
+        .task-nav-button.is-locked {
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.56;
+        }
+
+        .task-status-icon {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .task-nav-title {
+            display: block;
+            color: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .task-nav-subtitle {
+            display: block;
+            margin-top: 2px;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .locked-task-message {
+            padding: 10px 11px;
+            border: 1px solid rgba(212, 168, 67, 0.24);
+            border-radius: 12px;
+            background: rgba(212, 168, 67, 0.07);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .status-card {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.025);
+            display: grid;
+            gap: 12px;
+        }
+
+        .auth-section .status-card {
+            padding: 0;
+            gap: 0;
+            overflow: hidden;
+            background: rgba(20, 20, 20, 0.96);
+            box-shadow: 0 -14px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        .simple-sign-out-button {
+            width: 100%;
+            padding: 11px 12px;
+            border: 0;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-align: left;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .simple-sign-out-button:hover {
+            background: var(--hover);
+            color: var(--accent);
+        }
+
+        .auth-refresh-banner {
+            position: absolute;
+            top: 16px;
+            left: 284px;
+            right: 344px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(212, 168, 67, 0.28);
+            border-radius: 14px;
+            background: rgba(20, 20, 20, 0.94);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+            color: var(--text-primary);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .auth-refresh-banner button {
+            flex: 0 0 auto;
+            padding: 8px 11px;
+            border: 1px solid rgba(212, 168, 67, 0.38);
+            border-radius: 999px;
+            background: rgba(212, 168, 67, 0.1);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .auth-refresh-banner button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .mini-actions,
+        .project-switcher,
+        .task-pill-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .mini-button,
+        .project-chip,
+        .task-pill {
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .mini-button,
+        .project-chip {
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .auth-section .mini-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .auth-section .mini-button {
+            width: 100%;
+            padding: 8px 10px;
+            text-align: center;
+        }
+
+        .task-pill {
+            padding: 8px 11px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .mini-button:hover,
+        .project-chip:hover,
+        .task-pill:hover {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .project-chip.is-active,
+        .task-pill.is-active {
+            border-color: rgba(212, 168, 67, 0.6);
+            background: rgba(212, 168, 67, 0.12);
+            color: var(--accent);
+        }
+
+        .muted-note {
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .center-panel {
+            display: grid;
+            padding: 32px;
+            background:
+                radial-gradient(circle at top left, rgba(212, 168, 67, 0.08), transparent 32%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+                var(--center-panel);
+            overflow: hidden;
+        }
+
+        .center-panel.is-empty {
+            place-items: center;
+        }
+
+        .doc-workspace {
+            min-width: 0;
+            min-height: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: minmax(0, 1fr);
+        }
+
+        .open-doc-button {
+            padding: 10px 12px;
+            border: 1px solid rgba(212, 168, 67, 0.32);
+            border-radius: 999px;
+            background: rgba(212, 168, 67, 0.08);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .open-doc-button:hover {
+            background: rgba(212, 168, 67, 0.14);
+            border-color: rgba(212, 168, 67, 0.52);
+            transform: translateY(-1px);
+        }
+
+        .floating-open-doc-button {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            z-index: 3;
+            padding: 12px 15px;
+            border-color: rgba(212, 168, 67, 0.5);
+            background: rgba(20, 20, 20, 0.86);
+            box-shadow: 0 16px 42px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .doc-frame-shell {
+            position: relative;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: rgba(12, 12, 12, 0.92);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+        }
+
+        .doc-frame {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: 0;
+            background: #ffffff;
+        }
+
+        .doc-loading-overlay,
+        .doc-fallback-overlay {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(15, 15, 15, 0.86);
+            text-align: center;
+        }
+
+        .doc-loading-card,
+        .doc-fallback-card {
+            width: min(360px, 100%);
+            display: grid;
+            gap: 12px;
+            justify-items: center;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--card);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.26);
+        }
+
+        .doc-loading-card p,
+        .doc-fallback-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .center-placeholder {
+            width: min(560px, 100%);
+            padding: 32px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(30, 30, 30, 0.95), rgba(22, 22, 22, 0.95));
+            box-shadow: 0 24px 60px var(--shadow);
+            text-align: center;
+        }
+
+        .recovery-card {
+            display: grid;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .recovery-card .placeholder-kicker {
+            margin: 0;
+            width: fit-content;
+        }
+
+        .recovery-card h2 {
+            text-align: left;
+        }
+
+        .recovery-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .recovery-action-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 10px 12px;
+            border: 1px solid rgba(212, 168, 67, 0.32);
+            border-radius: 999px;
+            background: rgba(212, 168, 67, 0.08);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .recovery-action-link:hover {
+            border-color: rgba(212, 168, 67, 0.52);
+            background: rgba(212, 168, 67, 0.14);
+        }
+
+        .placeholder-kicker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            padding: 6px 10px;
+            border: 1px solid rgba(212, 168, 67, 0.24);
+            border-radius: 999px;
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: rgba(212, 168, 67, 0.08);
+        }
+
+        .center-placeholder h2 {
+            margin: 0 0 12px;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .center-placeholder p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .state-preview {
+            margin-top: 22px;
+            display: grid;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .state-preview-card {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .state-preview-card h3 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .state-preview-card p {
+            font-size: 13px;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 24px 20px;
+            background: var(--right-sidebar);
+            border-left: 1px solid var(--border);
+        }
+
+        .guidance-card {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .task-guidance {
+            display: grid;
+            gap: 16px;
+        }
+
+        .guidance-header {
+            display: grid;
+            gap: 10px;
+        }
+
+        .guidance-kicker {
+            width: fit-content;
+            padding: 6px 9px;
+            border: 1px solid rgba(212, 168, 67, 0.24);
+            border-radius: 999px;
+            background: rgba(212, 168, 67, 0.08);
+            color: var(--accent);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .guidance-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 20px;
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+        }
+
+        .guidance-tagline {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-style: italic;
+            line-height: 1.65;
+        }
+
+        .guidance-block {
+            display: grid;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .guidance-block.is-what {
+            border-left-color: var(--accent);
+        }
+
+        .guidance-block.is-why {
+            border-left-color: #58c27d;
+        }
+
+        .guidance-block.is-how {
+            border-left-color: #5ea1ff;
+        }
+
+        .guidance-block.is-mistakes {
+            border-left-color: #ff6b6b;
+        }
+
+        .guidance-block h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .guidance-block p,
+        .diagram-caption {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .guidance-bullets {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .diagram-frame {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .diagram-frame img {
+            width: 100%;
+            display: block;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .diagram-image-clickable {
+            cursor: zoom-in;
+            transition: opacity 150ms ease, transform 150ms ease;
+        }
+
+        .diagram-image-clickable:hover {
+            opacity: 0.92;
+            transform: scale(1.01);
+        }
+
+        .diagram-fallback {
+            padding: 16px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .diagram-lightbox-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: grid;
+            place-items: center;
+            padding: 32px;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .diagram-lightbox-close {
+            position: fixed;
+            top: 18px;
+            right: 22px;
+            z-index: 82;
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(30, 30, 30, 0.95);
+            color: var(--text-primary);
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+        }
+
+        .diagram-lightbox-close:hover {
+            background: var(--accent);
+            color: #111111;
+            transform: scale(1.05);
+        }
+
+        .diagram-lightbox-content {
+            width: min(1100px, 94vw);
+            height: min(820px, 88vh);
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            overflow: hidden;
+            border: 1px solid rgba(212, 168, 67, 0.24);
+            border-radius: 20px;
+            background: rgba(20, 20, 20, 0.96);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.62);
+        }
+
+        .diagram-lightbox-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .diagram-lightbox-toolbar button {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+        }
+
+        .diagram-lightbox-toolbar button:hover {
+            border-color: rgba(212, 168, 67, 0.5);
+            background: rgba(212, 168, 67, 0.08);
+            color: var(--accent);
+        }
+
+        .diagram-lightbox-toolbar span {
+            min-width: 58px;
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .diagram-lightbox-scroll {
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .diagram-lightbox-image {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 12px;
+            transform-origin: center center;
+            transition: transform 150ms ease;
+        }
+
+        .diagram-lightbox-fallback {
+            width: min(520px, 100%);
+            margin: auto;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+            text-align: center;
+        }
+
+        .resource-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .resource-link,
+        .template-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-decoration: none;
+        }
+
+        .resource-link:hover {
+            border-color: rgba(212, 168, 67, 0.42);
+            background: var(--hover);
+            color: var(--accent);
+        }
+
+        .template-label {
+            color: var(--accent);
+            border-color: rgba(212, 168, 67, 0.26);
+            background: rgba(212, 168, 67, 0.07);
+        }
+
+        .checklist-card {
+            display: grid;
+            gap: 14px;
+        }
+
+        .checklist-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .checklist-header h3 {
+            margin: 0;
+        }
+
+        .checklist-count {
+            flex: 0 0 auto;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .checklist-progress-track {
+            width: 100%;
+            height: 7px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .checklist-progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: inherit;
+            background: var(--accent);
+            transition: width 180ms ease;
+        }
+
+        .checklist-items {
+            display: grid;
+            gap: 9px;
+        }
+
+        .checklist-item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 10px;
+            align-items: start;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.025);
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.5;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .checklist-item:hover {
+            border-color: rgba(212, 168, 67, 0.28);
+            background: var(--hover);
+        }
+
+        .checklist-item input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.035);
+            color: #111111;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .checklist-item input:checked + .custom-checkbox {
+            border-color: rgba(212, 168, 67, 0.72);
+            background: var(--accent);
+        }
+
+        .checklist-item input:focus-visible + .custom-checkbox {
+            outline: 2px solid rgba(212, 168, 67, 0.48);
+            outline-offset: 2px;
+        }
+
+        .checklist-item.is-checked {
+            color: var(--text-primary);
+        }
+
+        .task-complete-message {
+            padding: 11px 12px;
+            border: 1px solid rgba(88, 194, 125, 0.32);
+            border-radius: 12px;
+            background: rgba(88, 194, 125, 0.08);
+            color: #9be7b4;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .guidance-card h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .guidance-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .guidance-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .guidance-item {
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.025);
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+            transition: background 150ms ease;
+        }
+
+        .guidance-item:hover {
+            background: var(--hover);
+        }
+
+        @media (max-width: 1100px) {
+            .app-shell {
+                grid-template-columns: 240px minmax(0, 1fr) 300px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app-shell {
+                grid-template-columns: 220px minmax(0, 1fr) 280px;
+            }
+
+            .center-panel {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .app-shell {
+                grid-template-columns: 210px minmax(360px, 1fr) 260px;
+            }
+
+            .left-sidebar,
+            .right-sidebar {
+                padding: 18px 14px;
+            }
+
+            .center-panel {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useEffect, useMemo, useRef, useState } = React;
+
+        const STATE_STORAGE_KEY = 'smb_state';
+        const AUTH_STORAGE_KEY = 'smb_auth_token';
+        const GOOGLE_OAUTH_CLIENT_ID = '203979048578-9onoru8b2ep1nn0ngi488eibc20auoln.apps.googleusercontent.com';
+        const GOOGLE_OAUTH_SCOPES = [
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/documents',
+            'https://www.googleapis.com/auth/gmail.readonly'
+        ].join(' ');
+        const TOKEN_EXPIRY_BUFFER_MS = 60000;
+        const AUTH_REMEMBER_DURATION_MS = 90 * 24 * 60 * 60 * 1000;
+        const DRIVE_API_BASE_URL = 'https://www.googleapis.com/drive/v3';
+        const MARKETING_PROJECTS_FOLDER_NAME = 'marketing-projects';
+        const MASTER_PROJECT_TEMPLATE_FILE_ID = '1iwVp357VIfNPpaxPvrzjBWEywUz7m4OgtF6gTrNgGA0';
+        const PROJECT_DOCUMENT_COPY_COUNT = 1;
+        const DIAGRAM_ZOOM_LEVELS = [1, 1.25, 1.5, 2, 2.5, 3];
+
+        const PHASE_DEFINITIONS = [
+            { phase: 1, phaseName: 'Foundations' },
+            { phase: 2, phaseName: 'Plan & Engineer' },
+            { phase: 3, phaseName: 'Draft, Review, Iterate' }
+        ];
+
+        const TASK_DEFINITIONS = [
+            {
+                taskId: 1,
+                phase: 1,
+                phaseName: 'Foundations',
+                shortTitle: 'Marketing Fundamentals',
+                fullDocTitle: 'Phase 1 - Task 1: Marketing Fundamentals',
+                tabId: 't.0',
+                lessonNumber: 'LESSON 1',
+                tagline: 'Humans want stuff. Businesses help them get it. Marketing is how the business talks to them.',
+                what: [
+                    'Every business runs on the same setup: humans want stuff, businesses show up to help them get it.',
+                    'A target market is a group of people who all roughly want the same thing.',
+                    'Marketing is the red arrow — the way the business talks to customers.',
+                    'You\'re getting paid to understand people. The better you are at it, the bigger the chunk of the market you\'ll capture.'
+                ],
+                why: 'Most business owners just spew out marketing. They copy what everyone else is doing and hope it sticks. That\'s why most local businesses are stuck. The better you understand the target market, the better you know how to grab their attention.',
+                how: [
+                    'Find the people who want something specific — that\'s your target market.',
+                    'Figure out what they want and how they judge whether something\'s valuable.',
+                    'Provide products or services that match what they want.',
+                    'Communicate in a way that resonates with what\'s already in their head.'
+                ],
+                mistakes: [
+                    'Spewing out marketing because that\'s what everyone else is doing.',
+                    'Skipping the "who" and jumping straight to ads, posts, and tactics.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-01-diagram.png',
+                    caption: 'Business and Target Market with a red arrow between them. The arrow is labeled "marketing."'
+                },
+                externalLinks: [
+                    { label: 'Miro', url: 'https://miro.com' },
+                    { label: 'Figma', url: 'https://figma.com' }
+                ],
+                checklist: [
+                    'Identified my specific target market',
+                    'Defined exactly what they want',
+                    'Documented how the business helps them get it',
+                    'Written the statement: "We help [people] get [outcome] through [product]"',
+                    'Created the Business ↔ Marketing ↔ Target Market diagram'
+                ]
+            },
+            {
+                taskId: 2,
+                phase: 1,
+                phaseName: 'Foundations',
+                shortTitle: 'How People Think',
+                fullDocTitle: 'Phase 1 - Task 2: How People Think',
+                tabId: 't.ydgz63tave8a',
+                lessonNumber: 'LESSON 2',
+                tagline: 'Demographics are the surface. Psychographics are the win.',
+                what: [
+                    'Demographics are basic — age, gender, education. Useful, not where the money is.',
+                    'Psychographics are how they\'re thinking about problems and desires.',
+                    'People run decisions through five categories: Current State, Dream State, Roadblocks, Solutions, Products.',
+                    'Most marketers stop at "women 25 to 45." That\'s where they lose.'
+                ],
+                why: 'When you understand how the target market thinks through these five categories, you\'ve got an advantage every other marketer doesn\'t have. You\'re speaking past demographics straight to what\'s happening in their head. They feel seen. They buy.',
+                how: [
+                    'Current State: frustrations, dislikes, fears, day-to-day feelings.',
+                    'Dream State: what they want to be, have, and do.',
+                    'Roadblocks: little problems between current and dream.',
+                    'Solutions: methods that solve those roadblocks.',
+                    'Products: specific offers inside each solution.',
+                    'Google Maps: search "[service] near me" and "[service] + city". Look for 1★ complaints, 5★ desired results, and repeated phrases.',
+                    'Yelp: search "[service] + location". Look for negative experiences, what made people choose the business, and expectations vs reality.',
+                    'Facebook: search business pages in the niche and ads in feed. Look for comments under posts/ads, questions before buying, and objections like "price?" or "does it work?".',
+                    'Trustpilot: search brand names or companies. Look for trust issues, refund complaints, and what builds credibility.',
+                    'YouTube: search "[service] review", "[service] results", and "[service] scam". Look for skepticism, pain before the solution, and what people wish was better.',
+                    'Instagram: search niche hashtags and competitor pages. Look for comment questions, desire signals like "I need this", and before/after reactions.',
+                    'TikTok: search "[service] transformation" and "[service] results". Look for emotional reactions, viral hooks, and what grabs attention.',
+                    'Reddit: search "How to choose [service]", "Why is [problem] happening", and "[service] worth it?" Look for deep frustrations, real stories, and hidden fears.',
+                    'Quora: search "Is [service] worth it?" and "Best way to [solve problem]". Look for decision-making process, common doubts, and alternatives people consider.',
+                    'Google Keyword Planner: search "[service] near me", "best [service]", and "cost of [service]". Look for high-intent keywords, buying signals, and popular search terms.',
+                    'Ubersuggest: search the same keywords as above. Look for variations, long-tail intent, and SEO gaps.'
+                ],
+                mistakes: [
+                    'Stopping at demographics — "Women 25 to 45 in this zip code" isn\'t a person.',
+                    'Writing the dream state in your words — "Energized" isn\'t what the customer is saying.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-02-diagram.png',
+                    caption: 'Five-stack: Current State → Dream State → Roadblocks → Solutions → Products. First two are where the customer lives. Last three are how they\'re shopping.'
+                },
+                templateLink: 'Market Research Template',
+                externalLinks: [
+                    { label: 'Target Market: Google Maps', url: 'https://www.google.com/maps' },
+                    { label: 'Target Market: Yelp', url: 'https://www.yelp.com' },
+                    { label: 'Target Market: Facebook Reviews & Comments', url: 'https://www.facebook.com/search/pages' },
+                    { label: 'Target Market: Trustpilot', url: 'https://www.trustpilot.com' },
+                    { label: 'Target Market: YouTube Comments', url: 'https://www.youtube.com' },
+                    { label: 'Target Market: Instagram Comments', url: 'https://www.instagram.com' },
+                    { label: 'Target Market: TikTok Comments', url: 'https://www.tiktok.com' },
+                    { label: 'Target Market: Reddit', url: 'https://www.reddit.com' },
+                    { label: 'Target Market: Quora', url: 'https://www.quora.com' },
+                    { label: 'Target Market: Google Keyword Planner', url: 'https://ads.google.com/home/tools/keyword-planner/' },
+                    { label: 'Target Market: Ubersuggest', url: 'https://neilpatel.com/ubersuggest/' }
+                ],
+                checklist: [
+                    'Defined the Current State (frustrations, fears, daily feelings)',
+                    'Defined the Dream State (what they want to be/have/do)',
+                    'Listed all Roadblocks between current and dream',
+                    'Identified Solutions (methods that solve the roadblocks)',
+                    'Listed specific Products in each solution category',
+                    'Used the market\'s actual language throughout (not my words)'
+                ]
+            },
+            {
+                taskId: 3,
+                phase: 1,
+                phaseName: 'Foundations',
+                shortTitle: 'Market Research',
+                fullDocTitle: 'Phase 1 - Task 3: Market Research',
+                tabId: 't.5dn56s9efkj',
+                lessonNumber: 'LESSON 3',
+                tagline: 'Two pathways. Run them both and you\'ll find opportunities the business never knew were sitting there.',
+                what: [
+                    'Two pathways: online research (reviews, before/after, market voice) and competitive landscape (direct competitors + top players in other cities).',
+                    'Online research is where unfiltered language and desires live — negative reviews are gold.',
+                    'The competitive landscape shows what top players say and what they don\'t.'
+                ],
+                why: 'Most local business owners are spewing generic marketing. The opportunity is just sitting there. Top players in SF or LA have already spent millions figuring out what works. You\'re stealing the recipe.',
+                how: [
+                    'Read the reviews — 5-star, 4-star, 1-star, all of them.',
+                    'Hunt the negative reviews — they show what\'s missing and what\'s the gap.',
+                    'Find before/after stories — YouTube is rich here.',
+                    'Audit direct competitors — how are they communicating?',
+                    'Find top players in more competitive markets — reverse engineer them.',
+                    'Apply the recipe — adapt what they\'re doing for your local market.',
+                    'Meta Ads Library: search competitor names and niche keywords. Look for hooks in the first line, offers like discounts or guarantees, and ad angles such as pain vs result.',
+                    'Google Ads Transparency Center: search competitor brands and "[service] companies". Look for headlines, keywords they target, and messaging style.',
+                    'Competitor Websites: search Google for "best [service] in [city]" and "[service] company near me". Look for weak vs strong headlines, clear or vague offers, trust elements like reviews/guarantees, and missing info that creates opportunity gaps.'
+                ],
+                mistakes: [
+                    'Copying the local competitors — they\'re probably bad too.',
+                    'Skipping negative reviews because they "feel like complaints" — that\'s where the gap is hiding.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-03-diagram.png',
+                    caption: 'Two parallel lanes — Online Research and Competitive Landscape — both feeding into Opportunities.'
+                },
+                templateLink: 'Top Player Funnel Breakdown',
+                externalLinks: [
+                    { label: 'Top Player: Meta Ads Library', url: 'https://www.facebook.com/ads/library/' },
+                    { label: 'Top Player: Google Ads Transparency Center', url: 'https://adstransparency.google.com/' },
+                    { label: 'Top Player: Competitor Websites Search', url: 'https://www.google.com/search?q=competitor+service+pages+landing+pages+FAQs+testimonials' }
+                ],
+                checklist: [
+                    'Read 50+ reviews (Google, Yelp, Amazon) — 4-5 star AND 1-2 star',
+                    'Extracted exact language and feelings from reviews',
+                    'Found before/after transformation stories (YouTube, Reddit, Instagram)',
+                    'Audited 3-5 direct local competitors (websites, ads, messaging)',
+                    'Found top players in major competitive markets (LA, NYC, SF)',
+                    'Documented what top players say AND what they don\'t say',
+                    'Completed the Top Player Funnel Breakdown template'
+                ]
+            },
+            {
+                taskId: 4,
+                phase: 1,
+                phaseName: 'Foundations',
+                shortTitle: 'The CIA Method',
+                fullDocTitle: 'Phase 1 - Task 4: The CIA Method',
+                tabId: 't.ncqn2i4w2jbv',
+                lessonNumber: 'LESSON 4',
+                tagline: 'Open source only gets you part of the picture. To get the inside scoop, recruit a human source.',
+                what: [
+                    'Open source intelligence is the online research from Lesson 3 — useful, and only part of the picture.',
+                    'Human intelligence is recruiting an insider on the ground.',
+                    'Your insider gives you the inside scoop, the language, the stuff you can\'t find online.',
+                    'Combining open source + human intel gives you the edge over everybody else.'
+                ],
+                why: 'Just like the State Department needs insider info before planning anything serious, you need it before launching marketing. Insider intel lets you catch them at the right moment with the right words.',
+                how: [
+                    'Find your insider — ask the client to intro a customer.',
+                    'Prepare before the call — know what you\'re hunting for.',
+                    'Frame it as helping — "I\'m running this project, I\'d love your insights."',
+                    'Map their journey — how they found out, why they bought, life before/after.',
+                    'Ask the inside questions — "What worried you? What were you afraid of?"',
+                    'Reward negative feedback — "Thank you. I didn\'t even see that."',
+                    'Battle test — "I\'ve got two ideas for an ad. Which do you prefer and why?"'
+                ],
+                mistakes: [
+                    'Showing up unprepared — you\'ll waste their time and yours.',
+                    'Flinching when they criticize — that\'s the last useful answer you\'ll get.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-04-diagram.png',
+                    caption: 'Two intel streams — Open Source (online research) and Human Intel (insider). Together they\'re the full picture.'
+                },
+                templateLink: 'CIA Checklist',
+                externalLinks: [
+                    { label: 'Otter.ai', url: 'https://otter.ai' },
+                    { label: 'Zoom', url: 'https://zoom.us' },
+                    { label: 'Google Meet', url: 'https://meet.google.com' },
+                    { label: 'LinkedIn', url: 'https://linkedin.com' }
+                ],
+                checklist: [
+                    'Found and confirmed an insider from the target market',
+                    'Prepared all interview questions before the call',
+                    'Recorded the call (with permission) and have transcript/notes',
+                    'Mapped their full journey (how they found out, why they bought)',
+                    'Captured exact quotes about fears, worries, and desires',
+                    'Battle-tested 2-3 ad concepts and documented their reactions',
+                    'Extracted insider language to use in copy'
+                ]
+            },
+            {
+                taskId: 5,
+                phase: 2,
+                phaseName: 'Plan & Engineer',
+                shortTitle: 'The Winner\'s Writing Process',
+                fullDocTitle: 'Phase 2 - Task 5: The Winner\'s Writing Process',
+                tabId: 't.3j6tv0hluq56',
+                lessonNumber: 'LESSON 5',
+                tagline: 'Five questions. Ask them in order. By the end you\'ve got your strategy, your plan, and the outline of what your copy has to do.',
+                what: [
+                    'The WWP is five simple questions, asked in order.',
+                    'Q1. Who am I targeting?',
+                    'Q2. Where are they at now?',
+                    'Q3. What action do I want them to take?',
+                    'Q4. Step by step, what has to happen in their mind before they\'ll act?',
+                    'Q5. What can I do to trigger each of those mental steps?'
+                ],
+                why: 'You\'ve spent all this time understanding the target market and doing research. The WWP turns it into actual marketing. Without it, you\'re combining notes and hoping something useful comes out.',
+                how: [
+                    'Q1: Use everything from Lessons 1–4. Be specific.',
+                    'Q2: Awareness level and attention type (Lesson 6).',
+                    'Q3: One specific action — buy, subscribe, show up.',
+                    'Q4: Map the mental journey step by step.',
+                    'Q5: What triggers each step? (Lesson 8).'
+                ],
+                mistakes: [
+                    'Answering questions out of order — each one constrains the next.',
+                    'Skipping Q2 because "I already know where they are."'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-05-diagram.png',
+                    caption: 'Five questions stacked vertically. Q1 at the top. Each one constraining the next.'
+                },
+                templateLink: 'Winner\'s Writing Process',
+                checklist: [
+                    'Answered Q1: Who am I targeting? (specific, using Tasks 1–4 data)',
+                    'Answered Q2: Where are they now? (awareness level + attention type)',
+                    'Answered Q3: What one action do I want them to take?',
+                    'Answered Q4: What mental steps happen before they take that action?',
+                    'Answered Q5: What triggers each mental step?',
+                    'All 5 questions answered in order (not skipped)'
+                ]
+            },
+            {
+                taskId: 6,
+                phase: 2,
+                phaseName: 'Plan & Engineer',
+                shortTitle: 'Where They Are Now',
+                fullDocTitle: 'Phase 2 - Task 6: Where They Are Now',
+                tabId: 't.jdcyzkyk81rp',
+                lessonNumber: 'LESSON 6',
+                tagline: 'Two dimensions. Awareness is what they know. Attention is whether they\'re chilling or hunting. Sync up perfectly or nothing else matters.',
+                what: [
+                    'Two dimensions: awareness level and online attention type.',
+                    'Awareness levels: Unaware, Problem aware, Solution aware, Product aware.',
+                    'Attention types: Passive (scrolling, chilling) or Active (Googling, hunting).',
+                    'The job is to find them where they are and walk them toward the action.'
+                ],
+                why: 'When you don\'t intercept the reader perfectly at the right moment, everything else you do is wasted. The world\'s best offer doesn\'t matter when it\'s landing during a moment they\'re not in the headspace for it.',
+                how: [
+                    'Identify awareness level — Problem aware? Solution aware?',
+                    'Start with what they know, then walk them down the chain.',
+                    'Identify attention type — passive (scrolling) or active (searching)?',
+                    'Pick the funnel: Problem aware + passive = Interrupt funnel (social ads).',
+                    'Pick the funnel: Solution aware + active = Search funnel (Google ads, GMB).',
+                    'Pick the funnel: Unaware + passive = Disruption funnel.'
+                ],
+                mistakes: [
+                    'Putting audience higher on the awareness ladder than they really are.',
+                    'Defaulting to the platform you already know.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-06-diagram.png',
+                    caption: '2×2 grid. Awareness on the vertical. Attention on the horizontal. Funnel type labeled in each quadrant.'
+                },
+                checklist: [
+                    'Identified the awareness level (Unaware/Problem/Solution/Product Aware)',
+                    'Identified the attention type (Passive or Active)',
+                    'Mapped to the correct funnel type using the 2×2 grid',
+                    'Chosen the right platform based on the grid',
+                    'Written the moment statement',
+                    'Visualized the exact moment marketing hits them (time, place, mindset)'
+                ]
+            },
+            {
+                taskId: 7,
+                phase: 2,
+                phaseName: 'Plan & Engineer',
+                shortTitle: 'The Three Thresholds',
+                fullDocTitle: 'Phase 2 - Task 7: The Three Thresholds',
+                tabId: 't.sxvx4a6o3gsj',
+                lessonNumber: 'LESSON 7',
+                tagline: 'Three pillars they\'re running every decision through. Get all three above the line and they say yes. Miss one and they\'re gone.',
+                what: [
+                    'Three thresholds that must clear before someone buys: Desire/Value, Certainty, and Trust.',
+                    'Desire/Value asks: Is the value worth the cost?',
+                    'Certainty asks: Am I certain this will work for me?',
+                    'Trust asks: Do I trust this company or person?',
+                    'All three must be a yes — one no kills the sale.',
+                    'The size of the action sets the height of the thresholds.'
+                ],
+                why: 'When you understand the pattern, you can engineer exactly what\'s happening in the reader\'s mind. Most marketers slap a discount on everything. The barrier is almost never price.',
+                how: [
+                    'Desire: Vivid dream state, vivid pain, stack implications, identity connection.',
+                    'Certainty: Logic, social proof, testimonials, case studies, credible people.',
+                    'Trust: Reviews, familiarity, professional signals, certifications.',
+                    'Match thresholds to ask size — small ask = low thresholds, big ask = max.'
+                ],
+                mistakes: [
+                    'Defaulting to a discount — the barrier is almost never price.',
+                    'Spreading copy evenly across all three — the biggest gap gets the room.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-07-diagram.png',
+                    caption: 'Three vertical bars (Desire, Certainty, Trust) with a threshold line across them. Action size sets the height of the line.'
+                },
+                checklist: [
+                    'Assessed Desire/Value threshold',
+                    'Assessed Certainty threshold',
+                    'Assessed Trust threshold',
+                    'Identified the weakest threshold',
+                    'Designed 3-5 specific triggers to raise Desire',
+                    'Designed 3-5 specific triggers to raise Certainty',
+                    'Designed 3-5 specific triggers to raise Trust',
+                    'Matched threshold requirements to the size of the ask'
+                ]
+            },
+            {
+                taskId: 8,
+                phase: 2,
+                phaseName: 'Plan & Engineer',
+                shortTitle: 'Triggers, Effects & The Baton Handoff',
+                fullDocTitle: 'Phase 2 - Task 8: Triggers, Effects & The Baton Handoff',
+                tabId: 't.fo749bbijzaq',
+                lessonNumber: 'LESSON 8',
+                tagline: 'You\'re a movie director. Each element triggers a mental effect. The effects add up to the sale. Each piece hands off cleanly to the next.',
+                what: [
+                    'Each marketing element (headline, image, testimonial, button) is a trigger designed to create a specific mental effect.',
+                    'The effects are the mental steps from Q4 of the WWP.',
+                    'Every element hands the baton to the next — Ad → LP → Offer.',
+                    'It\'s one continuous experience — the slippery slide.'
+                ],
+                why: 'You can\'t control the reader\'s brain. What you can do is trigger the corresponding emotion with the right element. When the baton drops between elements, the reader bounces.',
+                how: [
+                    'Map mental steps from Q4 — each is a thought on the way to action.',
+                    'Design a trigger for each step: stops scrolling → pattern interrupt visual.',
+                    'Design a trigger for each step: "This is for me" → headline with exact pain point from CIA notes.',
+                    'Design a trigger for each step: "This might be different" → testimonial in insider language.',
+                    'Design a trigger for each step: "People like me did this" → before/after matching their identity.',
+                    'Design a trigger for each step: "No risk" → zero-risk offer framing.',
+                    'Connect triggers across elements — ad\'s last beat hands to LP\'s first beat.',
+                    'Read the funnel top to bottom out loud — one continuous thought.',
+                    'Reverse engineer top player funnels element by element.'
+                ],
+                mistakes: [
+                    'Listing features instead of designing experiences.',
+                    'Letting the LP open with logistics when the ad started a feelings conversation.',
+                    'Reviewing each element alone — the break is invisible until you read top to bottom.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-08-diagram.png',
+                    caption: 'Three columns: Mental Step | Trigger | Element. One row per step. The whole chain is a slippery slide from scrolling to buying.'
+                },
+                checklist: [
+                    'Listed every mental step from WWP Q4',
+                    'Designed a specific trigger for each mental step',
+                    'Mapped each trigger to its marketing element',
+                    'Verified the Ad hands off cleanly to the Landing Page',
+                    'Verified the Landing Page hands off cleanly to the Offer',
+                    'Read the entire funnel top to bottom out loud — flows as one thought',
+                    'Reverse engineered 2-3 top player funnels for reference'
+                ]
+            },
+            {
+                taskId: 9,
+                phase: 3,
+                phaseName: 'Draft, Review, Iterate',
+                shortTitle: 'Drafting',
+                fullDocTitle: 'Phase 3 - Task 9: Drafting',
+                tabId: 't.jl8brcq4ska7',
+                lessonNumber: 'LESSON 9',
+                tagline: 'Volume and flow over polish. Just blitz out. Turn off the critical part of your brain and write like you\'re talking to a real person.',
+                what: [
+                    'Drafting is volume work — speed is the point.',
+                    'Imagine you\'re literally talking to the target person.',
+                    'First drafts always suck — that\'s normal, they\'re supposed to.',
+                    'Two or three variations per asset minimum.'
+                ],
+                why: 'Once the volume\'s going, the good ideas show up. Try to be perfect on draft one and nothing comes out. The critic kills the flow — turn it off during drafting and let it back in for review.',
+                how: [
+                    'Review your WWP outline — mental steps and triggers.',
+                    'Picture the target person — their face, their daily life.',
+                    'Write or voice-to-text — talk to that person.',
+                    'Turn the critic off — no editing during drafting.',
+                    'Two or three variations per asset — different angles.',
+                    'No distractions — phone away, hammer through it.'
+                ],
+                mistakes: [
+                    'Critiquing while drafting — the flow stops and nothing useful comes out.',
+                    'Trying to write the whole funnel in one pass — one element at a time.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-09-diagram.png',
+                    caption: 'Full loop: Drafting → Self-Review → CIA Insider Review → Launch. Drafting is the first stage.'
+                },
+                externalLinks: [
+                    { label: 'Otter.ai', url: 'https://otter.ai' },
+                    { label: 'Freedom', url: 'https://freedom.to' },
+                    { label: 'Forest', url: 'https://forestapp.cc' }
+                ],
+                checklist: [
+                    'Reviewed WWP outline before writing',
+                    'Pictured the specific target person from CIA interview',
+                    'Wrote 2-3 variations of each asset',
+                    'Kept the inner critic off during drafting',
+                    'Used voice-to-text or fast typing — no stopping',
+                    'Worked on one element at a time',
+                    'Wrote in a distraction-free environment'
+                ]
+            },
+            {
+                taskId: 10,
+                phase: 3,
+                phaseName: 'Draft, Review, Iterate',
+                shortTitle: 'Self-Review: Three Scans',
+                fullDocTitle: 'Phase 3 - Task 10: Self-Review: Three Scans',
+                tabId: 't.yscnjy3n65pl',
+                lessonNumber: 'LESSON 10',
+                tagline: 'You wrote with the prefrontal cortex. You\'re going to review with the lizard brain. Three scans, in order.',
+                what: [
+                    'Every draft passes through three scans.',
+                    'Lizard brain scan: Read as a bored, grumpy, distracted stranger.',
+                    'Baton handoff scan: Each line leads to the next, slippery slide intact.',
+                    'Threshold scan: Desire above cost, Certainty above line, Trust above line.',
+                    'Then check language precision and mechanics.'
+                ],
+                why: 'You wrote it excited. Your target market reads it with the lizard brain. Two completely different audiences. When copy doesn\'t survive the lizard brain scan, it won\'t survive in the wild either.',
+                how: [
+                    'Wait before reviewing — walk away, sleep, fresh eyes mandatory.',
+                    'Lizard brain: Is it boring? Confusing? Hard? Simplify.',
+                    'Baton handoff: Does each line lead to the next? Ad hands to LP cleanly?',
+                    'Threshold: Desire above cost? Certainty above line? Trust above line?',
+                    'Language precision: Use market\'s words from CIA notes. Be specific.',
+                    'Cut ruthlessly: When a line isn\'t pushing toward the sale, delete it.',
+                    'Check mechanics: typos, links, images, buttons.'
+                ],
+                mistakes: [
+                    'Reviewing immediately after drafting — the lizard brain isn\'t in the room yet.',
+                    'Polishing tone before the structure is sound — tone is the last pass.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-10-diagram.png',
+                    caption: 'Self-Review sits between Drafting and CIA Insider Review. Three scans run in order before sending to the insider.'
+                },
+                templateLink: 'Self-Review Checklist',
+                checklist: [
+                    'Waited before reviewing (took a break — walk, sleep, reset)',
+                    'Lizard Brain Scan complete — removed boring/confusing parts',
+                    'Baton Handoff Scan complete — every line leads to the next',
+                    'Threshold Scan complete — Desire, Certainty, Trust above the line',
+                    'Language precision — used market\'s exact words from CIA notes',
+                    'Cut ruthlessly — deleted everything not pushing toward the action',
+                    'Checked mechanics: typos, links, images, buttons all work'
+                ]
+            },
+            {
+                taskId: 11,
+                phase: 3,
+                phaseName: 'Draft, Review, Iterate',
+                shortTitle: 'CIA Insider Review',
+                fullDocTitle: 'Phase 3 - Task 11: CIA Insider Review',
+                tabId: 't.fynxj2j5iaw5',
+                lessonNumber: 'LESSON 11',
+                tagline: 'Every other business hopes it sticks. You\'re going to cheat. Your insider reviews your stuff before launch.',
+                what: [
+                    'The insider is the pre-validation step before anything goes live.',
+                    'You\'re showing them your work and watching how they respond — their preference is the data.',
+                    'Always show comparisons — your page next to 2-3 competitor pages.',
+                    'When the insider hesitates, zoom in on which threshold is weakest.'
+                ],
+                why: 'Other businesses spend money launching and find out the hard way. You\'re finding out for free. When the insider compares your work to competitors, their real preference comes out.',
+                how: [
+                    'Always show comparisons — your work + 2-3 competitor versions side by side.',
+                    'Watch the face — in person or video when you can.',
+                    'Read between the lines — some criticism is wrapped in politeness.',
+                    'When hesitant: "Is the offer not worth it? Not sure it\'ll work? Don\'t trust the business?"',
+                    'Reward negative feedback — "Thank you. I didn\'t even see that. What else?"',
+                    'Iterate and re-show — loop until insider says "I\'d pick this one."'
+                ],
+                mistakes: [
+                    'Showing the draft alone — without comparison, all you get is opinions.',
+                    'Defending the work when pushed back — you\'ll lose the signal.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-11-diagram.png',
+                    caption: 'Three cards side by side: Yours, Competitor A, Competitor B. A finger pointing at one. The full Drafting → Self-Review → CIA loop.'
+                },
+                externalLinks: [
+                    { label: 'Zoom', url: 'https://zoom.us' },
+                    { label: 'Google Meet', url: 'https://meet.google.com' },
+                    { label: 'UsabilityHub', url: 'https://usabilityhub.com' },
+                    { label: 'Figma', url: 'https://figma.com' }
+                ],
+                checklist: [
+                    'Showed comparisons: my version + 2-3 competitor versions side by side',
+                    'Reviewed via video to watch body language and facial reactions',
+                    'Noted where insider hesitated, tensed up, or skimmed',
+                    'Asked about which threshold was weak when they hesitated',
+                    'Rewarded negative feedback to keep truth flowing',
+                    'Iterated based on feedback and re-showed',
+                    'Insider confirmed "I\'d pick this one"'
+                ]
+            },
+            {
+                taskId: 12,
+                phase: 3,
+                phaseName: 'Draft, Review, Iterate',
+                shortTitle: 'The Iteration Cycle',
+                fullDocTitle: 'Phase 3 - Task 12: The Iteration Cycle',
+                tabId: 't.f76a8avsf4c4',
+                lessonNumber: 'LESSON 12',
+                tagline: 'Loop drafting and self-review until it passes all three scans. Then CIA insider review. Then launch.',
+                what: [
+                    'The iteration cycle is the loop: Draft → Self-Review → Refine → Re-review → Refine. Until all three scans pass.',
+                    'Then CIA insider review.',
+                    'After insider review, more iteration. Then launch.',
+                    'The whole point is launching with copy pre-validated by the actual market.'
+                ],
+                why: 'First drafts are hypotheses. Each round of review is a step closer to the version that will actually work. Other businesses launch and find out the hard way. You\'re finding out for free. The loop is not optional.',
+                how: [
+                    'Run the three scans — lizard brain, baton handoff, thresholds.',
+                    'Edit. Re-scan. Edit. Re-scan. Until all three pass.',
+                    'Send to insider with comparisons — watch body language, reward negatives.',
+                    'Edit based on insider feedback. Re-show.',
+                    'Stop when insider says "I\'d pick this one." Now it\'s ready.',
+                    'Launch.'
+                ],
+                mistakes: [
+                    'Iterating forever — when it\'s not getting closer, the issue is the plan.',
+                    'Sending to insider before self-review is clean.'
+                ],
+                diagram: {
+                    src: '/assets/diagrams/task-12-diagram.png',
+                    caption: 'The full loop: Drafting → Self-Review → CIA Insider Review → Refine → Launch.'
+                },
+                checklist: [
+                    'Ran all three self-review scans on the draft',
+                    'Edited and re-scanned until all three passed',
+                    'Sent to CIA insider with comparisons',
+                    'Edited based on insider feedback',
+                    'Re-showed to insider',
+                    'Insider confirmed preference for my version',
+                    'All assets are launch-ready and pre-validated',
+                    'Ready to launch'
+                ]
+            }
+        ];
+
+        function getTaskDefinition(taskId) {
+            return TASK_DEFINITIONS.find((task) => task.taskId === taskId) || null;
+        }
+
+        function createDefaultProjectTask(taskId, docId = '') {
+            const taskDefinition = getTaskDefinition(taskId);
+
+            if (!taskDefinition) {
+                throw new Error(`Unknown task definition for task ${taskId}.`);
+            }
+
+            return {
+                taskId,
+                docId,
+                completed: false,
+                checklist: taskDefinition.checklist.map(() => false)
+            };
+        }
+
+        function isTaskComplete(task) {
+            if (!task || !Array.isArray(task.checklist) || task.checklist.length === 0) {
+                return false;
+            }
+
+            return Boolean(task.completed) && task.checklist.every(Boolean);
+        }
+
+        function isTaskUnlocked(project, taskId) {
+            if (taskId === 1) {
+                return true;
+            }
+
+            if (!project || !Array.isArray(project.tasks)) {
+                return false;
+            }
+
+            return TASK_DEFINITIONS
+                .filter((taskDefinition) => taskDefinition.taskId < taskId)
+                .every((taskDefinition) => {
+                    const previousTask = project.tasks.find((task) => task.taskId === taskDefinition.taskId);
+                    return isTaskComplete(previousTask);
+                });
+        }
+
+        function getDefaultAppState() {
+            return {
+                projects: [],
+                currentProjectId: null
+            };
+        }
+
+        function normalizeTaskSelection(taskId) {
+            const normalizedTaskId = Number(taskId);
+            return getTaskDefinition(normalizedTaskId) ? normalizedTaskId : 1;
+        }
+
+        function normalizeProjectTask(task, taskDefinition) {
+            const fallbackTask = createDefaultProjectTask(taskDefinition.taskId, '');
+            const safeChecklist = Array.isArray(task?.checklist)
+                ? task.checklist.slice(0, taskDefinition.checklist.length).map(Boolean)
+                : [];
+            const normalizedChecklist = taskDefinition.checklist.map((_, index) => safeChecklist[index] || false);
+
+            return {
+                ...fallbackTask,
+                ...(task && typeof task === 'object' ? task : {}),
+                taskId: taskDefinition.taskId,
+                docId: typeof task?.docId === 'string' ? task.docId : '',
+                completed: normalizedChecklist.length > 0 && normalizedChecklist.every(Boolean),
+                checklist: normalizedChecklist
+            };
+        }
+
+        function normalizeProject(project, index) {
+            if (!project || typeof project !== 'object') {
+                return null;
+            }
+
+            const safeId = typeof project.id === 'string' && project.id.trim()
+                ? project.id
+                : `local-project-${index + 1}`;
+            const safeName = typeof project.name === 'string' && project.name.trim()
+                ? project.name.trim()
+                : `Project ${index + 1}`;
+            const rawTasks = Array.isArray(project.tasks) ? project.tasks : [];
+            const tasks = TASK_DEFINITIONS.map((taskDefinition) => {
+                const existingTask = rawTasks.find((task) => Number(task?.taskId) === taskDefinition.taskId);
+                return normalizeProjectTask(existingTask, taskDefinition);
+            });
+            const safeLastOpenedTask = normalizeTaskSelection(project.lastOpenedTask);
+            const recoveredLastOpenedTask = isTaskUnlocked({ tasks }, safeLastOpenedTask)
+                ? safeLastOpenedTask
+                : 1;
+
+            return {
+                id: safeId,
+                name: safeName,
+                folderId: typeof project.folderId === 'string' ? project.folderId : '',
+                projectDocId: typeof project.projectDocId === 'string' ? project.projectDocId : '',
+                lastOpenedTask: recoveredLastOpenedTask,
+                tasks
+            };
+        }
+
+        function normalizeState(rawState) {
+            if (!rawState || typeof rawState !== 'object') {
+                return getDefaultAppState();
+            }
+
+            const projects = Array.isArray(rawState.projects)
+                ? rawState.projects
+                    .map(normalizeProject)
+                    .filter(Boolean)
+                    .filter((project) => !project.id.startsWith('demo-project-'))
+                : [];
+            const currentProjectId = typeof rawState.currentProjectId === 'string'
+                ? rawState.currentProjectId
+                : null;
+            const hasCurrentProject = projects.some((project) => project.id === currentProjectId);
+
+            return {
+                projects,
+                currentProjectId: hasCurrentProject ? currentProjectId : (projects[0]?.id || null)
+            };
+        }
+
+        function loadState() {
+            const fallbackState = getDefaultAppState();
+
+            try {
+                const rawValue = window.localStorage.getItem(STATE_STORAGE_KEY);
+
+                if (!rawValue) {
+                    window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(fallbackState));
+                    return fallbackState;
+                }
+
+                const normalizedState = normalizeState(JSON.parse(rawValue));
+
+                if (JSON.stringify(normalizedState) !== rawValue) {
+                    window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(normalizedState));
+                }
+
+                return normalizedState;
+            } catch (error) {
+                console.warn('Unable to load local app state. Resetting to default.', error);
+                window.localStorage.removeItem(STATE_STORAGE_KEY);
+                window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(fallbackState));
+                return fallbackState;
+            }
+        }
+
+        function saveState(state) {
+            const normalizedState = normalizeState(state);
+            window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(normalizedState));
+            return normalizedState;
+        }
+
+        function getCurrentProject(state) {
+            const normalizedState = normalizeState(state);
+            return normalizedState.projects.find((project) => project.id === normalizedState.currentProjectId) || null;
+        }
+
+        function getCurrentTask(project) {
+            if (!project || !Array.isArray(project.tasks)) {
+                return null;
+            }
+
+            return project.tasks.find((task) => task.taskId === normalizeTaskSelection(project.lastOpenedTask)) || project.tasks[0] || null;
+        }
+
+        function getGoogleDocEditUrl(docId, embedded = false, tabId = '') {
+            const safeDocId = String(docId || '').trim();
+            const safeTabId = String(tabId || '').trim();
+
+            if (!safeDocId) {
+                return '';
+            }
+
+            const queryParams = [];
+
+            if (safeTabId) {
+                queryParams.push(`tab=${encodeURIComponent(safeTabId)}`);
+            }
+
+            if (embedded) {
+                queryParams.push('embedded=true');
+            }
+
+            return `https://docs.google.com/document/d/${encodeURIComponent(safeDocId)}/edit${queryParams.length ? `?${queryParams.join('&')}` : ''}`;
+        }
+
+        function getProjectDocumentReference(project, projectTask, taskDefinition) {
+            const projectDocId = typeof project?.projectDocId === 'string'
+                ? project.projectDocId.trim()
+                : '';
+            const taskDocId = typeof projectTask?.docId === 'string'
+                ? projectTask.docId.trim()
+                : '';
+
+            if (projectDocId) {
+                return {
+                    docId: projectDocId,
+                    tabId: typeof taskDefinition?.tabId === 'string' ? taskDefinition.tabId : '',
+                    source: 'projectDocId'
+                };
+            }
+
+            if (taskDocId) {
+                return {
+                    docId: taskDocId,
+                    tabId: '',
+                    source: 'legacyTaskDocId'
+                };
+            }
+
+            return {
+                docId: '',
+                tabId: '',
+                source: 'missing'
+            };
+        }
+
+        function selectProject(state, projectId) {
+            const normalizedState = normalizeState(state);
+            const hasProject = normalizedState.projects.some((project) => project.id === projectId);
+
+            if (!hasProject) {
+                return normalizedState;
+            }
+
+            return {
+                ...normalizedState,
+                currentProjectId: projectId
+            };
+        }
+
+        function selectTask(state, taskId) {
+            const normalizedState = normalizeState(state);
+            const currentProject = getCurrentProject(normalizedState);
+
+            if (!currentProject) {
+                return normalizedState;
+            }
+
+            const safeTaskId = normalizeTaskSelection(taskId);
+
+            return {
+                ...normalizedState,
+                projects: normalizedState.projects.map((project) => (
+                    project.id === currentProject.id
+                        ? { ...project, lastOpenedTask: safeTaskId }
+                        : project
+                ))
+            };
+        }
+
+        function renameProjectInState(state, projectId, nextName) {
+            const normalizedState = normalizeState(state);
+            const safeName = String(nextName || '').trim();
+
+            if (!safeName) {
+                return normalizedState;
+            }
+
+            return {
+                ...normalizedState,
+                projects: normalizedState.projects.map((project) => (
+                    project.id === projectId ? { ...project, name: safeName } : project
+                ))
+            };
+        }
+
+        function deleteProjectFromState(state, projectId) {
+            const normalizedState = normalizeState(state);
+            const projects = normalizedState.projects.filter((project) => project.id !== projectId);
+            const currentProjectId = normalizedState.currentProjectId === projectId
+                ? (projects[0]?.id || null)
+                : normalizedState.currentProjectId;
+
+            return normalizeState({ projects, currentProjectId });
+        }
+
+        function updateTaskChecklistItem(state, projectId, taskId, checklistIndex, checked) {
+            const normalizedState = normalizeState(state);
+
+            return {
+                ...normalizedState,
+                projects: normalizedState.projects.map((project) => {
+                    if (project.id !== projectId) {
+                        return project;
+                    }
+
+                    let updatedTaskComplete = false;
+                    const safeTaskId = normalizeTaskSelection(taskId);
+                    const nextTasks = project.tasks.map((task) => {
+                        if (task.taskId !== safeTaskId) {
+                            return task;
+                        }
+
+                        const taskDefinition = getTaskDefinition(safeTaskId);
+                        const nextChecklist = taskDefinition.checklist.map((_, index) => (
+                            index === checklistIndex ? Boolean(checked) : Boolean(task.checklist[index])
+                        ));
+                        updatedTaskComplete = nextChecklist.every(Boolean);
+
+                        return {
+                            ...task,
+                            checklist: nextChecklist,
+                            completed: updatedTaskComplete
+                        };
+                    });
+
+                    return {
+                        ...project,
+                        lastOpenedTask: !updatedTaskComplete && project.lastOpenedTask > safeTaskId ? safeTaskId : project.lastOpenedTask,
+                        tasks: nextTasks
+                    };
+                })
+            };
+        }
+
+        function getProjectTask(project, taskId) {
+            if (!project || !Array.isArray(project.tasks)) {
+                return null;
+            }
+
+            return project.tasks.find((task) => Number(task?.taskId) === Number(taskId)) || null;
+        }
+
+        function getProjectCompletion(project) {
+            if (!project || !Array.isArray(project.tasks)) {
+                return { completedCount: 0, totalCount: TASK_DEFINITIONS.length };
+            }
+
+            return {
+                completedCount: project.tasks.filter(isTaskComplete).length,
+                totalCount: TASK_DEFINITIONS.length
+            };
+        }
+
+        function createLocalId(prefix = 'project') {
+            if (window.crypto?.randomUUID) {
+                return window.crypto.randomUUID();
+            }
+
+            return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
+
+        function escapeDriveQueryValue(value) {
+            return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
+        function isMasterProjectTemplatePlaceholder() {
+            return MASTER_PROJECT_TEMPLATE_FILE_ID.includes('PASTE_') || MASTER_PROJECT_TEMPLATE_FILE_ID.includes('_HERE');
+        }
+
+        function normalizeProjectNameKey(projectName) {
+            return String(projectName || '').trim().toLowerCase();
+        }
+
+        function getUniqueProjectName(projectName, reservedNames = []) {
+            const safeProjectName = String(projectName || '').trim();
+
+            if (!safeProjectName) {
+                return '';
+            }
+
+            const reservedNameKeys = new Set(reservedNames.map(normalizeProjectNameKey).filter(Boolean));
+            let candidateName = safeProjectName;
+            let suffix = 2;
+
+            while (reservedNameKeys.has(normalizeProjectNameKey(candidateName))) {
+                candidateName = `${safeProjectName} (${suffix})`;
+                suffix += 1;
+            }
+
+            return candidateName;
+        }
+
+        async function driveRequest(token, path, options = {}) {
+            if (!token?.access_token || isTokenExpired(token)) {
+                window.StrategicMarketingBootcampAuthRuntime?.requireReauth('Google access needs to be refreshed before Drive changes. Reconnect Google, then try again.');
+                throw new Error('Google access needs to be refreshed. Reconnect Google and try again.');
+            }
+
+            const response = await fetch(`${DRIVE_API_BASE_URL}${path}`, {
+                ...options,
+                headers: {
+                    Authorization: `Bearer ${token.access_token}`,
+                    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+                    ...(options.headers || {})
+                }
+            });
+            const responseText = await response.text();
+            let data = null;
+
+            try {
+                data = responseText ? JSON.parse(responseText) : null;
+            } catch (error) {
+                data = responseText;
+            }
+
+            if (!response.ok) {
+                if (window.StrategicMarketingBootcampAuthRuntime?.handleApiAuthFailure(response.status)) {
+                    throw new Error('Google authorization needs to be refreshed. Reconnect Google and retry.');
+                }
+
+                const message = data?.error?.message || data?.message || `Google Drive API request failed with status ${response.status}.`;
+                throw new Error(message);
+            }
+
+            return data;
+        }
+
+        async function findDriveFolder(token, folderName, parentId) {
+            const query = [
+                `name='${escapeDriveQueryValue(folderName)}'`,
+                "mimeType='application/vnd.google-apps.folder'",
+                `'${escapeDriveQueryValue(parentId)}' in parents`,
+                'trashed=false'
+            ].join(' and ');
+            const result = await driveRequest(
+                token,
+                `/files?q=${encodeURIComponent(query)}&spaces=drive&fields=files(id,name)&pageSize=1`
+            );
+
+            return result?.files?.[0] || null;
+        }
+
+        async function createDriveFolder(token, folderName, parentId) {
+            return driveRequest(token, '/files?fields=id,name', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: folderName,
+                    mimeType: 'application/vnd.google-apps.folder',
+                    parents: [parentId]
+                })
+            });
+        }
+
+        async function getOrCreateDriveFolder(token, folderName, parentId) {
+            const existingFolder = await findDriveFolder(token, folderName, parentId);
+            return existingFolder || createDriveFolder(token, folderName, parentId);
+        }
+
+        async function getAvailableProjectFolderName(token, projectName, parentId, reservedNames = [], currentFolderId = '') {
+            const safeProjectName = String(projectName || '').trim();
+
+            if (!safeProjectName) {
+                throw new Error('Project name is required.');
+            }
+
+            const reservedNameKeys = new Set(reservedNames.map(normalizeProjectNameKey).filter(Boolean));
+            let candidateName = safeProjectName;
+            let suffix = 2;
+
+            while (true) {
+                if (!reservedNameKeys.has(normalizeProjectNameKey(candidateName))) {
+                    const existingFolder = await findDriveFolder(token, candidateName, parentId);
+
+                    if (!existingFolder || existingFolder.id === currentFolderId) {
+                        return candidateName;
+                    }
+                }
+
+                candidateName = `${safeProjectName} (${suffix})`;
+                suffix += 1;
+            }
+        }
+
+        async function copyMasterProjectDoc(token, fileName, folderId) {
+            return driveRequest(token, `/files/${encodeURIComponent(MASTER_PROJECT_TEMPLATE_FILE_ID)}/copy?fields=id,name`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: fileName,
+                    parents: [folderId]
+                })
+            });
+        }
+
+        async function renameDriveFolder(token, folderId, folderName) {
+            const safeFolderName = String(folderName || '').trim();
+
+            if (!folderId || !safeFolderName) {
+                return null;
+            }
+
+            return driveRequest(token, `/files/${encodeURIComponent(folderId)}?fields=id,name`, {
+                method: 'PATCH',
+                body: JSON.stringify({ name: safeFolderName })
+            });
+        }
+
+        async function trashDriveFolder(token, folderId) {
+            if (!folderId) {
+                return null;
+            }
+
+            return driveRequest(token, `/files/${encodeURIComponent(folderId)}?fields=id,name,trashed`, {
+                method: 'PATCH',
+                body: JSON.stringify({ trashed: true })
+            });
+        }
+
+        async function createProjectInDrive(token, projectName, onProgress, reservedProjectNames = []) {
+            const safeProjectName = projectName.trim();
+
+            if (!safeProjectName) {
+                throw new Error('Project name is required.');
+            }
+
+            if (isMasterProjectTemplatePlaceholder()) {
+                throw new Error('The master project template ID is still a placeholder. Replace it before creating Drive projects.');
+            }
+
+            onProgress?.({ createdCount: 0, message: 'Creating marketing-projects folder...' });
+            const rootFolder = await getOrCreateDriveFolder(token, MARKETING_PROJECTS_FOLDER_NAME, 'root');
+            onProgress?.({ createdCount: 0, message: 'Checking project name...' });
+            const finalProjectName = await getAvailableProjectFolderName(token, safeProjectName, rootFolder.id, reservedProjectNames);
+            onProgress?.({
+                createdCount: 0,
+                message: finalProjectName === safeProjectName
+                    ? 'Creating project folder...'
+                    : `Creating project folder as "${finalProjectName}" to avoid a duplicate...`
+            });
+            const projectFolder = await createDriveFolder(token, finalProjectName, rootFolder.id);
+            const copiedProjectDoc = await copyMasterProjectDoc(
+                token,
+                finalProjectName,
+                projectFolder.id
+            );
+            const projectTasks = TASK_DEFINITIONS.map((taskDefinition) => createDefaultProjectTask(taskDefinition.taskId, ''));
+            onProgress?.({
+                createdCount: 1,
+                message: 'Creating your project document... (1/1 file created)'
+            });
+
+            return {
+                id: createLocalId('project'),
+                name: finalProjectName,
+                folderId: projectFolder.id,
+                projectDocId: copiedProjectDoc.id,
+                lastOpenedTask: 1,
+                tasks: projectTasks
+            };
+        }
+
+        function isPlaceholderClientId() {
+            return GOOGLE_OAUTH_CLIENT_ID.includes('YOUR_GOOGLE_OAUTH_CLIENT_ID');
+        }
+
+        function normalizeAuthToken(token) {
+            if (!token || typeof token !== 'object' || typeof token.access_token !== 'string' || !token.access_token.trim()) {
+                return null;
+            }
+
+            return {
+                access_token: token.access_token,
+                token_type: typeof token.token_type === 'string' ? token.token_type : 'Bearer',
+                scope: typeof token.scope === 'string' ? token.scope : GOOGLE_OAUTH_SCOPES,
+                expires_in: Number(token.expires_in) || 0,
+                issued_at: Number(token.issued_at) || Date.now()
+            };
+        }
+
+        function loadAuthToken() {
+            try {
+                const rawValue = window.localStorage.getItem(AUTH_STORAGE_KEY);
+                if (!rawValue) {
+                    return null;
+                }
+
+                const normalizedToken = normalizeAuthToken(JSON.parse(rawValue));
+
+                if (!normalizedToken) {
+                    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+                }
+
+                return normalizedToken;
+            } catch (error) {
+                console.warn('Unable to load auth token from localStorage.', error);
+                window.localStorage.removeItem(AUTH_STORAGE_KEY);
+                return null;
+            }
+        }
+
+        function saveAuthToken(token) {
+            const normalizedToken = normalizeAuthToken(token);
+
+            if (!normalizedToken) {
+                throw new Error('Cannot save an invalid auth token.');
+            }
+
+            window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(normalizedToken));
+            return normalizedToken;
+        }
+
+        function clearAuthToken() {
+            window.localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
+
+        function isTokenExpired(token) {
+            if (!token || !token.issued_at || !token.expires_in) {
+                return true;
+            }
+
+            const expiresAt = token.issued_at + (token.expires_in * 1000);
+            return Date.now() >= (expiresAt - TOKEN_EXPIRY_BUFFER_MS);
+        }
+
+        function isRememberedAuthExpired(token) {
+            if (!token?.issued_at) {
+                return true;
+            }
+
+            return Date.now() >= (token.issued_at + AUTH_REMEMBER_DURATION_MS);
+        }
+
+        function isAuthFailureStatus(status) {
+            return status === 401 || status === 403;
+        }
+
+        const INITIAL_STORED_AUTH_TOKEN = loadAuthToken();
+        const INITIAL_AUTH_TOKEN = INITIAL_STORED_AUTH_TOKEN && !isRememberedAuthExpired(INITIAL_STORED_AUTH_TOKEN)
+            ? INITIAL_STORED_AUTH_TOKEN
+            : null;
+        const INITIAL_AUTH_NOTICE = INITIAL_STORED_AUTH_TOKEN && isRememberedAuthExpired(INITIAL_STORED_AUTH_TOKEN)
+            ? 'Your saved Google connection is older than 90 days. Continue with Google to connect again.'
+            : '';
+
+        if (INITIAL_STORED_AUTH_TOKEN && !INITIAL_AUTH_TOKEN) {
+            clearAuthToken();
+        }
+
+        window.StrategicMarketingBootcampData = {
+            PHASE_DEFINITIONS,
+            TASK_DEFINITIONS,
+            getTaskDefinition,
+            createDefaultProjectTask,
+            isTaskComplete,
+            isTaskUnlocked,
+            getUniqueProjectName
+        };
+
+        window.StrategicMarketingBootcampState = {
+            STATE_STORAGE_KEY,
+            getDefaultAppState,
+            normalizeState,
+            loadState,
+            saveState,
+            getCurrentProject,
+            getCurrentTask,
+            getGoogleDocEditUrl,
+            getProjectDocumentReference,
+            selectProject,
+            selectTask,
+            renameProjectInState,
+            deleteProjectFromState,
+            updateTaskChecklistItem,
+            getProjectTask,
+            getProjectCompletion
+        };
+
+        window.StrategicMarketingBootcampAuth = {
+            AUTH_STORAGE_KEY,
+            GOOGLE_OAUTH_CLIENT_ID,
+            GOOGLE_OAUTH_SCOPES,
+            loadAuthToken,
+            saveAuthToken,
+            clearAuthToken,
+            isTokenExpired,
+            isRememberedAuthExpired,
+            isAuthFailureStatus
+        };
+
+        window.StrategicMarketingBootcampDrive = {
+            DRIVE_API_BASE_URL,
+            MARKETING_PROJECTS_FOLDER_NAME,
+            MASTER_PROJECT_TEMPLATE_FILE_ID,
+            PROJECT_DOCUMENT_COPY_COUNT,
+            driveRequest,
+            findDriveFolder,
+            createDriveFolder,
+            getOrCreateDriveFolder,
+            getAvailableProjectFolderName,
+            copyMasterProjectDoc,
+            renameDriveFolder,
+            trashDriveFolder,
+            createProjectInDrive
+        };
+
+        function LoginScreen({ authReady, authLoading, authNotice, onContinueWithGoogle }) {
+            return (
+                <main className="auth-shell">
+                    <section className="auth-card" aria-label="Google sign in">
+                        <div className="auth-kicker">Google OAuth</div>
+                        <h1>Strategic Marketing Bootcamp</h1>
+                        <p>
+                            Continue with Google before the workspace loads. Sprint 4 requests Drive, Docs, and Gmail readonly scopes and stores the token in <strong>{AUTH_STORAGE_KEY}</strong>.
+                        </p>
+                        {authNotice && <div className="auth-message">{authNotice}</div>}
+                        <button
+                            className="google-auth-button"
+                            type="button"
+                            disabled={authLoading || !authReady}
+                            onClick={onContinueWithGoogle}
+                        >
+                            {authLoading ? 'Connecting to Google...' : 'Continue with Google'}
+                        </button>
+                        <ul className="scope-list">
+                            <li>https://www.googleapis.com/auth/drive</li>
+                            <li>https://www.googleapis.com/auth/documents</li>
+                            <li>https://www.googleapis.com/auth/gmail.readonly</li>
+                        </ul>
+                        <p>
+                            {isPlaceholderClientId()
+                                ? <>Replace <strong>{GOOGLE_OAUTH_CLIENT_ID}</strong> with a real Google OAuth client ID before testing sign-in end to end.</>
+                                : <>OAuth client configured. Make sure <strong>http://localhost:4173</strong> is added as an authorized JavaScript origin in Google Cloud.</>}
+                        </p>
+                    </section>
+                </main>
+            );
+        }
+
+        function OnboardingModal({ isFirstProject, creationState, onCreateProject, onCancel }) {
+            const [projectName, setProjectName] = useState('');
+            const trimmedProjectName = projectName.trim();
+            const progressPercent = Math.round((creationState.createdCount / PROJECT_DOCUMENT_COPY_COUNT) * 100);
+
+            const handleSubmit = (event) => {
+                event.preventDefault();
+
+                if (!trimmedProjectName || creationState.isCreating) {
+                    return;
+                }
+
+                onCreateProject(trimmedProjectName);
+            };
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+                    <form className="onboarding-modal" onSubmit={handleSubmit}>
+                        <h2 id="onboarding-title">
+                            {isFirstProject ? 'Welcome. What is your first project name?' : 'What is your new project name?'}
+                        </h2>
+                        <p>
+                            This will create a Drive folder and copy one master project document with all 12 task tabs.
+                        </p>
+
+                        {creationState.isCreating ? (
+                            <div className="creation-status" aria-live="polite">
+                                <div className="spinner" aria-hidden="true"></div>
+                                <p>{creationState.message || `Creating your project document... (${creationState.createdCount}/${PROJECT_DOCUMENT_COPY_COUNT} file created)`}</p>
+                                <div className="progress-track" aria-hidden="true">
+                                    <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {creationState.error && <div className="error-box">{creationState.error}</div>}
+                                <input
+                                    className="project-name-input"
+                                    type="text"
+                                    value={projectName}
+                                    placeholder="Example: Acme Dental Campaign"
+                                    onChange={(event) => setProjectName(event.target.value)}
+                                    autoFocus
+                                />
+                                <div className="modal-actions">
+                                    {!isFirstProject && (
+                                        <button className="secondary-action" type="button" onClick={onCancel}>Cancel</button>
+                                    )}
+                                    <button className="primary-action" type="submit" disabled={!trimmedProjectName}>
+                                        {creationState.error ? 'Retry' : 'Confirm'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </form>
+                </div>
+            );
+        }
+
+        function DeleteProjectModal({ project, deleteState, onCancel, onConfirm }) {
+            if (!project) {
+                return null;
+            }
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-project-title">
+                    <div className="onboarding-modal delete-modal">
+                        <h2 id="delete-project-title">Delete project?</h2>
+                        <p>
+                            This will remove <strong>{project.name}</strong> from this app and move its Google Drive folder and copied docs to trash.
+                        </p>
+                        <div className="delete-modal-warning">
+                            This is not a browser alert. Cancel keeps the project unchanged. Delete project will only continue if Google Drive confirms the folder was moved to trash.
+                        </div>
+
+                        {deleteState.error && <div className="error-box">{deleteState.error}</div>}
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" disabled={deleteState.isDeleting} onClick={onCancel}>Cancel</button>
+                            <button className="primary-action danger-action" type="button" disabled={deleteState.isDeleting} onClick={onConfirm}>
+                                {deleteState.isDeleting ? 'Deleting...' : 'Delete project'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function RenameProjectModal({ project, renameState, onCancel, onConfirm }) {
+            const [projectName, setProjectName] = useState(project?.name || '');
+            const trimmedProjectName = projectName.trim();
+
+            useEffect(() => {
+                setProjectName(project?.name || '');
+            }, [project?.id, project?.name]);
+
+            if (!project) {
+                return null;
+            }
+
+            const handleSubmit = (event) => {
+                event.preventDefault();
+
+                if (!trimmedProjectName || renameState.isRenaming) {
+                    return;
+                }
+
+                onConfirm(trimmedProjectName);
+            };
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="rename-project-title">
+                    <form className="onboarding-modal" onSubmit={handleSubmit}>
+                        <h2 id="rename-project-title">Rename project</h2>
+                        <p>
+                            Enter a new project name. If that name already exists, the app will automatically use a unique name and keep Google Drive aligned.
+                        </p>
+
+                        {renameState.error && <div className="error-box">{renameState.error}</div>}
+
+                        <input
+                            className="project-name-input"
+                            type="text"
+                            value={projectName}
+                            placeholder="Example: Acme Dental Campaign"
+                            onChange={(event) => setProjectName(event.target.value)}
+                            autoFocus
+                        />
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" disabled={renameState.isRenaming} onClick={onCancel}>Cancel</button>
+                            <button className="primary-action" type="submit" disabled={!trimmedProjectName || renameState.isRenaming}>
+                                {renameState.isRenaming ? 'Renaming...' : 'Save name'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
+        function ProjectNavigation({
+            projects,
+            currentProjectId,
+            expandedProjectIds,
+            lockedTaskMessage,
+            onToggleProject,
+            onSelectTask,
+            onLockedTaskClick,
+            onRenameProject,
+            onDeleteProject
+        }) {
+            if (!projects.length) {
+                return (
+                    <div className="project-list-placeholder">
+                        No project has been created yet. Complete onboarding to create your first Drive project.
+                    </div>
+                );
+            }
+
+            return (
+                <div className="project-accordion-list">
+                    {lockedTaskMessage && <div className="locked-task-message" role="status">{lockedTaskMessage}</div>}
+                    {projects.map((project) => {
+                        const isCurrentProject = project.id === currentProjectId;
+                        const isExpanded = expandedProjectIds.includes(project.id);
+                        const completion = getProjectCompletion(project);
+
+                        return (
+                            <article className={`project-accordion ${isCurrentProject ? 'is-current' : ''}`} key={project.id}>
+                                <button
+                                    className="project-accordion-header"
+                                    type="button"
+                                    aria-expanded={isExpanded}
+                                    onClick={() => onToggleProject(project.id)}
+                                >
+                                    <span>
+                                        <span className="project-title">{project.name}</span>
+                                        <span className="project-meta">{completion.completedCount}/{completion.totalCount} tasks complete</span>
+                                    </span>
+                                    <span className="project-toggle" aria-hidden="true">{isExpanded ? '▾' : '▸'}</span>
+                                </button>
+
+                                {isExpanded && (
+                                    <>
+                                        <div className="project-actions" aria-label={`${project.name} actions`}>
+                                            <button
+                                                className="project-action-button"
+                                                type="button"
+                                                aria-label={`Rename project ${project.name}`}
+                                                title="Rename project"
+                                                onClick={() => onRenameProject(project.id)}
+                                            >
+                                                <span aria-hidden="true">✎</span>
+                                            </button>
+                                            <button
+                                                className="project-action-button is-danger"
+                                                type="button"
+                                                aria-label={`Delete project ${project.name}`}
+                                                title="Delete project"
+                                                onClick={() => onDeleteProject(project.id)}
+                                            >
+                                                <span aria-hidden="true">🗑</span>
+                                            </button>
+                                        </div>
+
+                                        <div className="project-phases">
+                                        {PHASE_DEFINITIONS.map((phaseDefinition) => (
+                                            <div className="phase-group" key={`${project.id}-phase-${phaseDefinition.phase}`}>
+                                                <p className="phase-label">Phase {phaseDefinition.phase} · {phaseDefinition.phaseName}</p>
+                                                {TASK_DEFINITIONS
+                                                    .filter((taskDefinition) => taskDefinition.phase === phaseDefinition.phase)
+                                                    .map((taskDefinition) => {
+                                                        const projectTask = getProjectTask(project, taskDefinition.taskId);
+                                                        const isComplete = isTaskComplete(projectTask);
+                                                        const isUnlocked = isTaskUnlocked(project, taskDefinition.taskId);
+                                                        const isActive = isCurrentProject && project.lastOpenedTask === taskDefinition.taskId;
+                                                        const statusIcon = !isUnlocked ? '🔒' : (isComplete ? '✅' : '🔲');
+
+                                                        return (
+                                                            <button
+                                                                className={`task-nav-button ${isActive ? 'is-active' : ''} ${isUnlocked ? '' : 'is-locked'}`}
+                                                                type="button"
+                                                                key={`${project.id}-task-${taskDefinition.taskId}`}
+                                                                aria-current={isActive ? 'page' : undefined}
+                                                                aria-disabled={!isUnlocked}
+                                                                title={isUnlocked ? taskDefinition.fullDocTitle : `Complete Task ${taskDefinition.taskId - 1} to unlock this task.`}
+                                                                onClick={() => {
+                                                                    if (!isUnlocked) {
+                                                                        onLockedTaskClick(taskDefinition.taskId);
+                                                                        return;
+                                                                    }
+
+                                                                    onSelectTask(project.id, taskDefinition.taskId);
+                                                                }}
+                                                            >
+                                                                <span className="task-status-icon" aria-hidden="true">{statusIcon}</span>
+                                                                <span>
+                                                                    <span className="task-nav-title">Task {taskDefinition.taskId}: {taskDefinition.shortTitle}</span>
+                                                                    <span className="task-nav-subtitle">{taskDefinition.lessonNumber}</span>
+                                                                </span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                            </div>
+                                        ))}
+                                        </div>
+                                    </>
+                                )}
+                            </article>
+                        );
+                    })}
+                </div>
+            );
+        }
+
+        function CenterWorkspace({ currentProject, currentTask, currentTaskDefinition }) {
+            const [isFrameLoading, setIsFrameLoading] = useState(false);
+            const [showFrameFallback, setShowFrameFallback] = useState(false);
+            const fallbackTimerRef = useRef(null);
+            const documentReference = getProjectDocumentReference(currentProject, currentTask, currentTaskDefinition);
+            const docUrl = getGoogleDocEditUrl(documentReference.docId, false, documentReference.tabId);
+            const embeddedDocUrl = getGoogleDocEditUrl(documentReference.docId, true, documentReference.tabId);
+
+            useEffect(() => {
+                if (fallbackTimerRef.current) {
+                    window.clearTimeout(fallbackTimerRef.current);
+                }
+
+                if (!embeddedDocUrl) {
+                    setIsFrameLoading(false);
+                    setShowFrameFallback(false);
+                    return undefined;
+                }
+
+                setIsFrameLoading(true);
+                setShowFrameFallback(false);
+
+                fallbackTimerRef.current = window.setTimeout(() => {
+                    setShowFrameFallback(true);
+                }, 8000);
+
+                return () => {
+                    if (fallbackTimerRef.current) {
+                        window.clearTimeout(fallbackTimerRef.current);
+                    }
+                };
+            }, [embeddedDocUrl]);
+
+            if (!currentProject) {
+                return (
+                    <div className="center-placeholder">
+                        <div className="placeholder-kicker">Task Workspace</div>
+                        <h2>Select a task to begin</h2>
+                        <p>
+                            Create a project first, then choose an unlocked task from the left sidebar to load its Google Doc here.
+                        </p>
+                    </div>
+                );
+            }
+
+            if (!currentTask || !currentTaskDefinition || !embeddedDocUrl) {
+                const isOneDocProject = Boolean(currentProject.projectDocId);
+
+                return (
+                    <div className="center-placeholder recovery-card">
+                        <div className="placeholder-kicker">Recovery State</div>
+                        <h2>{isOneDocProject ? 'Project document is missing' : 'Task document is missing'}</h2>
+                        <p>
+                            {isOneDocProject
+                                ? 'This project exists, but its project-level Google Doc ID is missing or invalid. Create a new project or restore this project from a valid saved state.'
+                                : 'This legacy project exists, but the selected task is missing its Google Doc ID. Create a new project or restore this project from a valid saved state.'}
+                        </p>
+                        <div className="recovery-actions">
+                            <span className="recovery-action-link">Use + New Project in the sidebar</span>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="doc-workspace">
+                    <div className="doc-frame-shell">
+                        <iframe
+                            className="doc-frame"
+                            key={embeddedDocUrl}
+                            title={`${currentProject.name} — ${currentTaskDefinition.fullDocTitle}`}
+                            src={embeddedDocUrl}
+                            onLoad={() => {
+                                if (fallbackTimerRef.current) {
+                                    window.clearTimeout(fallbackTimerRef.current);
+                                }
+
+                                setIsFrameLoading(false);
+                                setShowFrameFallback(false);
+                            }}
+                        ></iframe>
+
+                        <a className="open-doc-button floating-open-doc-button" href={docUrl} target="_blank" rel="noopener noreferrer">
+                            Open in Google Docs ↗
+                        </a>
+
+                        {isFrameLoading && (
+                            <div className="doc-loading-overlay" aria-live="polite">
+                                <div className="doc-loading-card">
+                                    <div className="spinner" aria-hidden="true"></div>
+                                    <p>Loading {currentTaskDefinition.fullDocTitle}...</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {showFrameFallback && (
+                            <div className="doc-fallback-overlay" aria-live="polite">
+                                <div className="doc-fallback-card">
+                                    <p>If Google Docs is blocked in the iframe, open the task directly in Google Docs.</p>
+                                    <a className="open-doc-button" href={docUrl} target="_blank" rel="noopener noreferrer">
+                                        Open in Google Docs ↗
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function GuidanceBlock({ title, variant, children }) {
+            return (
+                <section className={`guidance-block is-${variant}`}>
+                    <h3>{title}</h3>
+                    {children}
+                </section>
+            );
+        }
+
+        function TaskChecklist({ currentTask, currentTaskDefinition, onToggleChecklistItem }) {
+            if (!currentTask || !currentTaskDefinition) {
+                return null;
+            }
+
+            const checkedCount = currentTask.checklist.filter(Boolean).length;
+            const totalCount = currentTaskDefinition.checklist.length;
+            const progressPercent = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+            const isComplete = isTaskComplete(currentTask);
+
+            return (
+                <section className="guidance-card checklist-card">
+                    <div className="checklist-header">
+                        <h3>Checklist</h3>
+                        <span className="checklist-count">{checkedCount}/{totalCount}</span>
+                    </div>
+
+                    <div className="checklist-progress-track" aria-hidden="true">
+                        <div className="checklist-progress-fill" style={{ width: `${progressPercent}%` }}></div>
+                    </div>
+
+                    <div className="checklist-items">
+                        {currentTaskDefinition.checklist.map((item, index) => {
+                            const isChecked = Boolean(currentTask.checklist[index]);
+
+                            return (
+                                <label className={`checklist-item ${isChecked ? 'is-checked' : ''}`} key={`${currentTaskDefinition.taskId}-checklist-${index}`}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={(event) => onToggleChecklistItem(index, event.target.checked)}
+                                    />
+                                    <span className="custom-checkbox" aria-hidden="true">{isChecked ? '✓' : ''}</span>
+                                    <span>{item}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+
+                    {isComplete && <div className="task-complete-message">Task complete! Next task unlocked.</div>}
+                </section>
+            );
+        }
+
+        function GuidancePanel({ currentTask, currentTaskDefinition, onOpenDiagram, onToggleChecklistItem }) {
+            const [hasDiagramError, setHasDiagramError] = useState(false);
+
+            useEffect(() => {
+                setHasDiagramError(false);
+            }, [currentTaskDefinition?.taskId]);
+
+            if (!currentTaskDefinition) {
+                return (
+                    <div className="guidance-card">
+                        <h3>Task guidance will appear here</h3>
+                        <p>Select a task to load lesson guidance.</p>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="task-guidance">
+                    <section className="guidance-card guidance-header">
+                        <div className="guidance-kicker">{currentTaskDefinition.lessonNumber}</div>
+                        <h2>{currentTaskDefinition.shortTitle}</h2>
+                        <p className="guidance-tagline">{currentTaskDefinition.tagline}</p>
+                    </section>
+
+                    <TaskChecklist
+                        currentTask={currentTask}
+                        currentTaskDefinition={currentTaskDefinition}
+                        onToggleChecklistItem={onToggleChecklistItem}
+                    />
+
+                    <GuidanceBlock title="What" variant="what">
+                        <ul className="guidance-bullets">
+                            {currentTaskDefinition.what.map((item) => <li key={item}>{item}</li>)}
+                        </ul>
+                    </GuidanceBlock>
+
+                    <GuidanceBlock title="Why" variant="why">
+                        <p>{currentTaskDefinition.why}</p>
+                    </GuidanceBlock>
+
+                    <GuidanceBlock title="How" variant="how">
+                        <ul className="guidance-bullets">
+                            {currentTaskDefinition.how.map((item) => <li key={item}>{item}</li>)}
+                        </ul>
+                    </GuidanceBlock>
+
+                    <GuidanceBlock title="Mistakes" variant="mistakes">
+                        <ul className="guidance-bullets">
+                            {currentTaskDefinition.mistakes.map((item) => <li key={item}>{item}</li>)}
+                        </ul>
+                    </GuidanceBlock>
+
+                    <section className="guidance-card">
+                        <h3>Diagram</h3>
+                        <div className="diagram-frame">
+                            {!hasDiagramError ? (
+                                <img
+                                    className="diagram-image-clickable"
+                                    src={currentTaskDefinition.diagram.src}
+                                    alt={currentTaskDefinition.diagram.caption}
+                                    onClick={() => onOpenDiagram(currentTaskDefinition)}
+                                    onError={() => setHasDiagramError(true)}
+                                />
+                            ) : (
+                                <div className="diagram-fallback">Diagram preview unavailable. Use the caption below as the visual brief.</div>
+                            )}
+                        </div>
+                        {hasDiagramError && <p className="diagram-caption">{currentTaskDefinition.diagram.caption}</p>}
+                    </section>
+
+                    {(currentTaskDefinition.templateLink || currentTaskDefinition.externalLinks?.length > 0) && (
+                        <section className="guidance-card">
+                            <h3>Resources</h3>
+                            <div className="resource-list">
+                                {currentTaskDefinition.templateLink && (
+                                    <span className="template-label">Template: {currentTaskDefinition.templateLink}</span>
+                                )}
+                                {(currentTaskDefinition.externalLinks || []).map((link) => (
+                                    <a
+                                        className="resource-link"
+                                        href={link.url}
+                                        key={`${currentTaskDefinition.taskId}-${link.label}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {link.label} ↗
+                                    </a>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+                </div>
+            );
+        }
+
+        function DiagramLightbox({ taskDefinition, zoomIndex, onClose, onCycleZoom }) {
+            const [hasLightboxImageError, setHasLightboxImageError] = useState(false);
+            const zoomLevel = DIAGRAM_ZOOM_LEVELS[zoomIndex] || 1;
+
+            useEffect(() => {
+                setHasLightboxImageError(false);
+            }, [taskDefinition?.taskId]);
+
+            if (!taskDefinition) {
+                return null;
+            }
+
+            return (
+                <div className="diagram-lightbox-backdrop" role="dialog" aria-modal="true" aria-label="Diagram viewer" onClick={onClose}>
+                    <button
+                        className="diagram-lightbox-close"
+                        type="button"
+                        aria-label="Close diagram"
+                        onClick={onClose}
+                    >
+                        ×
+                    </button>
+
+                    <div className="diagram-lightbox-content" onClick={(event) => event.stopPropagation()}>
+                        <div className="diagram-lightbox-toolbar">
+                            <button type="button" onClick={() => onCycleZoom(-1)}>− Zoom</button>
+                            <span>{Math.round(zoomLevel * 100)}%</span>
+                            <button type="button" onClick={() => onCycleZoom(1)}>+ Zoom</button>
+                        </div>
+
+                        <div className="diagram-lightbox-scroll">
+                            {!hasLightboxImageError ? (
+                                <img
+                                    className="diagram-lightbox-image"
+                                    src={taskDefinition.diagram.src}
+                                    alt={taskDefinition.diagram.caption}
+                                    style={{ transform: `scale(${zoomLevel})` }}
+                                    onError={() => setHasLightboxImageError(true)}
+                                />
+                            ) : (
+                                <div className="diagram-lightbox-fallback">
+                                    Diagram preview unavailable. {taskDefinition.diagram.caption}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const firstTask = getTaskDefinition(1);
+            const [appState, setAppState] = useState(() => loadState());
+            const [authToken, setAuthToken] = useState(() => INITIAL_AUTH_TOKEN);
+            const [authReady, setAuthReady] = useState(false);
+            const [authLoading, setAuthLoading] = useState(false);
+            const [authTokenClient, setAuthTokenClient] = useState(null);
+            const [authNotice, setAuthNotice] = useState(() => INITIAL_AUTH_NOTICE || (isPlaceholderClientId() ? 'Google OAuth is implemented, but the client ID is still a placeholder.' : ''));
+            const authRequestRef = useRef(null);
+            const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+            const [creationState, setCreationState] = useState({
+                isCreating: false,
+                createdCount: 0,
+                message: '',
+                error: ''
+            });
+            const [expandedProjectIds, setExpandedProjectIds] = useState(() => appState.currentProjectId ? [appState.currentProjectId] : []);
+            const [lockedTaskMessage, setLockedTaskMessage] = useState('');
+            const [diagramLightboxTask, setDiagramLightboxTask] = useState(null);
+            const [diagramZoomIndex, setDiagramZoomIndex] = useState(0);
+            const [deleteProjectState, setDeleteProjectState] = useState({
+                projectId: null,
+                isDeleting: false,
+                error: ''
+            });
+            const [renameProjectState, setRenameProjectState] = useState({
+                projectId: null,
+                isRenaming: false,
+                error: ''
+            });
+
+            useEffect(() => {
+                let isActive = true;
+                let intervalId = null;
+
+                const initializeGoogleClient = () => {
+                    if (!isActive || !window.google?.accounts?.oauth2) {
+                        return;
+                    }
+
+                    if (isPlaceholderClientId()) {
+                        setAuthReady(true);
+                        if (intervalId) {
+                            window.clearInterval(intervalId);
+                        }
+                        return;
+                    }
+
+                    try {
+                        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+                            client_id: GOOGLE_OAUTH_CLIENT_ID,
+                            scope: GOOGLE_OAUTH_SCOPES,
+                            callback: (response) => {
+                                const pendingRequest = authRequestRef.current;
+                                authRequestRef.current = null;
+                                setAuthLoading(false);
+
+                                if (!response || response.error) {
+                                    const errorMessage = response?.error_description || response?.error || 'Google sign-in did not complete. Please try again.';
+
+                                    if (!pendingRequest?.silent) {
+                                        setAuthNotice(errorMessage);
+                                    }
+
+                                    pendingRequest?.reject(new Error(errorMessage));
+                                    return;
+                                }
+
+                                const savedToken = saveAuthToken({
+                                    access_token: response.access_token,
+                                    token_type: response.token_type,
+                                    scope: response.scope,
+                                    expires_in: response.expires_in,
+                                    issued_at: Date.now()
+                                });
+
+                                setAuthToken(savedToken);
+                                setAuthNotice('');
+                                pendingRequest?.resolve(savedToken);
+                            }
+                        });
+
+                        setAuthTokenClient(tokenClient);
+                        setAuthReady(true);
+
+                        if (intervalId) {
+                            window.clearInterval(intervalId);
+                        }
+                    } catch (error) {
+                        setAuthLoading(false);
+                        setAuthReady(false);
+                        setAuthNotice('Unable to initialize Google OAuth. Check the client ID configuration and try again.');
+                    }
+                };
+
+                initializeGoogleClient();
+                intervalId = window.setInterval(initializeGoogleClient, 150);
+
+                return () => {
+                    isActive = false;
+                    if (intervalId) {
+                        window.clearInterval(intervalId);
+                    }
+                };
+            }, []);
+
+            useEffect(() => {
+                const handleStorage = (event) => {
+                    if (event.key === STATE_STORAGE_KEY) {
+                        setAppState(loadState());
+                    }
+
+                    if (event.key === AUTH_STORAGE_KEY) {
+                        const latestToken = loadAuthToken();
+                        setAuthToken(latestToken && !isRememberedAuthExpired(latestToken) ? latestToken : null);
+                    }
+                };
+
+                window.addEventListener('storage', handleStorage);
+                return () => window.removeEventListener('storage', handleStorage);
+            }, []);
+
+            useEffect(() => {
+                if (authToken && appState.projects.length === 0) {
+                    setIsOnboardingOpen(true);
+                }
+            }, [authToken, appState.projects.length]);
+
+            useEffect(() => {
+                if (!diagramLightboxTask) {
+                    return undefined;
+                }
+
+                const handleEscape = (event) => {
+                    if (event.key === 'Escape') {
+                        setDiagramLightboxTask(null);
+                        setDiagramZoomIndex(0);
+                    }
+                };
+
+                window.addEventListener('keydown', handleEscape);
+                return () => window.removeEventListener('keydown', handleEscape);
+            }, [diagramLightboxTask]);
+
+            useEffect(() => {
+                if (!appState.currentProjectId) {
+                    return;
+                }
+
+                setExpandedProjectIds((previousProjectIds) => (
+                    previousProjectIds.includes(appState.currentProjectId)
+                        ? previousProjectIds
+                        : [...previousProjectIds, appState.currentProjectId]
+                ));
+            }, [appState.currentProjectId]);
+
+            useEffect(() => {
+                window.StrategicMarketingBootcampAuthRuntime = {
+                    requireReauth: (reason = 'Your Google session needs to be refreshed. Continue with Google to re-authenticate.') => {
+                        setAuthNotice(reason);
+                    },
+                    handleApiAuthFailure: (status) => {
+                        if (isAuthFailureStatus(status)) {
+                            setAuthNotice('Google API access expired or was rejected. Continue with Google to re-authenticate.');
+                            return true;
+                        }
+
+                        return false;
+                    }
+                };
+
+                return () => {
+                    delete window.StrategicMarketingBootcampAuthRuntime;
+                };
+            }, []);
+
+            useEffect(() => {
+                if (!authReady || !authToken || !isTokenExpired(authToken)) {
+                    return;
+                }
+
+                requestGoogleAccess('', { silent: true }).catch(() => {
+                    setAuthNotice('Google access expired. Reconnect Google before making Drive changes. Your projects remain saved.');
+                });
+            }, [authReady, authToken, authTokenClient]);
+
+            const currentProject = useMemo(() => getCurrentProject(appState), [appState]);
+            const currentTask = useMemo(() => getCurrentTask(currentProject), [currentProject]);
+            const currentTaskDefinition = useMemo(() => getTaskDefinition(currentTask?.taskId || firstTask.taskId), [currentTask, firstTask.taskId]);
+            const projectPendingDelete = useMemo(() => (
+                appState.projects.find((project) => project.id === deleteProjectState.projectId) || null
+            ), [appState.projects, deleteProjectState.projectId]);
+            const projectPendingRename = useMemo(() => (
+                appState.projects.find((project) => project.id === renameProjectState.projectId) || null
+            ), [appState.projects, renameProjectState.projectId]);
+
+            const persistState = (nextState) => {
+                const savedState = saveState(nextState);
+                setAppState(savedState);
+            };
+
+            const handleSelectProject = (projectId) => {
+                persistState(selectProject(appState, projectId));
+            };
+
+            const handleToggleProject = (projectId) => {
+                setLockedTaskMessage('');
+                handleSelectProject(projectId);
+                setExpandedProjectIds((previousProjectIds) => (
+                    previousProjectIds.includes(projectId)
+                        ? previousProjectIds.filter((expandedProjectId) => expandedProjectId !== projectId)
+                        : [...previousProjectIds, projectId]
+                ));
+            };
+
+            const handleSelectTask = (taskId) => {
+                persistState(selectTask(appState, taskId));
+            };
+
+            const handleSelectProjectTask = (projectId, taskId) => {
+                setLockedTaskMessage('');
+                const nextSelectedState = selectTask(selectProject(appState, projectId), taskId);
+                persistState(nextSelectedState);
+            };
+
+            const handleLockedTaskClick = (taskId) => {
+                setLockedTaskMessage(`Task ${taskId} is locked. Complete Task ${taskId - 1} before opening it.`);
+            };
+
+            const requestGoogleAccess = (promptMode = '', options = {}) => {
+                const isSilent = Boolean(options.silent);
+
+                if (isPlaceholderClientId()) {
+                    const error = new Error('Replace the Google OAuth client ID placeholder before testing sign-in.');
+
+                    if (!isSilent) {
+                        setAuthNotice(error.message);
+                    }
+
+                    return Promise.reject(error);
+                }
+
+                if (!authTokenClient) {
+                    const error = new Error('Google sign-in is still initializing. Please try again in a moment.');
+
+                    if (!isSilent) {
+                        setAuthNotice(error.message);
+                    }
+
+                    return Promise.reject(error);
+                }
+
+                if (authRequestRef.current) {
+                    authRequestRef.current.reject(new Error('A newer Google connection request started.'));
+                }
+
+                setAuthLoading(!isSilent);
+
+                if (!isSilent) {
+                    setAuthNotice('');
+                }
+
+                return new Promise((resolve, reject) => {
+                    authRequestRef.current = { resolve, reject, silent: isSilent };
+
+                    try {
+                        authTokenClient.requestAccessToken({ prompt: promptMode });
+                    } catch (error) {
+                        authRequestRef.current = null;
+                        setAuthLoading(false);
+                        reject(error);
+                    }
+                });
+            };
+
+            const getValidGoogleToken = async (failureNotice = 'Reconnect Google before making Drive changes. Your projects remain saved.') => {
+                const latestToken = loadAuthToken() || authToken;
+
+                if (latestToken && !isRememberedAuthExpired(latestToken) && !isTokenExpired(latestToken)) {
+                    return latestToken;
+                }
+
+                try {
+                    return await requestGoogleAccess('', { silent: true });
+                } catch (error) {
+                    setAuthNotice(failureNotice);
+                    throw new Error('Google access needs to be refreshed. Reconnect Google and try again.');
+                }
+            };
+
+            const handleRenameProject = async (projectId) => {
+                const project = appState.projects.find((projectItem) => projectItem.id === projectId);
+
+                if (!project) {
+                    return;
+                }
+
+                setRenameProjectState({
+                    projectId,
+                    isRenaming: false,
+                    error: ''
+                });
+            };
+
+            const handleCancelRenameProject = () => {
+                if (renameProjectState.isRenaming) {
+                    return;
+                }
+
+                setRenameProjectState({
+                    projectId: null,
+                    isRenaming: false,
+                    error: ''
+                });
+            };
+
+            const handleConfirmRenameProject = async (nextName) => {
+                const project = projectPendingRename;
+
+                if (!project || renameProjectState.isRenaming) {
+                    return;
+                }
+
+                const safeName = String(nextName || '').trim();
+
+                if (!safeName || safeName === project.name) {
+                    handleCancelRenameProject();
+                    return;
+                }
+
+                setRenameProjectState((previousState) => ({
+                    ...previousState,
+                    isRenaming: true,
+                    error: ''
+                }));
+
+                const reservedProjectNames = appState.projects
+                    .filter((projectItem) => projectItem.id !== project.id)
+                    .map((projectItem) => projectItem.name);
+                let finalProjectName = getUniqueProjectName(safeName, reservedProjectNames);
+
+                if (project.folderId) {
+                    try {
+                        const driveToken = await getValidGoogleToken('Reconnect with Google before renaming the Drive project folder. Your local project was not changed.');
+                        const rootFolder = await getOrCreateDriveFolder(driveToken, MARKETING_PROJECTS_FOLDER_NAME, 'root');
+                        finalProjectName = await getAvailableProjectFolderName(
+                            driveToken,
+                            safeName,
+                            rootFolder.id,
+                            reservedProjectNames,
+                            project.folderId
+                        );
+                        await renameDriveFolder(driveToken, project.folderId, finalProjectName);
+                    } catch (error) {
+                        setRenameProjectState((previousState) => ({
+                            ...previousState,
+                            isRenaming: false,
+                            error: error.message || 'Unable to rename the Drive folder. Try again.'
+                        }));
+                        return;
+                    }
+                }
+
+                persistState(renameProjectInState(appState, project.id, finalProjectName));
+                setLockedTaskMessage(
+                    finalProjectName === safeName
+                        ? 'Project name updated.'
+                        : `Project renamed to "${finalProjectName}" to avoid a duplicate.`
+                );
+                setRenameProjectState({
+                    projectId: null,
+                    isRenaming: false,
+                    error: ''
+                });
+            };
+
+            const handleDeleteProject = (projectId) => {
+                const project = appState.projects.find((projectItem) => projectItem.id === projectId);
+
+                if (!project) {
+                    return;
+                }
+
+                setDeleteProjectState({
+                    projectId,
+                    isDeleting: false,
+                    error: ''
+                });
+            };
+
+            const handleCancelDeleteProject = () => {
+                if (deleteProjectState.isDeleting) {
+                    return;
+                }
+
+                setDeleteProjectState({
+                    projectId: null,
+                    isDeleting: false,
+                    error: ''
+                });
+            };
+
+            const handleConfirmDeleteProject = async () => {
+                if (!projectPendingDelete || deleteProjectState.isDeleting) {
+                    return;
+                }
+
+                setDeleteProjectState((previousState) => ({
+                    ...previousState,
+                    isDeleting: true,
+                    error: ''
+                }));
+
+                try {
+                    if (projectPendingDelete.folderId) {
+                        const driveToken = await getValidGoogleToken('Reconnect Google before deleting the Drive project folder. Your project was not deleted.');
+                        await trashDriveFolder(driveToken, projectPendingDelete.folderId);
+                    }
+
+                    const deletedProjectName = projectPendingDelete.name;
+                    persistState(deleteProjectFromState(appState, projectPendingDelete.id));
+                    setExpandedProjectIds((previousProjectIds) => previousProjectIds.filter((expandedProjectId) => expandedProjectId !== projectPendingDelete.id));
+                    setLockedTaskMessage(`${deletedProjectName} deleted. Google Drive folder moved to trash.`);
+                    setDeleteProjectState({
+                        projectId: null,
+                        isDeleting: false,
+                        error: ''
+                    });
+                } catch (error) {
+                    setDeleteProjectState((previousState) => ({
+                        ...previousState,
+                        isDeleting: false,
+                        error: error.message || 'Unable to delete the Drive folder. Project was not removed from this app.'
+                    }));
+                }
+            };
+
+            const handleToggleChecklistItem = (checklistIndex, checked) => {
+                if (!currentProject || !currentTask) {
+                    return;
+                }
+
+                const nextState = updateTaskChecklistItem(
+                    appState,
+                    currentProject.id,
+                    currentTask.taskId,
+                    checklistIndex,
+                    checked
+                );
+
+                persistState(nextState);
+            };
+
+            const handleOpenDiagram = (taskDefinition) => {
+                setDiagramLightboxTask(taskDefinition);
+                setDiagramZoomIndex(0);
+            };
+
+            const handleCloseDiagram = () => {
+                setDiagramLightboxTask(null);
+                setDiagramZoomIndex(0);
+            };
+
+            const handleCycleDiagramZoom = (direction) => {
+                setDiagramZoomIndex((currentIndex) => {
+                    const totalZoomLevels = DIAGRAM_ZOOM_LEVELS.length;
+                    return (currentIndex + direction + totalZoomLevels) % totalZoomLevels;
+                });
+            };
+
+            const resetCreationState = () => {
+                setCreationState({
+                    isCreating: false,
+                    createdCount: 0,
+                    message: '',
+                    error: ''
+                });
+            };
+
+            const handleOpenNewProject = () => {
+                resetCreationState();
+                setIsOnboardingOpen(true);
+            };
+
+            const handleCancelOnboarding = () => {
+                if (appState.projects.length === 0 || creationState.isCreating) {
+                    return;
+                }
+
+                resetCreationState();
+                setIsOnboardingOpen(false);
+            };
+
+            const handleCreateProject = async (projectName) => {
+                setCreationState({
+                    isCreating: true,
+                    createdCount: 0,
+                    message: 'Checking Google connection...',
+                    error: ''
+                });
+
+                try {
+                    const driveToken = await getValidGoogleToken('Reconnect Google before creating a project. Your saved projects were not changed.');
+                    setCreationState({
+                        isCreating: true,
+                        createdCount: 0,
+                        message: 'Creating your project document... (0/1 file created)',
+                        error: ''
+                    });
+                    const createdProject = await createProjectInDrive(
+                        driveToken,
+                        projectName,
+                        (progress) => {
+                            setCreationState({
+                                isCreating: true,
+                                createdCount: progress.createdCount || 0,
+                                message: progress.message || `Creating your project document... (${progress.createdCount || 0}/${PROJECT_DOCUMENT_COPY_COUNT} file created)`,
+                                error: ''
+                            });
+                        },
+                        appState.projects.map((project) => project.name)
+                    );
+                    const nextState = saveState({
+                        projects: [...appState.projects, createdProject],
+                        currentProjectId: createdProject.id
+                    });
+
+                    setAppState(nextState);
+                    setCreationState({
+                        isCreating: false,
+                        createdCount: PROJECT_DOCUMENT_COPY_COUNT,
+                        message: '',
+                        error: ''
+                    });
+                    setIsOnboardingOpen(false);
+                } catch (error) {
+                    setCreationState((previousState) => ({
+                        ...previousState,
+                        isCreating: false,
+                        error: error.message || 'Unable to create the project. Please retry.'
+                    }));
+                }
+            };
+
+            const handleContinueWithGoogle = () => {
+                requestGoogleAccess(authToken ? '' : 'consent').catch(() => {});
+            };
+
+            const handleSignOut = () => {
+                clearAuthToken();
+                setAuthToken(null);
+                setAuthNotice('You have been signed out. Continue with Google to sign in again.');
+            };
+
+            if (!authToken) {
+                return (
+                    <LoginScreen
+                        authReady={authReady}
+                        authLoading={authLoading}
+                        authNotice={authNotice}
+                        onContinueWithGoogle={handleContinueWithGoogle}
+                    />
+                );
+            }
+
+            return (
+                <main className="app-shell">
+                    {authToken && authNotice && (
+                        <div className="auth-refresh-banner" role="status">
+                            <span>{authNotice}</span>
+                            <button type="button" disabled={authLoading || !authReady} onClick={handleContinueWithGoogle}>
+                                {authLoading ? 'Connecting...' : 'Reconnect Google'}
+                            </button>
+                        </div>
+                    )}
+
+                    <aside className="left-sidebar" aria-label="Project navigation">
+                        <div className="brand-block">
+                            <h1 className="brand-label">Strategic Marketing Bootcamp</h1>
+                            <button className="new-project-button" type="button" onClick={handleOpenNewProject}>+ New Project</button>
+                        </div>
+
+                        <section className="project-section project-navigation-section" aria-label="Projects">
+                            <h2 className="section-heading">Projects</h2>
+                            <ProjectNavigation
+                                projects={appState.projects}
+                                currentProjectId={appState.currentProjectId}
+                                expandedProjectIds={expandedProjectIds}
+                                lockedTaskMessage={lockedTaskMessage}
+                                onToggleProject={handleToggleProject}
+                                onSelectTask={handleSelectProjectTask}
+                                onLockedTaskClick={handleLockedTaskClick}
+                                onRenameProject={handleRenameProject}
+                                onDeleteProject={handleDeleteProject}
+                            />
+                        </section>
+
+                        <section className="project-section auth-section" aria-label="Authentication status">
+                            <h2 className="section-heading">Authentication</h2>
+                            <div className="status-card">
+                                <button className="simple-sign-out-button" type="button" onClick={handleSignOut}>Sign out</button>
+                            </div>
+                        </section>
+
+                    </aside>
+
+                    <section className={`center-panel ${currentProject ? '' : 'is-empty'}`} aria-label="Main workspace">
+                        <CenterWorkspace
+                            currentProject={currentProject}
+                            currentTask={currentTask}
+                            currentTaskDefinition={currentTaskDefinition}
+                        />
+                    </section>
+
+                    <aside className="right-sidebar" aria-label="Task guidance panel">
+                        <GuidancePanel
+                            currentTask={currentProject ? currentTask : null}
+                            currentTaskDefinition={currentProject ? currentTaskDefinition : null}
+                            onOpenDiagram={handleOpenDiagram}
+                            onToggleChecklistItem={handleToggleChecklistItem}
+                        />
+                    </aside>
+
+                    {diagramLightboxTask && (
+                        <DiagramLightbox
+                            taskDefinition={diagramLightboxTask}
+                            zoomIndex={diagramZoomIndex}
+                            onClose={handleCloseDiagram}
+                            onCycleZoom={handleCycleDiagramZoom}
+                        />
+                    )}
+
+                    {isOnboardingOpen && (
+                        <OnboardingModal
+                            isFirstProject={appState.projects.length === 0}
+                            creationState={creationState}
+                            onCreateProject={handleCreateProject}
+                            onCancel={handleCancelOnboarding}
+                        />
+                    )}
+
+                    {projectPendingDelete && (
+                        <DeleteProjectModal
+                            project={projectPendingDelete}
+                            deleteState={deleteProjectState}
+                            onCancel={handleCancelDeleteProject}
+                            onConfirm={handleConfirmDeleteProject}
+                        />
+                    )}
+
+                    {projectPendingRename && (
+                        <RenameProjectModal
+                            project={projectPendingRename}
+                            renameState={renameProjectState}
+                            onCancel={handleCancelRenameProject}
+                            onConfirm={handleConfirmRenameProject}
+                        />
+                    )}
+                </main>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
