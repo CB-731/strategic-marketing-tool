@@ -411,7 +411,8 @@
         }
 
         .project-navigation-section {
-            grid-template-rows: auto minmax(0, 1fr);
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
             overflow-x: hidden;
             padding-right: 2px;
@@ -457,13 +458,13 @@
         }
 
         .project-accordion-list {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 10px;
-            align-content: start;
-            align-items: start;
         }
 
         .project-accordion {
+            flex: 0 0 auto;
             overflow: hidden;
             border: 1px solid var(--border);
             border-radius: 14px;
