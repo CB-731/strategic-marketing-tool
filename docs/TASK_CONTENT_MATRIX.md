@@ -80,9 +80,6 @@ Use exact format with the user's project name inserted:
 
 ### Task 3 — Market Research
 
-- Read 50+ reviews (Google, Yelp, Amazon) — 4-5 star AND 1-2 star
-- Extracted exact language and feelings from reviews
-- Found before/after transformation stories (YouTube, Reddit, Instagram)
 - Audited 3-5 direct local competitors (websites, ads, messaging)
 - Found top players in major competitive markets (LA, NYC, SF)
 - Documented what top players say AND what they don't say
