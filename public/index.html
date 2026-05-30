@@ -162,10 +162,12 @@
             padding: 24px;
             background: rgba(0, 0, 0, 0.72);
             backdrop-filter: blur(10px);
+            overflow-y: auto;
         }
 
         .onboarding-modal {
-            width: min(480px, 100%);
+            width: min(560px, calc(100vw - 48px));
+            max-height: calc(100vh - 40px);
             padding: 28px;
             border: 1px solid rgba(212, 168, 67, 0.28);
             border-radius: 22px;
@@ -173,6 +175,29 @@
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
             display: grid;
             gap: 16px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(212, 168, 67, 0.7) rgba(255, 255, 255, 0.04);
+        }
+
+        .onboarding-modal::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .onboarding-modal::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+        }
+
+        .onboarding-modal::-webkit-scrollbar-thumb {
+            border: 2px solid rgba(18, 18, 18, 0.98);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.9), rgba(212, 168, 67, 0.55));
+        }
+
+        .onboarding-modal::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(212, 168, 67, 1), rgba(212, 168, 67, 0.72));
         }
 
         .onboarding-modal h2 {
@@ -935,9 +960,11 @@
             padding: 0;
             border: 1px solid rgba(212, 168, 67, 0.44);
             border-radius: 999px;
-            background: linear-gradient(180deg, rgba(212, 168, 67, 0.25), rgba(212, 168, 67, 0.12));
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.2), rgba(212, 168, 67, 0.08));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             color: var(--text-primary);
-            box-shadow: 0 14px 26px rgba(0, 0, 0, 0.34);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
             cursor: pointer;
             transition: width 180ms ease, min-width 180ms ease, padding 180ms ease, border-radius 180ms ease, background 180ms ease, border-color 180ms ease, transform 150ms ease;
         }
@@ -957,6 +984,8 @@
         .gws-fab.is-paused {
             border-color: rgba(212, 168, 67, 0.3);
             background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
         .gws-fab-icon {
@@ -975,13 +1004,15 @@
             position: absolute;
             right: 0;
             bottom: calc(100% + 10px);
-            width: 248px;
+            width: 280px;
             display: grid;
             gap: 10px;
             padding: 12px;
             border: 1px solid var(--border);
             border-radius: 14px;
-            background: #1a1a1a;
+            background: rgba(26, 26, 26, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
         }
 
@@ -1828,6 +1859,11 @@
         const STAGE2_TASKS_PER_ELEMENT = 3;
         const MAX_STAGE2_ELEMENTS = 10;
         const STAGE2_CONFIRM_TEXT = 'backup';
+        const MAX_DRAFT_ASSETS = 12;
+        const TEMPLATE_BACKUP_TAB_TITLE_FALLBACK = 'Template Tabs Backups';
+        const TEMPLATE_BACKUP_TAB_TITLE_KEYS = ['template tabs backups', 'template tabs buckups'];
+        const TASK_09_BACKUP_TAB_TITLE = 'Task 09 — Drafting';
+        const MAX_DOCUMENT_TAB_TITLE_LENGTH = 50;
 
         const PHASE_DEFINITIONS = [
             { phase: 1, phaseName: 'Foundations' },
@@ -2450,8 +2486,124 @@
             };
         }
 
+        function normalizeDraftingState(drafting) {
+            const rawAssets = Array.isArray(drafting?.assets) ? drafting.assets : [];
+            const uniqueAssetKeys = new Set();
+            const assets = rawAssets
+                .map((assetName) => String(assetName || '').trim())
+                .filter(Boolean)
+                .filter((assetName) => {
+                    const key = assetName.toLowerCase();
+
+                    if (uniqueAssetKeys.has(key)) {
+                        return false;
+                    }
+
+                    uniqueAssetKeys.add(key);
+                    return true;
+                })
+                .slice(0, MAX_DRAFT_ASSETS);
+
+            const assetAssignments = Object.entries(drafting?.assetAssignments || {}).reduce((accumulator, [funnelItemName, itemAssets]) => {
+                const safeFunnelItemName = String(funnelItemName || '').trim();
+
+                if (!safeFunnelItemName) {
+                    return accumulator;
+                }
+
+                const uniqueAssignmentKeys = new Set();
+                const normalizedAssets = (Array.isArray(itemAssets) ? itemAssets : [])
+                    .map((assetName) => String(assetName || '').trim())
+                    .filter(Boolean)
+                    .filter((assetName) => {
+                        const key = assetName.toLowerCase();
+
+                        if (uniqueAssignmentKeys.has(key)) {
+                            return false;
+                        }
+
+                        uniqueAssignmentKeys.add(key);
+                        return true;
+                    })
+                    .slice(0, MAX_DRAFT_ASSETS);
+
+                if (normalizedAssets.length) {
+                    accumulator[safeFunnelItemName] = normalizedAssets;
+                }
+
+                return accumulator;
+            }, {});
+
+            const generatedTabIds = Array.from(new Set(
+                (Array.isArray(drafting?.generatedTabIds) ? drafting.generatedTabIds : [])
+                    .map((tabId) => String(tabId || '').trim())
+                    .filter(Boolean)
+            ));
+
+            const parentTabIds = Object.entries(drafting?.parentTabIds || {}).reduce((accumulator, [elementName, tabId]) => {
+                const safeElementName = String(elementName || '').trim();
+                const safeTabId = String(tabId || '').trim();
+
+                if (safeElementName && safeTabId) {
+                    accumulator[safeElementName] = safeTabId;
+                }
+
+                return accumulator;
+            }, {});
+
+            return {
+                assets,
+                assetAssignments,
+                generatedTabIds,
+                parentTabIds
+            };
+        }
+
         function getProjectStage2Elements(project) {
             return normalizeStage2State(project?.stage2).elements;
+        }
+
+        function getProjectDraftAssets(project) {
+            const draftingState = normalizeDraftingState(project?.drafting);
+            const assignmentAssets = Object.values(draftingState.assetAssignments || {}).flat();
+
+            if (assignmentAssets.length) {
+                const seenKeys = new Set();
+
+                return assignmentAssets.filter((assetName) => {
+                    const safeAssetName = String(assetName || '').trim();
+                    const key = safeAssetName.toLowerCase();
+
+                    if (!safeAssetName || seenKeys.has(key)) {
+                        return false;
+                    }
+
+                    seenKeys.add(key);
+                    return true;
+                });
+            }
+
+            return draftingState.assets;
+        }
+
+        function getProjectDraftAssetAssignments(project) {
+            const draftingState = normalizeDraftingState(project?.drafting);
+            const stage2Elements = getProjectStage2Elements(project);
+            const assignments = {};
+
+            stage2Elements.forEach((elementName) => {
+                const safeElementName = String(elementName || '').trim();
+
+                if (!safeElementName) {
+                    return;
+                }
+
+                assignments[safeElementName] = [
+                    ...(draftingState.assetAssignments[safeElementName] || draftingState.assets || [])
+                ];
+            });
+
+            return assignments;
         }
 
         function getProjectTaskDefinitions(project) {
@@ -2614,6 +2766,7 @@
                 ? project.name.trim()
                 : `Project ${index + 1}`;
             const stage2 = normalizeStage2State(project.stage2);
+            const drafting = normalizeDraftingState(project.drafting);
             const rawTasks = Array.isArray(project.tasks) ? project.tasks : [];
             const taskDefinitions = getProjectTaskDefinitions({ ...project, stage2 });
             const tasks = taskDefinitions.map((taskDefinition) => {
@@ -2632,6 +2785,7 @@
                 projectDocId: typeof project.projectDocId === 'string' ? project.projectDocId : '',
                 lastOpenedTask: recoveredLastOpenedTask,
                 stage2,
+                drafting,
                 tasks
             };
         }
@@ -3080,6 +3234,7 @@
                 projectDocId: copiedProjectDoc.id,
                 lastOpenedTask: 1,
                 stage2: normalizeStage2State({}),
+                drafting: normalizeDraftingState({}),
                 tasks: projectTasks
             };
         }
@@ -4167,6 +4322,216 @@
             );
         }
 
+        function DraftAssetsSetupModal({
+            isOpen,
+            funnelItems,
+            assetAssignments,
+            isSubmitting,
+            error,
+            onChangeAsset,
+            onAddAsset,
+            onRemoveAsset,
+            onCancel,
+            onSubmit
+        }) {
+            const [draftAssetNames, setDraftAssetNames] = useState({});
+            const [editingByFunnelItem, setEditingByFunnelItem] = useState({});
+            const totalAssetCount = funnelItems.reduce((count, funnelItemName) => {
+                return count + (assetAssignments[funnelItemName]?.length || 0);
+            }, 0);
+            const canSubmit = !isSubmitting
+                && funnelItems.length > 0
+                && funnelItems.every((funnelItemName) => {
+                    const funnelAssets = assetAssignments[funnelItemName] || [];
+                    return funnelAssets.length > 0 && funnelAssets.every((assetName) => String(assetName || '').trim());
+                });
+
+            useEffect(() => {
+                if (!isOpen) {
+                    return;
+                }
+
+                const nextDraftNames = {};
+                const nextEditingState = {};
+
+                funnelItems.forEach((funnelItemName) => {
+                    nextDraftNames[funnelItemName] = '';
+                    nextEditingState[funnelItemName] = null;
+                });
+
+                setDraftAssetNames(nextDraftNames);
+                setEditingByFunnelItem(nextEditingState);
+            }, [isOpen, funnelItems]);
+
+            const handleSubmitAssetDraft = (funnelItemName) => {
+                const safeDraftName = String(draftAssetNames[funnelItemName] || '').trim();
+                const editingIndex = editingByFunnelItem[funnelItemName];
+
+                if (!safeDraftName || isSubmitting) {
+                    return;
+                }
+
+                let wasSaved = false;
+
+                if (Number.isInteger(editingIndex)) {
+                    wasSaved = Boolean(onChangeAsset(funnelItemName, editingIndex, safeDraftName));
+                } else {
+                    wasSaved = Boolean(onAddAsset(funnelItemName, safeDraftName));
+                }
+
+                if (wasSaved) {
+                    setDraftAssetNames((previousState) => ({
+                        ...previousState,
+                        [funnelItemName]: ''
+                    }));
+                    setEditingByFunnelItem((previousState) => ({
+                        ...previousState,
+                        [funnelItemName]: null
+                    }));
+                }
+            };
+
+            const handleStartEdit = (funnelItemName, index) => {
+                const nextValue = String(assetAssignments[funnelItemName]?.[index] || '');
+
+                setDraftAssetNames((previousState) => ({
+                    ...previousState,
+                    [funnelItemName]: nextValue
+                }));
+                setEditingByFunnelItem((previousState) => ({
+                    ...previousState,
+                    [funnelItemName]: index
+                }));
+            };
+
+            if (!isOpen) {
+                return null;
+            }
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="draft-assets-setup-title">
+                    <form
+                        className="onboarding-modal"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+
+                            if (canSubmit) {
+                                onSubmit();
+                            }
+                        }}
+                    >
+                        <h2 id="draft-assets-setup-title">Set draft assets for Task 9</h2>
+                        <p>
+                            Add draft assets inside each funnel group. On submit, template draft duplicates will be moved under each funnel item and renamed exactly to the draft asset names you entered.
+                        </p>
+
+                        <div className="delete-modal-warning">
+                            Funnel items detected: {funnelItems.join(' • ')}
+                        </div>
+
+                        <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
+                            <span className="project-meta">Each funnel item needs at least one draft asset.</span>
+                            <span className="project-meta">Total assets: {totalAssetCount}</span>
+                        </div>
+
+                        {funnelItems.map((funnelItemName, funnelItemIndex) => {
+                            const funnelAssets = assetAssignments[funnelItemName] || [];
+                            const editingIndex = editingByFunnelItem[funnelItemName];
+
+                            return (
+                                <div key={`draft-funnel-${funnelItemName}-${funnelItemIndex}`} className="stage2-element-list" style={{ marginBottom: '1rem' }}>
+                                    <div className="delete-modal-warning" style={{ marginBottom: '0.75rem' }}>
+                                        <strong>{funnelItemName}</strong>
+                                    </div>
+
+                                    <div className="stage2-element-builder">
+                                        <input
+                                            className="project-name-input"
+                                            value={draftAssetNames[funnelItemName] || ''}
+                                            onChange={(event) => setDraftAssetNames((previousState) => ({
+                                                ...previousState,
+                                                [funnelItemName]: event.target.value
+                                            }))}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter') {
+                                                    event.preventDefault();
+                                                    handleSubmitAssetDraft(funnelItemName);
+                                                }
+                                            }}
+                                            placeholder={Number.isInteger(editingIndex)
+                                                ? `Edit asset ${editingIndex + 1} for ${funnelItemName}`
+                                                : `Add draft asset for ${funnelItemName}`}
+                                            autoFocus={funnelItemIndex === 0}
+                                        />
+                                        <button
+                                            className="stage2-push-button"
+                                            type="button"
+                                            onClick={() => handleSubmitAssetDraft(funnelItemName)}
+                                            disabled={!String(draftAssetNames[funnelItemName] || '').trim() || isSubmitting}
+                                            title={Number.isInteger(editingIndex) ? 'Save asset' : 'Add asset'}
+                                            aria-label={Number.isInteger(editingIndex) ? 'Save asset' : 'Add asset'}
+                                        >
+                                            ↵
+                                        </button>
+                                    </div>
+
+                                    <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
+                                        <span className="project-meta">
+                                            {Number.isInteger(editingIndex)
+                                                ? `Editing asset ${editingIndex + 1}. Press Enter or arrow to save.`
+                                                : 'Press Enter or arrow to add.'}
+                                        </span>
+                                        <span className="project-meta">{funnelAssets.length}/{MAX_DRAFT_ASSETS}</span>
+                                    </div>
+
+                                    {!funnelAssets.length && (
+                                        <div className="stage2-empty-state">No assets for {funnelItemName} yet.</div>
+                                    )}
+
+                                    {funnelAssets.map((assetName, assetIndex) => (
+                                        <div key={`draft-asset-${funnelItemName}-${assetIndex}-${assetName}`} className="stage2-element-row">
+                                            <span className="stage2-element-name">{assetName}</span>
+                                            <div className="stage2-element-actions">
+                                                <button
+                                                    className="stage2-icon-button"
+                                                    type="button"
+                                                    onClick={() => handleStartEdit(funnelItemName, assetIndex)}
+                                                    disabled={isSubmitting}
+                                                    title={`Edit ${assetName}`}
+                                                    aria-label={`Edit ${assetName}`}
+                                                >
+                                                    ✎
+                                                </button>
+                                                <button
+                                                    className="stage2-icon-button"
+                                                    type="button"
+                                                    onClick={() => onRemoveAsset(funnelItemName, assetIndex)}
+                                                    disabled={isSubmitting}
+                                                    title={`Delete ${assetName}`}
+                                                    aria-label={`Delete ${assetName}`}
+                                                >
+                                                    🗑
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })}
+
+                        {error && <div className="error-box">{error}</div>}
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" disabled={isSubmitting} onClick={onCancel}>Cancel</button>
+                            <button className="primary-action" type="submit" disabled={!canSubmit}>
+                                {isSubmitting ? 'Applying...' : 'Submit'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
         function ProjectNavigation({
             projects,
             currentProjectId,
@@ -4713,6 +5078,127 @@
             return '';
         }
 
+        function validateDraftAssets(assets) {
+            const safeAssets = Array.isArray(assets) ? assets : [];
+
+            if (!safeAssets.length) {
+                return 'Add at least one draft asset.';
+            }
+
+            if (safeAssets.length > MAX_DRAFT_ASSETS) {
+                return `You can add up to ${MAX_DRAFT_ASSETS} draft assets.`;
+            }
+
+            const seenKeys = new Set();
+
+            for (const assetName of safeAssets) {
+                const safeAssetName = String(assetName || '').trim();
+
+                if (!safeAssetName) {
+                    return 'Draft asset names cannot be empty.';
+                }
+
+                const key = safeAssetName.toLowerCase();
+
+                if (seenKeys.has(key)) {
+                    return `Duplicate draft asset name found: "${safeAssetName}".`;
+                }
+
+                seenKeys.add(key);
+            }
+
+            return '';
+        }
+
+        function validateDraftAssetAssignments(assetAssignments, funnelItems) {
+            const safeAssignments = assetAssignments && typeof assetAssignments === 'object' ? assetAssignments : {};
+            const safeFunnelItems = Array.isArray(funnelItems) ? funnelItems : [];
+            const globalAssetKeys = new Set();
+
+            if (!safeFunnelItems.length) {
+                return 'Set Stage 2 funnel elements before configuring draft assets.';
+            }
+
+            for (const funnelItemName of safeFunnelItems) {
+                const safeFunnelItemName = String(funnelItemName || '').trim();
+
+                if (!safeFunnelItemName) {
+                    return 'Funnel item name cannot be empty.';
+                }
+
+                const assets = Array.isArray(safeAssignments[safeFunnelItemName]) ? safeAssignments[safeFunnelItemName] : [];
+
+                if (!assets.length) {
+                    return `Add at least one draft asset for ${safeFunnelItemName}.`;
+                }
+
+                if (assets.length > MAX_DRAFT_ASSETS) {
+                    return `You can add up to ${MAX_DRAFT_ASSETS} draft assets per funnel item.`;
+                }
+
+                const localAssetKeys = new Set();
+
+                for (const assetName of assets) {
+                    const safeAssetName = String(assetName || '').trim();
+
+                    if (!safeAssetName) {
+                        return `Draft asset names cannot be empty for ${safeFunnelItemName}.`;
+                    }
+
+                    const localKey = safeAssetName.toLowerCase();
+
+                    if (localAssetKeys.has(localKey)) {
+                        return `Duplicate draft asset name found in ${safeFunnelItemName}: "${safeAssetName}".`;
+                    }
+
+                    localAssetKeys.add(localKey);
+
+                    if (globalAssetKeys.has(localKey)) {
+                        return `Draft asset name must be unique across all funnel items: "${safeAssetName}".`;
+                    }
+
+                    globalAssetKeys.add(localKey);
+                }
+            }
+
+            return '';
+        }
+
+        function sanitizeDocumentTabTitle(title, fallback = 'Draft') {
+            const safeFallback = String(fallback || '').trim() || 'Draft';
+            const safeTitle = String(title || '').trim() || safeFallback;
+            const maxTitleLength = Math.max(8, Number(MAX_DOCUMENT_TAB_TITLE_LENGTH) || 50);
+            return safeTitle.slice(0, maxTitleLength);
+        }
+
+        function buildUniqueTabTitle(baseTitle, usedTitleKeys) {
+            const fallbackTitle = 'Draft';
+            const safeBaseTitle = sanitizeDocumentTabTitle(baseTitle, fallbackTitle);
+            const maxTitleLength = Math.max(8, Number(MAX_DOCUMENT_TAB_TITLE_LENGTH) || 50);
+            const trimToLimit = (value, maxLength) => sanitizeDocumentTabTitle(
+                String(value || '').trim().slice(0, Math.max(1, maxLength)),
+                fallbackTitle
+            );
+            const baseWithinLimit = trimToLimit(safeBaseTitle, maxTitleLength);
+            let nextTitle = baseWithinLimit || fallbackTitle;
+            let suffix = 2;
+
+            while (usedTitleKeys.has(nextTitle.toLowerCase())) {
+                const suffixText = ` ${suffix}`;
+                const maxBaseLength = Math.max(1, maxTitleLength - suffixText.length);
+                const candidateBase = trimToLimit(baseWithinLimit || fallbackTitle, maxBaseLength);
+                nextTitle = `${candidateBase}${suffixText}`;
+                suffix += 1;
+            }
+
+            usedTitleKeys.add(nextTitle.toLowerCase());
+            return nextTitle;
+        }
+
+        function buildUniqueDraftTabTitle(assetName, templateTitle, usedTitleKeys) {
+            return sanitizeDocumentTabTitle(assetName, 'Draft');
+        }
+
         function rebuildProjectTasksForStage2(project, elementNames) {
             const previousTaskDefinitions = getProjectTaskDefinitions(project);
             const previousTasksByTemplateTaskId = {};
@@ -4816,7 +5302,8 @@
             const [authTokenClient, setAuthTokenClient] = useState(null);
             const [authNotice, setAuthNotice] = useState(() => INITIAL_AUTH_NOTICE || (isPlaceholderClientId() ? 'Google OAuth is implemented, but the client ID is still a placeholder.' : ''));
             const authRequestRef = useRef(null);
-            const lastVisitedTaskIdRef = useRef(null);
+            const lastStage2PromptKeyRef = useRef('');
+            const lastDraftPromptKeyRef = useRef('');
             const stage2MenuRef = useRef(null);
             const gwsMenuRef = useRef(null);
             const gwsAudioContextRef = useRef(null);
@@ -4854,6 +5341,12 @@
                 error: '',
                 elements: [],
                 confirmText: ''
+            });
+            const [draftAssetsSetupState, setDraftAssetsSetupState] = useState({
+                isOpen: false,
+                isSubmitting: false,
+                error: '',
+                assetAssignments: {}
             });
 
             useEffect(() => {
@@ -5056,13 +5549,51 @@
                 playGwsCompletionRingtone(gwsAudioContextRef).catch(() => {});
             }, [isGwsRunning, gwsRemainingSeconds]);
 
+            const currentProject = useMemo(() => getCurrentProject(appState), [appState]);
+            const currentTask = useMemo(() => getCurrentTask(currentProject), [currentProject]);
+            const currentTaskDefinition = useMemo(() => (
+                getTaskDefinition(currentTask?.taskId || firstTask.taskId, currentProject)
+            ), [currentTask, currentProject, firstTask.taskId]);
+            const isTaskFiveComplete = useMemo(() => {
+                if (!currentProject) {
+                    return false;
+                }
+
+                return isTaskComplete(getProjectTask(currentProject, 5));
+            }, [currentProject]);
+            const isTaskEightComplete = useMemo(() => {
+                if (!currentProject) {
+                    return false;
+                }
+
+                const taskDefinitions = getProjectTaskDefinitions(currentProject);
+                const taskEightDefinition = taskDefinitions.find((taskDefinition) => Number(taskDefinition.sourceTemplateTaskId || taskDefinition.taskId) === 8);
+
+                if (!taskEightDefinition) {
+                    return false;
+                }
+
+                return isTaskComplete(getProjectTask(currentProject, taskEightDefinition.taskId));
+            }, [currentProject]);
+            const isDraftingTaskSelected = useMemo(() => {
+                return Number(currentTaskDefinition?.sourceTemplateTaskId || currentTaskDefinition?.taskId) === 9;
+            }, [currentTaskDefinition]);
+            const projectPendingDelete = useMemo(() => (
+                appState.projects.find((project) => project.id === deleteProjectState.projectId) || null
+            ), [appState.projects, deleteProjectState.projectId]);
+            const projectPendingRename = useMemo(() => (
+                appState.projects.find((project) => project.id === renameProjectState.projectId) || null
+            ), [appState.projects, renameProjectState.projectId]);
+
             useEffect(() => {
-                const currentTaskId = Number(currentTask?.taskId) || 0;
-                const isEnteringTaskSix = currentTaskId === 6 && lastVisitedTaskIdRef.current !== 6;
+                if (!currentProject) {
+                    return;
+                }
 
-                lastVisitedTaskIdRef.current = currentTaskId;
+                const selectedTemplateTaskId = Number(currentTaskDefinition?.sourceTemplateTaskId || currentTask?.taskId || 0);
 
-                if (!isEnteringTaskSix || !currentProject || !isTaskFiveComplete) {
+                if (selectedTemplateTaskId !== 6) {
+                    lastStage2PromptKeyRef.current = '';
                     return;
                 }
 
@@ -5072,6 +5603,14 @@
                     return;
                 }
 
+                const promptKey = `${currentProject.id}:${Number(currentTask?.taskId) || 0}`;
+
+                if (lastStage2PromptKeyRef.current === promptKey) {
+                    return;
+                }
+
+                lastStage2PromptKeyRef.current = promptKey;
+
                 setStage2SetupState({
                     isOpen: true,
                     isReconfigure: false,
@@ -5080,7 +5619,45 @@
                     elements: [],
                     confirmText: ''
                 });
-            }, [currentTask?.taskId, currentProject, isTaskFiveComplete, stage2SetupState.isOpen]);
+            }, [currentProject, currentTask?.taskId, currentTaskDefinition, stage2SetupState.isOpen]);
+
+            useEffect(() => {
+                if (!currentProject) {
+                    return;
+                }
+
+                const selectedTemplateTaskId = Number(currentTaskDefinition?.sourceTemplateTaskId || currentTask?.taskId || 0);
+
+                if (selectedTemplateTaskId !== 9) {
+                    lastDraftPromptKeyRef.current = '';
+                    return;
+                }
+
+                if (draftAssetsSetupState.isOpen) {
+                    return;
+                }
+
+                const funnelItems = getProjectStage2Elements(currentProject);
+
+                if (!funnelItems.length || getProjectDraftAssets(currentProject).length > 0) {
+                    return;
+                }
+
+                const promptKey = `${currentProject.id}:${Number(currentTask?.taskId) || 0}`;
+
+                if (lastDraftPromptKeyRef.current === promptKey) {
+                    return;
+                }
+
+                lastDraftPromptKeyRef.current = promptKey;
+
+                setDraftAssetsSetupState({
+                    isOpen: true,
+                    isSubmitting: false,
+                    error: '',
+                    assetAssignments: getProjectDraftAssetAssignments(currentProject)
+                });
+            }, [currentProject, currentTask?.taskId, currentTaskDefinition, draftAssetsSetupState.isOpen]);
 
             useEffect(() => {
                 window.StrategicMarketingBootcampAuthRuntime = {
@@ -5111,25 +5688,6 @@
                     setAuthNotice('Google access expired. Reconnect Google before making Drive changes. Your projects remain saved.');
                 });
             }, [authReady, authToken, authTokenClient]);
-
-            const currentProject = useMemo(() => getCurrentProject(appState), [appState]);
-            const currentTask = useMemo(() => getCurrentTask(currentProject), [currentProject]);
-            const currentTaskDefinition = useMemo(() => (
-                getTaskDefinition(currentTask?.taskId || firstTask.taskId, currentProject)
-            ), [currentTask, currentProject, firstTask.taskId]);
-            const isTaskFiveComplete = useMemo(() => {
-                if (!currentProject) {
-                    return false;
-                }
-
-                return isTaskComplete(getProjectTask(currentProject, 5));
-            }, [currentProject]);
-            const projectPendingDelete = useMemo(() => (
-                appState.projects.find((project) => project.id === deleteProjectState.projectId) || null
-            ), [appState.projects, deleteProjectState.projectId]);
-            const projectPendingRename = useMemo(() => (
-                appState.projects.find((project) => project.id === renameProjectState.projectId) || null
-            ), [appState.projects, renameProjectState.projectId]);
 
             const persistState = (nextState) => {
                 const savedState = saveState(nextState);
@@ -5555,6 +6113,559 @@
                 });
             };
 
+            const handleOpenDraftAssetsSetup = () => {
+                if (!currentProject || !isTaskEightComplete) {
+                    return;
+                }
+
+                const existingAssignments = getProjectDraftAssetAssignments(currentProject);
+
+                setDraftAssetsSetupState({
+                    isOpen: true,
+                    isSubmitting: false,
+                    error: '',
+                    assetAssignments: existingAssignments
+                });
+            };
+
+            const handleCancelDraftAssetsSetup = () => {
+                if (draftAssetsSetupState.isSubmitting) {
+                    return;
+                }
+
+                setDraftAssetsSetupState((previousState) => ({
+                    ...previousState,
+                    isOpen: false,
+                    error: ''
+                }));
+            };
+
+            const handleDraftAssetChange = (funnelItemName, index, value) => {
+                const safeFunnelItemName = String(funnelItemName || '').trim();
+                const nextAssetName = String(value || '').trim();
+                let didUpdate = false;
+
+                setDraftAssetsSetupState((previousState) => {
+                    if (!safeFunnelItemName) {
+                        return previousState;
+                    }
+
+                    if (!nextAssetName) {
+                        return {
+                            ...previousState,
+                            error: 'Draft asset names cannot be empty.'
+                        };
+                    }
+
+                    const currentAssets = Array.isArray(previousState.assetAssignments?.[safeFunnelItemName])
+                        ? previousState.assetAssignments[safeFunnelItemName]
+                        : [];
+
+                    const duplicateExists = currentAssets.some((assetName, assetIndex) => (
+                        assetIndex !== index && String(assetName || '').trim().toLowerCase() === nextAssetName.toLowerCase()
+                    ));
+
+                    if (duplicateExists) {
+                        return {
+                            ...previousState,
+                            error: `Duplicate draft asset name found: "${nextAssetName}".`
+                        };
+                    }
+
+                    didUpdate = true;
+
+                    return {
+                        ...previousState,
+                        assetAssignments: {
+                            ...(previousState.assetAssignments || {}),
+                            [safeFunnelItemName]: currentAssets.map((assetName, assetIndex) => (
+                                assetIndex === index ? nextAssetName : assetName
+                            ))
+                        },
+                        error: ''
+                    };
+                });
+
+                return didUpdate;
+            };
+
+            const handleDraftAssetAdd = (funnelItemName, value) => {
+                const safeFunnelItemName = String(funnelItemName || '').trim();
+                const nextAssetName = String(value || '').trim();
+                let didAdd = false;
+
+                setDraftAssetsSetupState((previousState) => {
+                    if (!safeFunnelItemName) {
+                        return previousState;
+                    }
+
+                    if (!nextAssetName) {
+                        return {
+                            ...previousState,
+                            error: 'Enter a draft asset name before adding.'
+                        };
+                    }
+
+                    const currentAssets = Array.isArray(previousState.assetAssignments?.[safeFunnelItemName])
+                        ? previousState.assetAssignments[safeFunnelItemName]
+                        : [];
+
+                    if (currentAssets.length >= MAX_DRAFT_ASSETS) {
+                        return {
+                            ...previousState,
+                            error: `You can add up to ${MAX_DRAFT_ASSETS} draft assets for ${safeFunnelItemName}.`
+                        };
+                    }
+
+                    const duplicateExists = currentAssets.some((assetName) => (
+                        String(assetName || '').trim().toLowerCase() === nextAssetName.toLowerCase()
+                    ));
+
+                    if (duplicateExists) {
+                        return {
+                            ...previousState,
+                            error: `Duplicate draft asset name found: "${nextAssetName}".`
+                        };
+                    }
+
+                    didAdd = true;
+
+                    return {
+                        ...previousState,
+                        assetAssignments: {
+                            ...(previousState.assetAssignments || {}),
+                            [safeFunnelItemName]: [...currentAssets, nextAssetName]
+                        },
+                        error: ''
+                    };
+                });
+
+                return didAdd;
+            };
+
+            const handleDraftAssetRemove = (funnelItemName, index) => {
+                const safeFunnelItemName = String(funnelItemName || '').trim();
+
+                setDraftAssetsSetupState((previousState) => {
+                    const currentAssets = Array.isArray(previousState.assetAssignments?.[safeFunnelItemName])
+                        ? previousState.assetAssignments[safeFunnelItemName]
+                        : [];
+
+                    if (!safeFunnelItemName || !currentAssets.length) {
+                        return previousState;
+                    }
+
+                    return {
+                        ...previousState,
+                        assetAssignments: {
+                            ...(previousState.assetAssignments || {}),
+                            [safeFunnelItemName]: currentAssets.filter((_, assetIndex) => assetIndex !== index)
+                        },
+                        error: ''
+                    };
+                });
+            };
+
+            const syncDraftingDocumentTabs = async (driveToken, projectBeforeSync, projectAfterSync, assetAssignments) => {
+                if (!projectAfterSync.projectDocId) {
+                    return normalizeDraftingState(projectAfterSync.drafting);
+                }
+
+                const documentId = projectAfterSync.projectDocId;
+                const funnelItems = getProjectStage2Elements(projectAfterSync);
+
+                if (!funnelItems.length) {
+                    throw new Error('Set Stage 2 funnel elements before configuring draft assets.');
+                }
+
+                const validationError = validateDraftAssetAssignments(assetAssignments, funnelItems);
+
+                if (validationError) {
+                    throw new Error(validationError);
+                }
+
+                const draftingRootTabId = String(getStaticTaskDefinition(9)?.tabId || '').trim();
+
+                if (!draftingRootTabId) {
+                    throw new Error('Task 9 drafting tab ID is missing.');
+                }
+
+                const existingGeneratedTabIds = [...(projectBeforeSync.drafting?.generatedTabIds || [])].reverse();
+                const tabsBeforeCleanup = await listDocumentTabs(driveToken, documentId);
+                const tabBeforeCleanupById = new Map(tabsBeforeCleanup.map((tab) => [tab.tabId, tab]));
+                const generatedParentTabIds = new Set(
+                    Object.values(projectBeforeSync.drafting?.parentTabIds || {})
+                        .map((tabId) => String(tabId || '').trim())
+                        .filter(Boolean)
+                );
+
+                existingGeneratedTabIds.forEach((tabId) => {
+                    const safeTabId = String(tabId || '').trim();
+                    const tabMeta = tabBeforeCleanupById.get(safeTabId);
+
+                    if (tabMeta?.parentTabId === draftingRootTabId) {
+                        generatedParentTabIds.add(safeTabId);
+                    }
+                });
+
+                let nextTemplateSlot = tabsBeforeCleanup.filter((tab) => tab.parentTabId === draftingRootTabId).length;
+
+                for (const tabId of existingGeneratedTabIds) {
+                    const safeTabId = String(tabId || '').trim();
+
+                    if (!safeTabId || generatedParentTabIds.has(safeTabId) || !tabBeforeCleanupById.has(safeTabId)) {
+                        continue;
+                    }
+
+                    const poolTitle = `Task 9 Template ${String(nextTemplateSlot + 1).padStart(2, '0')}`;
+
+                    try {
+                        await updateDocumentTabProperties(
+                            driveToken,
+                            documentId,
+                            safeTabId,
+                            {
+                                parentTabId: draftingRootTabId,
+                                index: nextTemplateSlot,
+                                title: poolTitle
+                            },
+                            'parentTabId,index,title'
+                        );
+                        nextTemplateSlot += 1;
+                    } catch (error) {
+                        // Keep flow resilient if a tab is stale or already deleted.
+                    }
+                }
+
+                for (const tabId of existingGeneratedTabIds) {
+                    const safeTabId = String(tabId || '').trim();
+
+                    if (!safeTabId || !generatedParentTabIds.has(safeTabId)) {
+                        continue;
+                    }
+
+                    try {
+                        await deleteDocumentTab(driveToken, documentId, safeTabId);
+                    } catch (error) {
+                        // Ignore stale tab IDs from earlier runs.
+                    }
+                }
+
+                const totalAssetCount = funnelItems.reduce((count, funnelItemName) => {
+                    const safeName = String(funnelItemName || '').trim();
+                    return count + ((assetAssignments[safeName] || []).length || 0);
+                }, 0);
+
+                if (!totalAssetCount) {
+                    return normalizeDraftingState({
+                        assets: [],
+                        assetAssignments: {},
+                        generatedTabIds: [],
+                        parentTabIds: {}
+                    });
+                }
+
+                const tabsAfterCleanup = await listDocumentTabs(driveToken, documentId);
+                const rootTabExists = tabsAfterCleanup.some((tab) => tab.tabId === draftingRootTabId);
+
+                if (!rootTabExists) {
+                    throw new Error('Task 9 drafting tab was not found in the document.');
+                }
+
+                const tabsById = new Map(tabsAfterCleanup.map((tab) => [tab.tabId, tab]));
+                const getTabDepth = (tabId) => {
+                    const visitedTabIds = new Set();
+                    let currentTabId = String(tabId || '').trim();
+                    let depth = 0;
+
+                    while (currentTabId) {
+                        if (visitedTabIds.has(currentTabId)) {
+                            break;
+                        }
+
+                        visitedTabIds.add(currentTabId);
+                        const tabMeta = tabsById.get(currentTabId);
+                        depth += 1;
+
+                        if (!tabMeta) {
+                            break;
+                        }
+
+                        currentTabId = String(tabMeta.parentTabId || '').trim();
+                    }
+
+                    return depth;
+                };
+
+                const draftingRootMeta = tabsById.get(draftingRootTabId) || null;
+                const draftingRootDepth = getTabDepth(draftingRootTabId);
+
+                // Task 9 creates two nested levels below the Drafting root (funnel parent + asset child),
+                // so keep Drafting at top-level to stay within Docs' max nesting depth.
+                if (draftingRootMeta?.parentTabId && draftingRootDepth > 1) {
+                    try {
+                        await updateDocumentTabProperties(
+                            driveToken,
+                            documentId,
+                            draftingRootTabId,
+                            { parentTabId: '' },
+                            'parentTabId'
+                        );
+                    } catch (error) {
+                        throw new Error('Task 9 Drafting tab is nested too deep. Move it to top-level (not under backup tabs) and retry.');
+                    }
+                }
+
+                const tabsAfterRootRestore = await listDocumentTabs(driveToken, documentId);
+                const tabsAfterRootRestoreById = new Map(tabsAfterRootRestore.map((tab) => [tab.tabId, tab]));
+                const restoredDraftingRoot = tabsAfterRootRestoreById.get(draftingRootTabId) || null;
+
+                if (restoredDraftingRoot?.parentTabId) {
+                    throw new Error('Task 9 Drafting tab is still nested. Move it to top-level and retry.');
+                }
+
+                const generatedTabIds = [];
+                const parentTabIds = {};
+                const existingTitles = new Set(tabsAfterRootRestore.map((tab) => String(tab.title || '').trim().toLowerCase()).filter(Boolean));
+                const templatePoolTabs = tabsAfterRootRestore
+                    .filter((tab) => tab.parentTabId === draftingRootTabId)
+                    .sort((leftTab, rightTab) => leftTab.index - rightTab.index);
+
+                let templateBackupTab = tabsAfterRootRestore.find((tab) => (
+                    !tab.parentTabId && TEMPLATE_BACKUP_TAB_TITLE_KEYS.includes(String(tab.title || '').trim().toLowerCase())
+                )) || null;
+
+                if (!templateBackupTab?.tabId) {
+                    templateBackupTab = await addDocumentTab(driveToken, documentId, TEMPLATE_BACKUP_TAB_TITLE_FALLBACK);
+                }
+
+                let task09BackupTab = tabsAfterRootRestore.find((tab) => (
+                    tab.parentTabId === templateBackupTab.tabId
+                    && String(tab.title || '').trim().toLowerCase() === TASK_09_BACKUP_TAB_TITLE.toLowerCase()
+                )) || null;
+
+                const templateBackupChildren = tabsAfterRootRestore
+                    .filter((tab) => tab.parentTabId === templateBackupTab.tabId)
+                    .sort((leftTab, rightTab) => leftTab.index - rightTab.index);
+
+                if (!task09BackupTab?.tabId) {
+                    task09BackupTab = await addDocumentTab(driveToken, documentId, TASK_09_BACKUP_TAB_TITLE, {
+                        parentTabId: templateBackupTab.tabId,
+                        index: templateBackupChildren.length
+                    });
+                } else if (Number.isInteger(task09BackupTab.index) && task09BackupTab.index !== templateBackupChildren.length - 1) {
+                    try {
+                        await updateDocumentTabProperties(
+                            driveToken,
+                            documentId,
+                            task09BackupTab.tabId,
+                            {
+                                parentTabId: templateBackupTab.tabId,
+                                index: templateBackupChildren.length - 1
+                            },
+                            'parentTabId,index'
+                        );
+                    } catch (error) {
+                        // Keep cleanup resilient if ordering cannot be updated.
+                    }
+                }
+
+                if (templatePoolTabs.length < totalAssetCount) {
+                    throw new Error(
+                        `Not enough Task 9 draft template duplicates. Expected ${totalAssetCount}, found ${templatePoolTabs.length}.`
+                    );
+                }
+
+                let templateCursor = 0;
+
+                for (let funnelIndex = 0; funnelIndex < funnelItems.length; funnelIndex += 1) {
+                    const funnelItemName = String(funnelItems[funnelIndex] || '').trim();
+
+                    if (!funnelItemName) {
+                        continue;
+                    }
+
+                    const uniqueParentTitle = buildUniqueTabTitle(funnelItemName, existingTitles);
+
+                    const parentTab = await addDocumentTab(driveToken, documentId, uniqueParentTitle, {
+                        parentTabId: draftingRootTabId,
+                        index: funnelIndex
+                    });
+
+                    generatedTabIds.push(parentTab.tabId);
+                    parentTabIds[uniqueParentTitle] = parentTab.tabId;
+
+                    const funnelAssets = assetAssignments[funnelItemName] || [];
+
+                    for (let assetIndex = 0; assetIndex < funnelAssets.length; assetIndex += 1) {
+                        const assetName = String(funnelAssets[assetIndex] || '').trim();
+
+                        if (!assetName) {
+                            continue;
+                        }
+
+                        const poolTemplateTab = templatePoolTabs[templateCursor] || null;
+
+                        if (!poolTemplateTab?.tabId) {
+                            throw new Error(`Unable to locate a Task 9 draft template tab for ${funnelItemName}.`);
+                        }
+
+                        templateCursor += 1;
+
+                        const previousTitleKey = String(poolTemplateTab.title || '').trim().toLowerCase();
+
+                        if (previousTitleKey) {
+                            existingTitles.delete(previousTitleKey);
+                        }
+
+                        const nextChildTitle = buildUniqueDraftTabTitle(assetName, poolTemplateTab.title || 'Draft', existingTitles);
+                        const nextChildTitleKey = nextChildTitle.toLowerCase();
+
+                        if (existingTitles.has(nextChildTitleKey)) {
+                            throw new Error(`Draft tab title already exists in this document: "${nextChildTitle}". Use a unique asset name.`);
+                        }
+
+                        await updateDocumentTabProperties(
+                            driveToken,
+                            documentId,
+                            poolTemplateTab.tabId,
+                            {
+                                parentTabId: parentTab.tabId,
+                                index: assetIndex,
+                                title: nextChildTitle
+                            },
+                            'parentTabId,index,title'
+                        );
+
+                        existingTitles.add(nextChildTitleKey);
+
+                        generatedTabIds.push(poolTemplateTab.tabId);
+                    }
+                }
+
+                const unusedTemplateTabs = templatePoolTabs.slice(templateCursor);
+
+                for (let unusedIndex = 0; unusedIndex < unusedTemplateTabs.length; unusedIndex += 1) {
+                    const templateTab = unusedTemplateTabs[unusedIndex];
+
+                    if (!templateTab?.tabId) {
+                        continue;
+                    }
+
+                    try {
+                        await updateDocumentTabProperties(
+                            driveToken,
+                            documentId,
+                            templateTab.tabId,
+                            {
+                                parentTabId: task09BackupTab.tabId,
+                                index: unusedIndex
+                            },
+                            'parentTabId,index'
+                        );
+                    } catch (error) {
+                        // Keep the cleanup resilient if a template tab is already missing or protected.
+                    }
+                }
+
+                return normalizeDraftingState({
+                    assets: [],
+                    assetAssignments,
+                    generatedTabIds,
+                    parentTabIds
+                });
+            };
+
+            const handleSubmitDraftAssetsSetup = async () => {
+                if (!currentProject || !isTaskEightComplete || draftAssetsSetupState.isSubmitting) {
+                    return;
+                }
+
+                const funnelItems = getProjectStage2Elements(currentProject);
+                const normalizedAssignments = funnelItems.reduce((accumulator, funnelItemName) => {
+                    const safeFunnelItemName = String(funnelItemName || '').trim();
+                    const rawAssets = draftAssetsSetupState.assetAssignments?.[safeFunnelItemName] || [];
+                    const seenKeys = new Set();
+
+                    accumulator[safeFunnelItemName] = rawAssets
+                        .map((assetName) => String(assetName || '').trim())
+                        .filter(Boolean)
+                        .filter((assetName) => {
+                            const key = assetName.toLowerCase();
+
+                            if (seenKeys.has(key)) {
+                                return false;
+                            }
+
+                            seenKeys.add(key);
+                            return true;
+                        })
+                        .slice(0, MAX_DRAFT_ASSETS);
+
+                    return accumulator;
+                }, {});
+                const validationError = validateDraftAssetAssignments(normalizedAssignments, funnelItems);
+
+                if (validationError) {
+                    setDraftAssetsSetupState((previousState) => ({ ...previousState, error: validationError }));
+                    return;
+                }
+
+                if (!funnelItems.length) {
+                    setDraftAssetsSetupState((previousState) => ({
+                        ...previousState,
+                        error: 'Set Stage 2 funnel elements before configuring draft assets.'
+                    }));
+                    return;
+                }
+
+                setDraftAssetsSetupState((previousState) => ({ ...previousState, isSubmitting: true, error: '' }));
+
+                try {
+                    const nextProjectState = {
+                        ...currentProject,
+                        drafting: normalizeDraftingState({
+                            assets: [],
+                            assetAssignments: normalizedAssignments,
+                            generatedTabIds: [],
+                            parentTabIds: {}
+                        })
+                    };
+                    let nextDraftingState = normalizeDraftingState(nextProjectState.drafting);
+
+                    if (nextProjectState.projectDocId) {
+                        const driveToken = await getValidGoogleToken('Reconnect Google before applying draft asset tabs. Your project has not been changed yet.');
+                        nextDraftingState = await syncDraftingDocumentTabs(driveToken, currentProject, nextProjectState, normalizedAssignments);
+                    }
+
+                    const finalProject = {
+                        ...nextProjectState,
+                        drafting: nextDraftingState
+                    };
+                    const nextState = {
+                        ...appState,
+                        projects: appState.projects.map((project) => (
+                            project.id === currentProject.id ? finalProject : project
+                        ))
+                    };
+
+                    persistState(nextState);
+                    setDraftAssetsSetupState({
+                        isOpen: false,
+                        isSubmitting: false,
+                        error: '',
+                        assetAssignments: {}
+                    });
+                    setLockedTaskMessage('Task 9 draft asset tabs created for all funnel items.');
+                } catch (error) {
+                    setDraftAssetsSetupState((previousState) => ({
+                        ...previousState,
+                        isSubmitting: false,
+                        error: error.message || 'Unable to apply draft assets setup. Please retry.'
+                    }));
+                }
+            };
+
             const syncStage2DocumentTabs = async (driveToken, projectBeforeSync, projectAfterTaskRebuild, elementNames) => {
                 if (!projectAfterTaskRebuild.projectDocId) {
                     return normalizeStage2State(projectAfterTaskRebuild.stage2);
@@ -5770,6 +6881,17 @@
                 const isFirstStage2Setup = previousElements.length === 0;
 
                 if (isFirstStage2Setup) {
+                    const tabsBeforeArchive = await listDocumentTabs(driveToken, documentId);
+                    let templateBackupTab = tabsBeforeArchive.find((tab) => (
+                        !tab.parentTabId && TEMPLATE_BACKUP_TAB_TITLE_KEYS.includes(String(tab.title || '').trim().toLowerCase())
+                    ));
+
+                    if (!templateBackupTab?.tabId) {
+                        templateBackupTab = await addDocumentTab(driveToken, documentId, TEMPLATE_BACKUP_TAB_TITLE_FALLBACK);
+                    }
+
+                    let archiveIndex = tabsBeforeArchive.filter((tab) => tab.parentTabId === templateBackupTab.tabId).length;
+
                     for (const templateTaskDefinition of stage2TemplateTasks) {
                         const templateTaskId = Number(templateTaskDefinition.taskId);
                         const poolRootTabId = templatePoolRootByTaskId[String(templateTaskId)] || '';
@@ -5779,9 +6901,19 @@
                         }
 
                         try {
-                            await deleteDocumentTab(driveToken, documentId, poolRootTabId);
+                            await updateDocumentTabProperties(
+                                driveToken,
+                                documentId,
+                                poolRootTabId,
+                                {
+                                    parentTabId: templateBackupTab.tabId,
+                                    index: archiveIndex
+                                },
+                                'parentTabId,index'
+                            );
+                            archiveIndex += 1;
                         } catch (error) {
-                            // Ignore if template root was already removed.
+                            // Ignore if template root was already moved or missing.
                         }
                     }
                 }
@@ -6050,6 +7182,18 @@
                                             >
                                                 {currentProject && getProjectStage2Elements(currentProject).length ? 'Reconfigure Funnel' : 'Set Funnel Elements'}
                                             </button>
+                                            <button
+                                                className="stage2-menu-item"
+                                                type="button"
+                                                role="menuitem"
+                                                disabled={!currentProject || !isTaskEightComplete || getProjectStage2Elements(currentProject).length === 0}
+                                                onClick={() => {
+                                                    setIsStage2MenuOpen(false);
+                                                    handleOpenDraftAssetsSetup();
+                                                }}
+                                            >
+                                                {currentProject && getProjectDraftAssets(currentProject).length ? 'Reconfigure Draft Assets' : 'Set Draft Assets'}
+                                            </button>
 
                                             <div className="stage2-menu-divider" aria-hidden="true" />
 
@@ -6214,6 +7358,19 @@
                         onChangeConfirmText={(value) => setStage2SetupState((previousState) => ({ ...previousState, confirmText: value, error: '' }))}
                         onCancel={handleCancelStage2Setup}
                         onSubmit={handleSubmitStage2Setup}
+                    />
+
+                    <DraftAssetsSetupModal
+                        isOpen={draftAssetsSetupState.isOpen}
+                        funnelItems={currentProject ? getProjectStage2Elements(currentProject) : []}
+                        assetAssignments={draftAssetsSetupState.assetAssignments || {}}
+                        isSubmitting={draftAssetsSetupState.isSubmitting}
+                        error={draftAssetsSetupState.error}
+                        onChangeAsset={handleDraftAssetChange}
+                        onAddAsset={handleDraftAssetAdd}
+                        onRemoveAsset={handleDraftAssetRemove}
+                        onCancel={handleCancelDraftAssetsSetup}
+                        onSubmit={handleSubmitDraftAssetsSetup}
                     />
                 </main>
             );

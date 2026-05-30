@@ -108,6 +108,16 @@ Date: 2026-05-06
 - The app now tries silent Google token refresh with `prompt: ''` before Drive create, rename, and delete operations when the saved access token is expired.
 - The app also attempts silent refresh on startup when a remembered Google connection exists but the short-lived access token is expired.
 - If silent refresh fails, projects remain visible and reconnect guidance is shown without clearing `smb_state`.
+- CR-015 completed after the sprint plan.
+- Stage 2 task architecture is now dynamic per project and starts only after Task 5 completion.
+- Stage 2 setup modal supports add/edit/delete/reorder funnel elements, unique-name validation, and destructive reconfigure confirmation requiring typed `backup`.
+- Fixed Stage 2 Tasks 6-8 are replaced by generated per-element task triplets, numbering starts at 6, and downstream task numbering shifts accordingly.
+- Sidebar now renders funnel elements as Stage 2 parent groups with their generated tasks beneath each element.
+- One-doc projects now create/sync Google Docs parent tabs by funnel element and child tabs for generated Stage 2 tasks with matching numbering and titles.
+- Generated Stage 2 task-to-tab mappings persist in project state so selecting a task opens the exact corresponding document tab.
+- CR-016 completed after the sprint plan.
+- Stage 2 setup popup now uses a single add/edit input with Enter-key support and a compact arrow action button.
+- Stage 2 element rows now show icon-only edit and delete actions, and edit reuses the same top input for updates.
 
 ## Not Started
 
@@ -145,6 +155,8 @@ Date: 2026-05-06
 - CR-012 validation confirms `public/index.html` has no editor diagnostics, the app preview returns HTTP 200, compatibility helper markers are present, legacy fallback markers are present, and updated recovery copy markers are present.
 - CR-013 validation confirms `public/index.html` has no editor diagnostics, the app preview returns HTTP 200, stale old-template creation markers are absent, master document copy markers remain, and legacy view fallback markers remain.
 - CR-014 validation confirms `public/index.html` has no editor diagnostics, the app preview returns HTTP 200, silent refresh helper markers are present, and Drive action refresh markers are present for create, rename, and delete.
+- CR-015 validation confirms `public/index.html` has no editor diagnostics, the app preview returns HTTP 200 from `public/`, Stage 2 modal/reconfigure markers are present, Docs tab create/update/delete helper markers are present, and generated Stage 2 task-tab mapping markers are present.
+- CR-016 validation confirms `public/index.html` has no editor diagnostics, localhost static serving returns HTTP 200, and Stage 2 popup markers for input builder, Enter-key add/save, and icon edit/delete actions are present.
 - `npm run build` still fails because legacy `src` files contain JSX in `.ts` files.
 - `npm start` still fails because the old generated `dist/main.js` path is unrelated legacy scaffold code.
 - Dependency audit reports 8 high severity vulnerabilities from old server-side dependencies.

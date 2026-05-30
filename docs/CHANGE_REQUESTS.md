@@ -642,3 +642,109 @@ Validation:
 - Static app returns HTTP 200 at `http://localhost:4173`.
 - Served app contains silent refresh helper markers.
 - Served app contains Drive action refresh markers for create, rename, and delete.
+
+## CR-015 — Dynamic Stage 2 funnel elements with synced Docs tabs
+
+Status: Complete
+Priority: High
+Date: 2026-05-25
+
+Problem:
+- Stage 2 previously used fixed Tasks 6-8 once per project.
+- Users need to answer the same Stage 2 strategy questions for multiple funnel elements (for example Meta Ad, Landing Page) while keeping numbering and document tabs synchronized.
+
+Goal:
+- After Task 5 completion, replace fixed Stage 2 tasks with generated per-element task triplets.
+- Keep sidebar tasks and Google Docs parent/child tabs synchronized with matching order and numbering.
+- Allow later reconfiguration with explicit destructive confirmation.
+
+Scope:
+- Add project-level Stage 2 state for ordered funnel elements, generated tab ownership, and task-to-tab mapping.
+- Show a Stage 2 setup modal after Task 5 is complete if Stage 2 is not configured.
+- Stage 2 modal supports add/edit/delete/reorder for element names, unique-name validation, and max 10 elements.
+- Add reconfigure flow with destructive warning and required typed confirmation `backup`.
+- Generate Stage 2 tasks from Task 6/7/8 templates for each element.
+- Number generated tasks from 6 upward in element order.
+- Shift downstream task numbering after generated Stage 2 block.
+- Create Google Docs parent tabs using exact element names.
+- Create 3 child tabs per parent with Task 6/7/8 wording and updated numbers only.
+- Insert Stage 2 template content into generated child tabs.
+- Remove only previously generated Stage 2 tabs/tasks on reconfigure, then rebuild.
+
+Scope completed:
+- Added dynamic task-definition building per project so Stage 2 can be generated from funnel element inputs.
+- Added Stage 2 project normalization fields: `elements`, `taskTabIds`, and `generatedTabIds`.
+- Added first-time Stage 2 setup modal trigger after Task 5 completion.
+- Added manual `Reconfigure Stage 2` action once Task 5 is complete.
+- Added Stage 2 modal validation and drag/drop plus arrow-based ordering controls.
+- Added destructive reconfigure guard requiring exact text `backup`.
+- Added Docs API helper layer (`docsRequest`, `docsBatchUpdate`, tab add/update/delete helpers).
+- Added Stage 2 tab synchronization flow to create parent/child tab trees and persist exact task-tab mappings.
+- Added downstream tab title renumbering after Stage 2 generation/reconfigure.
+- Updated sidebar rendering to group generated Stage 2 tasks under each funnel element.
+- Kept Task 5 unchanged and used it only as setup gate.
+
+Do not change:
+- Do not modify Task 5 content/checklist behavior.
+- Do not remove legacy non-Stage-2 tasks/content.
+- Do not delete non-generated user tabs during Stage 2 reconfigure.
+
+Acceptance criteria:
+- Stage 2 setup is available only after Task 5 is complete.
+- Parent tab titles equal funnel element names exactly.
+- Stage 2 task numbering always starts at 6 and increments by task in element order.
+- Generated child tab titles keep Task 6/7/8 wording with numeric prefix updates only.
+- Sidebar tasks open the exact mapped generated Docs tabs.
+- Reconfigure requires typed `backup` and only removes generated Stage 2 content before rebuilding.
+
+Validation:
+- `public/index.html` has no editor diagnostics.
+- Static app runs from `public/` at `http://localhost:4173`.
+- Stage 2 modal markers, docs-tab helper markers, and generated Stage 2 mapping markers are present in `public/index.html`.
+
+## CR-016 — Stage 2 popup UX refinement (input + Enter/arrow + edit/delete)
+
+Status: Complete
+Priority: Medium
+Date: 2026-05-25
+
+Problem:
+- The Stage 2 setup popup UI was confusing during element entry.
+- Users requested a simple input flow where pressing Enter or a small arrow button adds an element.
+- Users requested per-element edit and delete icons next to each saved element.
+
+Goal:
+- Replace the row-heavy Stage 2 editor with a simpler add/edit workflow.
+- Keep existing Stage 2 validation rules and submission behavior unchanged.
+
+Scope:
+- Add a top input in the Stage 2 modal for element text entry.
+- Add a small arrow push button next to the input that performs the same action as Enter.
+- Support keyboard Enter key for add/save from that input.
+- Render saved element rows with two icon actions: edit and delete.
+- Editing an element pre-fills the top input and saves through Enter/arrow.
+- Keep duplicate-name, empty-name, and max-elements validation.
+
+Scope completed:
+- Added a dedicated Stage 2 input builder row with a compact arrow action button.
+- Added Enter key handling to submit element add/save without clicking.
+- Replaced inline row controls with icon-only element actions (`✎` edit and `🗑` delete).
+- Added edit-mode behavior so clicking edit loads the element name into the input for update.
+- Updated Stage 2 handlers so add/edit return success flags and only clear the draft on successful save.
+- Removed obsolete drag/reorder controls from the Stage 2 popup.
+
+Do not change:
+- Do not change Stage 2 numbering and Docs sync architecture.
+- Do not relax Stage 2 unique-name, empty-name, or max-elements rules.
+
+Acceptance criteria:
+- Stage 2 popup has one main input and one small arrow button beside it.
+- Pressing Enter in the input performs the same add/save action as clicking the arrow button.
+- Each listed element shows exactly two actions: edit and delete.
+- Edit action updates the selected element through the same input.
+- Existing Stage 2 submit/reconfigure flow still works.
+
+Validation:
+- `public/index.html` has no editor diagnostics.
+- Local app server returns HTTP 200 at `http://localhost:4173`.
+- Served source includes Stage 2 popup builder, Enter key handler, and edit/delete icon markers.
