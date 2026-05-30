@@ -4474,6 +4474,7 @@
             const [authTokenClient, setAuthTokenClient] = useState(null);
             const [authNotice, setAuthNotice] = useState(() => INITIAL_AUTH_NOTICE || (isPlaceholderClientId() ? 'Google OAuth is implemented, but the client ID is still a placeholder.' : ''));
             const authRequestRef = useRef(null);
+            const lastVisitedTaskIdRef = useRef(null);
             const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
             const [creationState, setCreationState] = useState({
                 isCreating: false,
@@ -4630,7 +4631,12 @@
             }, [appState.currentProjectId]);
 
             useEffect(() => {
-                if (!currentProject || !isTaskFiveComplete) {
+                const currentTaskId = Number(currentTask?.taskId) || 0;
+                const isEnteringTaskSix = currentTaskId === 6 && lastVisitedTaskIdRef.current !== 6;
+
+                lastVisitedTaskIdRef.current = currentTaskId;
+
+                if (!isEnteringTaskSix || !currentProject || !isTaskFiveComplete) {
                     return;
                 }
 
@@ -4648,7 +4654,7 @@
                     elements: [],
                     confirmText: ''
                 });
-            }, [currentProject, isTaskFiveComplete, stage2SetupState.isOpen]);
+            }, [currentTask?.taskId, currentProject, isTaskFiveComplete, stage2SetupState.isOpen]);
 
             useEffect(() => {
                 window.StrategicMarketingBootcampAuthRuntime = {
@@ -4991,12 +4997,7 @@
             };
 
             const handleCancelStage2Setup = () => {
-                const shouldBlockCancel = !stage2SetupState.isReconfigure
-                    && currentProject
-                    && isTaskFiveComplete
-                    && getProjectStage2Elements(currentProject).length === 0;
-
-                if (shouldBlockCancel || stage2SetupState.isSubmitting) {
+                if (stage2SetupState.isSubmitting) {
                     return;
                 }
 
