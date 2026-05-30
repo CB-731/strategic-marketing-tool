@@ -235,6 +235,107 @@
             box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
         }
 
+        .stage2-element-builder {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .stage2-push-button {
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(212, 168, 67, 0.45);
+            border-radius: 12px;
+            background: rgba(212, 168, 67, 0.14);
+            color: var(--accent);
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .stage2-push-button:hover {
+            transform: translateY(-1px);
+            background: rgba(212, 168, 67, 0.2);
+            border-color: rgba(212, 168, 67, 0.6);
+        }
+
+        .stage2-push-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stage2-element-list {
+            display: grid;
+            gap: 8px;
+            max-height: 260px;
+            overflow: auto;
+            padding: 4px;
+        }
+
+        .stage2-element-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .stage2-element-name {
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .stage2-element-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        .stage2-icon-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .stage2-icon-button:hover {
+            transform: translateY(-1px);
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.45);
+            color: var(--text-primary);
+        }
+
+        .stage2-icon-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stage2-empty-state {
+            padding: 12px;
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-align: center;
+        }
+
         .modal-actions {
             display: flex;
             justify-content: flex-end;
@@ -1484,6 +1585,12 @@
         const MASTER_PROJECT_TEMPLATE_FILE_ID = '1iwVp357VIfNPpaxPvrzjBWEywUz7m4OgtF6gTrNgGA0';
         const PROJECT_DOCUMENT_COPY_COUNT = 1;
         const DIAGRAM_ZOOM_LEVELS = [1, 1.25, 1.5, 2, 2.5, 3];
+        const DOCS_API_BASE_URL = 'https://docs.googleapis.com/v1';
+        const STAGE2_TEMPLATE_TASK_IDS = [6, 7, 8];
+        const STAGE2_START_TASK_ID = 6;
+        const STAGE2_TASKS_PER_ELEMENT = 3;
+        const MAX_STAGE2_ELEMENTS = 10;
+        const STAGE2_CONFIRM_TEXT = 'backup';
 
         const PHASE_DEFINITIONS = [
             { phase: 1, phaseName: 'Foundations' },
@@ -2057,12 +2164,129 @@
             }
         ];
 
-        function getTaskDefinition(taskId) {
-            return TASK_DEFINITIONS.find((task) => task.taskId === taskId) || null;
+        function getStaticTaskDefinition(taskId) {
+            return TASK_DEFINITIONS.find((task) => task.taskId === Number(taskId)) || null;
         }
 
-        function createDefaultProjectTask(taskId, docId = '') {
-            const taskDefinition = getTaskDefinition(taskId);
+        function formatLessonNumber(taskId) {
+            return `LESSON ${taskId}`;
+        }
+
+        function normalizeStage2State(stage2) {
+            const rawElements = Array.isArray(stage2?.elements) ? stage2.elements : [];
+            const uniqueNameKeys = new Set();
+            const elements = rawElements
+                .map((elementName) => String(elementName || '').trim())
+                .filter(Boolean)
+                .filter((elementName) => {
+                    const key = elementName.toLowerCase();
+                    if (uniqueNameKeys.has(key)) {
+                        return false;
+                    }
+
+                    uniqueNameKeys.add(key);
+                    return true;
+                })
+                .slice(0, MAX_STAGE2_ELEMENTS);
+
+            const taskTabIds = Object.entries(stage2?.taskTabIds || {}).reduce((accumulator, [taskIdKey, tabId]) => {
+                const numericTaskId = Number(taskIdKey);
+                const safeTabId = String(tabId || '').trim();
+
+                if (Number.isFinite(numericTaskId) && safeTabId) {
+                    accumulator[String(numericTaskId)] = safeTabId;
+                }
+
+                return accumulator;
+            }, {});
+
+            const generatedTabIds = Array.from(new Set(
+                (Array.isArray(stage2?.generatedTabIds) ? stage2.generatedTabIds : [])
+                    .map((tabId) => String(tabId || '').trim())
+                    .filter(Boolean)
+            ));
+
+            return {
+                elements,
+                taskTabIds,
+                generatedTabIds
+            };
+        }
+
+        function getProjectStage2Elements(project) {
+            return normalizeStage2State(project?.stage2).elements;
+        }
+
+        function getProjectTaskDefinitions(project) {
+            const stage2Elements = getProjectStage2Elements(project);
+
+            if (!stage2Elements.length) {
+                return TASK_DEFINITIONS.map((taskDefinition) => ({
+                    ...taskDefinition,
+                    sourceTemplateTaskId: taskDefinition.taskId,
+                    displayTaskNumber: taskDefinition.taskId,
+                    isGeneratedStage2: false
+                }));
+            }
+
+            const stage2TemplateTasks = STAGE2_TEMPLATE_TASK_IDS
+                .map((taskId) => getStaticTaskDefinition(taskId))
+                .filter(Boolean);
+            const downstreamTemplateTasks = TASK_DEFINITIONS.filter((taskDefinition) => taskDefinition.taskId >= 9);
+            const stage2Offset = (stage2Elements.length * STAGE2_TASKS_PER_ELEMENT) - STAGE2_TASKS_PER_ELEMENT;
+
+            const foundationTasks = TASK_DEFINITIONS
+                .filter((taskDefinition) => taskDefinition.taskId <= 5)
+                .map((taskDefinition) => ({
+                    ...taskDefinition,
+                    sourceTemplateTaskId: taskDefinition.taskId,
+                    displayTaskNumber: taskDefinition.taskId,
+                    isGeneratedStage2: false
+                }));
+
+            const generatedStage2Tasks = stage2Elements.flatMap((elementName, elementIndex) => (
+                stage2TemplateTasks.map((templateTaskDefinition, templateIndex) => {
+                    const generatedTaskId = STAGE2_START_TASK_ID + (elementIndex * STAGE2_TASKS_PER_ELEMENT) + templateIndex;
+
+                    return {
+                        ...templateTaskDefinition,
+                        taskId: generatedTaskId,
+                        displayTaskNumber: generatedTaskId,
+                        lessonNumber: formatLessonNumber(generatedTaskId),
+                        fullDocTitle: `Phase 2 - Task ${generatedTaskId}: ${templateTaskDefinition.shortTitle}`,
+                        sourceTemplateTaskId: templateTaskDefinition.taskId,
+                        stage2ElementName: elementName,
+                        stage2ElementIndex: elementIndex,
+                        isGeneratedStage2: true,
+                        tabId: ''
+                    };
+                })
+            ));
+
+            const shiftedDownstreamTasks = downstreamTemplateTasks.map((templateTaskDefinition) => {
+                const shiftedTaskId = templateTaskDefinition.taskId + stage2Offset;
+
+                return {
+                    ...templateTaskDefinition,
+                    taskId: shiftedTaskId,
+                    displayTaskNumber: shiftedTaskId,
+                    lessonNumber: formatLessonNumber(shiftedTaskId),
+                    fullDocTitle: `Phase ${templateTaskDefinition.phase} - Task ${shiftedTaskId}: ${templateTaskDefinition.shortTitle}`,
+                    sourceTemplateTaskId: templateTaskDefinition.taskId,
+                    isGeneratedStage2: false
+                };
+            });
+
+            return [...foundationTasks, ...generatedStage2Tasks, ...shiftedDownstreamTasks];
+        }
+
+        function getTaskDefinition(taskId, project = null) {
+            const taskDefinitions = getProjectTaskDefinitions(project);
+            return taskDefinitions.find((task) => task.taskId === Number(taskId)) || null;
+        }
+
+        function createDefaultProjectTask(taskId, docId = '', taskDefinitionOverride = null, project = null) {
+            const taskDefinition = taskDefinitionOverride || getTaskDefinition(taskId, project);
 
             if (!taskDefinition) {
                 throw new Error(`Unknown task definition for task ${taskId}.`);
@@ -2085,15 +2309,22 @@
         }
 
         function isTaskUnlocked(project, taskId) {
-            if (taskId === 1) {
-                return true;
-            }
-
             if (!project || !Array.isArray(project.tasks)) {
                 return false;
             }
 
-            return TASK_DEFINITIONS
+            const taskDefinitions = getProjectTaskDefinitions(project);
+            const firstTaskId = taskDefinitions[0]?.taskId;
+
+            if (!Number.isFinite(firstTaskId)) {
+                return false;
+            }
+
+            if (taskId === firstTaskId) {
+                return true;
+            }
+
+            return taskDefinitions
                 .filter((taskDefinition) => taskDefinition.taskId < taskId)
                 .every((taskDefinition) => {
                     const previousTask = project.tasks.find((task) => task.taskId === taskDefinition.taskId);
@@ -2108,13 +2339,17 @@
             };
         }
 
-        function normalizeTaskSelection(taskId) {
+        function normalizeTaskSelection(taskId, project = null) {
             const normalizedTaskId = Number(taskId);
-            return getTaskDefinition(normalizedTaskId) ? normalizedTaskId : 1;
+            const taskDefinitions = getProjectTaskDefinitions(project);
+            const fallbackTaskId = taskDefinitions[0]?.taskId || 1;
+            return taskDefinitions.some((taskDefinition) => taskDefinition.taskId === normalizedTaskId)
+                ? normalizedTaskId
+                : fallbackTaskId;
         }
 
         function normalizeProjectTask(task, taskDefinition) {
-            const fallbackTask = createDefaultProjectTask(taskDefinition.taskId, '');
+            const fallbackTask = createDefaultProjectTask(taskDefinition.taskId, '', taskDefinition);
             const safeChecklist = Array.isArray(task?.checklist)
                 ? task.checklist.slice(0, taskDefinition.checklist.length).map(Boolean)
                 : [];
@@ -2141,15 +2376,17 @@
             const safeName = typeof project.name === 'string' && project.name.trim()
                 ? project.name.trim()
                 : `Project ${index + 1}`;
+            const stage2 = normalizeStage2State(project.stage2);
             const rawTasks = Array.isArray(project.tasks) ? project.tasks : [];
-            const tasks = TASK_DEFINITIONS.map((taskDefinition) => {
+            const taskDefinitions = getProjectTaskDefinitions({ ...project, stage2 });
+            const tasks = taskDefinitions.map((taskDefinition) => {
                 const existingTask = rawTasks.find((task) => Number(task?.taskId) === taskDefinition.taskId);
                 return normalizeProjectTask(existingTask, taskDefinition);
             });
-            const safeLastOpenedTask = normalizeTaskSelection(project.lastOpenedTask);
-            const recoveredLastOpenedTask = isTaskUnlocked({ tasks }, safeLastOpenedTask)
+            const safeLastOpenedTask = normalizeTaskSelection(project.lastOpenedTask, { ...project, stage2 });
+            const recoveredLastOpenedTask = isTaskUnlocked({ tasks, stage2 }, safeLastOpenedTask)
                 ? safeLastOpenedTask
-                : 1;
+                : (taskDefinitions[0]?.taskId || 1);
 
             return {
                 id: safeId,
@@ -2157,6 +2394,7 @@
                 folderId: typeof project.folderId === 'string' ? project.folderId : '',
                 projectDocId: typeof project.projectDocId === 'string' ? project.projectDocId : '',
                 lastOpenedTask: recoveredLastOpenedTask,
+                stage2,
                 tasks
             };
         }
@@ -2225,7 +2463,7 @@
                 return null;
             }
 
-            return project.tasks.find((task) => task.taskId === normalizeTaskSelection(project.lastOpenedTask)) || project.tasks[0] || null;
+            return project.tasks.find((task) => task.taskId === normalizeTaskSelection(project.lastOpenedTask, project)) || project.tasks[0] || null;
         }
 
         function getGoogleDocEditUrl(docId, embedded = false, tabId = '') {
@@ -2256,11 +2494,12 @@
             const taskDocId = typeof projectTask?.docId === 'string'
                 ? projectTask.docId.trim()
                 : '';
+            const stage2TaskTabId = String(project?.stage2?.taskTabIds?.[String(taskDefinition?.taskId)] || '').trim();
 
             if (projectDocId) {
                 return {
                     docId: projectDocId,
-                    tabId: typeof taskDefinition?.tabId === 'string' ? taskDefinition.tabId : '',
+                    tabId: stage2TaskTabId || (typeof taskDefinition?.tabId === 'string' ? taskDefinition.tabId : ''),
                     source: 'projectDocId'
                 };
             }
@@ -2302,7 +2541,7 @@
                 return normalizedState;
             }
 
-            const safeTaskId = normalizeTaskSelection(taskId);
+            const safeTaskId = normalizeTaskSelection(taskId, currentProject);
 
             return {
                 ...normalizedState,
@@ -2351,13 +2590,13 @@
                     }
 
                     let updatedTaskComplete = false;
-                    const safeTaskId = normalizeTaskSelection(taskId);
+                    const safeTaskId = normalizeTaskSelection(taskId, project);
                     const nextTasks = project.tasks.map((task) => {
                         if (task.taskId !== safeTaskId) {
                             return task;
                         }
 
-                        const taskDefinition = getTaskDefinition(safeTaskId);
+                        const taskDefinition = getTaskDefinition(safeTaskId, project);
                         const nextChecklist = taskDefinition.checklist.map((_, index) => (
                             index === checklistIndex ? Boolean(checked) : Boolean(task.checklist[index])
                         ));
@@ -2388,13 +2627,15 @@
         }
 
         function getProjectCompletion(project) {
+            const totalTaskCount = getProjectTaskDefinitions(project).length;
+
             if (!project || !Array.isArray(project.tasks)) {
-                return { completedCount: 0, totalCount: TASK_DEFINITIONS.length };
+                return { completedCount: 0, totalCount: totalTaskCount };
             }
 
             return {
                 completedCount: project.tasks.filter(isTaskComplete).length,
-                totalCount: TASK_DEFINITIONS.length
+                totalCount: totalTaskCount
             };
         }
 
@@ -2601,8 +2842,536 @@
                 folderId: projectFolder.id,
                 projectDocId: copiedProjectDoc.id,
                 lastOpenedTask: 1,
+                stage2: normalizeStage2State({}),
                 tasks: projectTasks
             };
+        }
+
+        async function docsRequest(token, path, options = {}) {
+            if (!token?.access_token || isTokenExpired(token)) {
+                window.StrategicMarketingBootcampAuthRuntime?.requireReauth('Google access needs to be refreshed before Docs changes. Reconnect Google, then try again.');
+                throw new Error('Google access needs to be refreshed. Reconnect Google and try again.');
+            }
+
+            const response = await fetch(`${DOCS_API_BASE_URL}${path}`, {
+                ...options,
+                headers: {
+                    Authorization: `Bearer ${token.access_token}`,
+                    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+                    ...(options.headers || {})
+                }
+            });
+            const responseText = await response.text();
+            let data = null;
+
+            try {
+                data = responseText ? JSON.parse(responseText) : null;
+            } catch (error) {
+                data = responseText;
+            }
+
+            if (!response.ok) {
+                if (window.StrategicMarketingBootcampAuthRuntime?.handleApiAuthFailure(response.status)) {
+                    throw new Error('Google authorization needs to be refreshed. Reconnect Google and retry.');
+                }
+
+                const message = data?.error?.message || data?.message || `Google Docs API request failed with status ${response.status}.`;
+                throw new Error(message);
+            }
+
+            return data;
+        }
+
+        async function docsBatchUpdate(token, documentId, requests = []) {
+            return docsRequest(token, `/documents/${encodeURIComponent(documentId)}:batchUpdate`, {
+                method: 'POST',
+                body: JSON.stringify({ requests })
+            });
+        }
+
+        function flattenDocumentTabs(tabs = [], parentTabId = '') {
+            return tabs.flatMap((tab, index) => {
+                const tabId = String(tab?.tabProperties?.tabId || '').trim();
+                const title = String(tab?.tabProperties?.title || '').trim();
+                const node = {
+                    tabId,
+                    title,
+                    parentTabId: String(tab?.tabProperties?.parentTabId || parentTabId || '').trim(),
+                    index
+                };
+                const children = flattenDocumentTabs(Array.isArray(tab?.childTabs) ? tab.childTabs : [], tabId);
+                return [node, ...children];
+            }).filter((tab) => tab.tabId);
+        }
+
+        async function listDocumentTabs(token, documentId) {
+            const result = await docsRequest(token, `/documents/${encodeURIComponent(documentId)}?includeTabsContent=false&fields=tabs(tabProperties,childTabs(tabProperties,childTabs(tabProperties,childTabs(tabProperties))))`);
+            return flattenDocumentTabs(Array.isArray(result?.tabs) ? result.tabs : []);
+        }
+
+        function getStage2TemplateTaskDefinitions() {
+            return STAGE2_TEMPLATE_TASK_IDS.map((taskId) => getStaticTaskDefinition(taskId)).filter(Boolean);
+        }
+
+        function getStage2SubtaskTitle(taskNumber, templateTaskDefinition) {
+            return `Task ${taskNumber} — ${templateTaskDefinition.shortTitle}`;
+        }
+
+        function buildStage2TabTemplateText(templateTaskDefinition, generatedTaskNumber, elementName) {
+            const heading = `Task ${generatedTaskNumber} — ${templateTaskDefinition.shortTitle}`;
+            const headerLines = [
+                heading,
+                '',
+                `Funnel Element: ${elementName}`,
+                '',
+                `Tagline: ${templateTaskDefinition.tagline}`,
+                '',
+                'WHAT',
+                ...templateTaskDefinition.what.map((item) => `- ${item}`),
+                '',
+                'WHY',
+                templateTaskDefinition.why,
+                '',
+                'HOW',
+                ...templateTaskDefinition.how.map((item) => `- ${item}`),
+                '',
+                'MISTAKES',
+                ...templateTaskDefinition.mistakes.map((item) => `- ${item}`),
+                '',
+                'CHECKLIST',
+                ...templateTaskDefinition.checklist.map((item) => `- [ ] ${item}`),
+                ''
+            ];
+
+            return headerLines.join('\n');
+        }
+
+        function findTabNodeById(tabs = [], tabId = '') {
+            const safeTabId = String(tabId || '').trim();
+
+            if (!safeTabId || !Array.isArray(tabs)) {
+                return null;
+            }
+
+            for (const tab of tabs) {
+                const currentTabId = String(tab?.tabProperties?.tabId || '').trim();
+
+                if (currentTabId === safeTabId) {
+                    return tab;
+                }
+
+                const nestedMatch = findTabNodeById(tab?.childTabs || [], safeTabId);
+
+                if (nestedMatch) {
+                    return nestedMatch;
+                }
+            }
+
+            return null;
+        }
+
+        function buildUpdateFieldsFromObject(source, rootKey = '') {
+            const safeSource = source && typeof source === 'object' ? source : {};
+            const fields = Object.entries(safeSource)
+                .filter(([, value]) => value !== null && value !== undefined)
+                .map(([key]) => (rootKey ? `${rootKey}.${key}` : key));
+
+            return fields.join(',');
+        }
+
+        function sanitizeTextStyle(style) {
+            const safeStyle = style && typeof style === 'object' ? style : {};
+
+            return {
+                bold: safeStyle.bold,
+                italic: safeStyle.italic,
+                underline: safeStyle.underline,
+                strikethrough: safeStyle.strikethrough,
+                smallCaps: safeStyle.smallCaps,
+                backgroundColor: safeStyle.backgroundColor,
+                foregroundColor: safeStyle.foregroundColor,
+                fontSize: safeStyle.fontSize,
+                weightedFontFamily: safeStyle.weightedFontFamily,
+                baselineOffset: safeStyle.baselineOffset,
+                link: safeStyle.link
+            };
+        }
+
+        function sanitizeParagraphStyle(style) {
+            const safeStyle = style && typeof style === 'object' ? style : {};
+
+            return {
+                namedStyleType: safeStyle.namedStyleType,
+                alignment: safeStyle.alignment,
+                lineSpacing: safeStyle.lineSpacing,
+                direction: safeStyle.direction,
+                spacingMode: safeStyle.spacingMode,
+                spaceAbove: safeStyle.spaceAbove,
+                spaceBelow: safeStyle.spaceBelow,
+                borderBetween: safeStyle.borderBetween,
+                borderTop: safeStyle.borderTop,
+                borderBottom: safeStyle.borderBottom,
+                borderLeft: safeStyle.borderLeft,
+                borderRight: safeStyle.borderRight,
+                indentFirstLine: safeStyle.indentFirstLine,
+                indentStart: safeStyle.indentStart,
+                indentEnd: safeStyle.indentEnd,
+                keepLinesTogether: safeStyle.keepLinesTogether,
+                keepWithNext: safeStyle.keepWithNext,
+                avoidWidowAndOrphan: safeStyle.avoidWidowAndOrphan,
+                shading: safeStyle.shading,
+                pageBreakBefore: safeStyle.pageBreakBefore
+            };
+        }
+
+        function getBulletPresetFromListProperties(listProperties = {}) {
+            const firstLevel = Array.isArray(listProperties?.nestingLevels) ? listProperties.nestingLevels[0] : null;
+            const glyphType = String(firstLevel?.glyphType || '').trim().toUpperCase();
+            const glyphSymbol = String(firstLevel?.glyphSymbol || '').trim();
+
+            if (glyphSymbol.includes('☐') || glyphSymbol.includes('✅') || glyphSymbol.includes('☑') || glyphSymbol.includes('✓')) {
+                return 'BULLET_CHECKBOX';
+            }
+
+            if (['DECIMAL', 'ZERO_DECIMAL', 'ALPHA', 'UPPER_ALPHA', 'ROMAN', 'UPPER_ROMAN'].includes(glyphType)) {
+                return 'NUMBERED_DECIMAL_ALPHA_ROMAN';
+            }
+
+            return 'BULLET_DISC_CIRCLE_SQUARE';
+        }
+
+        function buildTabBlueprintFromTemplateTab(templateTab) {
+            const bodyContent = Array.isArray(templateTab?.documentTab?.body?.content)
+                ? templateTab.documentTab.body.content
+                : [];
+            const listMap = templateTab?.documentTab?.lists || {};
+            const namedStyles = Array.isArray(templateTab?.documentTab?.namedStyles?.styles)
+                ? templateTab.documentTab.namedStyles.styles
+                : [];
+
+            const textChunks = [];
+            const textStyles = [];
+            const paragraphStyles = [];
+            const bulletRanges = [];
+
+            bodyContent.forEach((block) => {
+                const paragraph = block?.paragraph;
+
+                if (!paragraph) {
+                    return;
+                }
+
+                const paragraphStart = Number(block?.startIndex) || 0;
+                const paragraphEnd = Number(block?.endIndex) || 0;
+
+                if (paragraphStart > 0 && paragraphEnd > paragraphStart) {
+                    const sanitizedParagraphStyle = sanitizeParagraphStyle(paragraph.paragraphStyle || {});
+                    const paragraphFields = buildUpdateFieldsFromObject(sanitizedParagraphStyle, 'paragraphStyle');
+
+                    if (paragraphFields) {
+                        paragraphStyles.push({
+                            startIndex: paragraphStart,
+                            endIndex: paragraphEnd,
+                            paragraphStyle: sanitizedParagraphStyle,
+                            fields: paragraphFields
+                        });
+                    }
+                }
+
+                if (paragraph?.bullet && paragraphStart > 0 && paragraphEnd > paragraphStart) {
+                    const listId = String(paragraph.bullet.listId || '').trim();
+                    const listProperties = listMap[listId]?.listProperties || {};
+
+                    bulletRanges.push({
+                        startIndex: paragraphStart,
+                        endIndex: paragraphEnd,
+                        bulletPreset: getBulletPresetFromListProperties(listProperties)
+                    });
+                }
+
+                const elements = Array.isArray(paragraph?.elements) ? paragraph.elements : [];
+
+                elements.forEach((element) => {
+                    const textRun = element?.textRun;
+                    const runText = String(textRun?.content || '');
+
+                    if (!runText) {
+                        return;
+                    }
+
+                    textChunks.push(runText);
+
+                    const runStart = Number(element?.startIndex) || 0;
+                    const runEnd = Number(element?.endIndex) || 0;
+
+                    if (runStart > 0 && runEnd > runStart) {
+                        const sanitizedTextStyle = sanitizeTextStyle(textRun.textStyle || {});
+                        const textFields = buildUpdateFieldsFromObject(sanitizedTextStyle, 'textStyle');
+
+                        if (textFields) {
+                            textStyles.push({
+                                startIndex: runStart,
+                                endIndex: runEnd,
+                                textStyle: sanitizedTextStyle,
+                                fields: textFields
+                            });
+                        }
+                    }
+                });
+            });
+
+            const namedStyleUpdates = namedStyles
+                .map((namedStyle) => {
+                    const safeNamedStyleType = String(namedStyle?.namedStyleType || '').trim();
+
+                    if (!safeNamedStyleType) {
+                        return null;
+                    }
+
+                    const sanitizedNamedStyle = {
+                        namedStyleType: safeNamedStyleType,
+                        textStyle: sanitizeTextStyle(namedStyle.textStyle || {}),
+                        paragraphStyle: sanitizeParagraphStyle(namedStyle.paragraphStyle || {})
+                    };
+                    const textStyleFields = buildUpdateFieldsFromObject(sanitizedNamedStyle.textStyle, 'textStyle');
+                    const paragraphStyleFields = buildUpdateFieldsFromObject(sanitizedNamedStyle.paragraphStyle, 'paragraphStyle');
+                    const fields = [textStyleFields, paragraphStyleFields].filter(Boolean).join(',');
+
+                    if (!fields) {
+                        return null;
+                    }
+
+                    return {
+                        namedStyle: sanitizedNamedStyle,
+                        fields
+                    };
+                })
+                .filter(Boolean);
+
+            return {
+                text: textChunks.join(''),
+                textStyles,
+                paragraphStyles,
+                bulletRanges,
+                namedStyleUpdates
+            };
+        }
+
+        async function getStage2TemplateBlueprintMap(token) {
+            const templateDocument = await docsRequest(
+                token,
+                `/documents/${encodeURIComponent(MASTER_PROJECT_TEMPLATE_FILE_ID)}?includeTabsContent=true`
+            );
+            const tabs = Array.isArray(templateDocument?.tabs) ? templateDocument.tabs : [];
+
+            return getStage2TemplateTaskDefinitions().reduce((accumulator, templateTaskDefinition) => {
+                const sourceTabId = String(templateTaskDefinition?.tabId || '').trim();
+
+                if (!sourceTabId) {
+                    return accumulator;
+                }
+
+                const templateTab = findTabNodeById(tabs, sourceTabId);
+
+                if (templateTab) {
+                    accumulator[String(templateTaskDefinition.taskId)] = buildTabBlueprintFromTemplateTab(templateTab);
+                }
+
+                return accumulator;
+            }, {});
+        }
+
+        async function applyBlueprintToTab(token, documentId, tabId, templateTaskDefinition, generatedTaskId, blueprint) {
+            if (!blueprint || !blueprint.text) {
+                throw new Error(
+                    `Unable to load template content for Task ${templateTaskDefinition.taskId}. Stage 2 sync stopped to avoid writing incorrect tab content.`
+                );
+            }
+
+            await insertTabContent(token, documentId, tabId, blueprint.text);
+
+            const stylingRequests = [
+                ...blueprint.namedStyleUpdates.map((namedStyleUpdate) => ({
+                    updateNamedStyle: {
+                        tabId,
+                        namedStyle: namedStyleUpdate.namedStyle,
+                        fields: namedStyleUpdate.fields
+                    }
+                })),
+                ...blueprint.paragraphStyles.map((paragraphStyleRange) => ({
+                    updateParagraphStyle: {
+                        range: {
+                            tabId,
+                            startIndex: paragraphStyleRange.startIndex,
+                            endIndex: paragraphStyleRange.endIndex
+                        },
+                        paragraphStyle: paragraphStyleRange.paragraphStyle,
+                        fields: paragraphStyleRange.fields
+                    }
+                })),
+                ...blueprint.textStyles.map((textStyleRange) => ({
+                    updateTextStyle: {
+                        range: {
+                            tabId,
+                            startIndex: textStyleRange.startIndex,
+                            endIndex: textStyleRange.endIndex
+                        },
+                        textStyle: textStyleRange.textStyle,
+                        fields: textStyleRange.fields
+                    }
+                })),
+                ...blueprint.bulletRanges.map((bulletRange) => ({
+                    createParagraphBullets: {
+                        range: {
+                            tabId,
+                            startIndex: bulletRange.startIndex,
+                            endIndex: bulletRange.endIndex
+                        },
+                        bulletPreset: bulletRange.bulletPreset
+                    }
+                }))
+            ];
+
+            if (stylingRequests.length) {
+                await docsBatchUpdate(token, documentId, stylingRequests);
+            }
+
+            const sourceTaskId = Number(templateTaskDefinition.taskId) || 0;
+            const sourceTitle = `Task ${sourceTaskId} — ${templateTaskDefinition.shortTitle}`;
+            const targetTitle = `Task ${generatedTaskId} — ${templateTaskDefinition.shortTitle}`;
+            const sourceLesson = `LESSON ${sourceTaskId}`;
+            const targetLesson = `LESSON ${generatedTaskId}`;
+
+            await docsBatchUpdate(token, documentId, [
+                {
+                    replaceAllText: {
+                        tabsCriteria: { tabIds: [tabId] },
+                        containsText: {
+                            text: sourceTitle,
+                            matchCase: true
+                        },
+                        replaceText: targetTitle
+                    }
+                },
+                {
+                    replaceAllText: {
+                        tabsCriteria: { tabIds: [tabId] },
+                        containsText: {
+                            text: sourceLesson,
+                            matchCase: true
+                        },
+                        replaceText: targetLesson
+                    }
+                }
+            ]);
+        }
+
+        async function addDocumentTab(token, documentId, title, options = {}) {
+            const parentTabId = String(options?.parentTabId || '').trim();
+            const hasIndex = Number.isInteger(options?.index) && options.index >= 0;
+            const request = {
+                addDocumentTab: {
+                    tabProperties: {
+                        title,
+                        ...(parentTabId ? { parentTabId } : {}),
+                        ...(hasIndex ? { index: options.index } : {})
+                    }
+                }
+            };
+
+            const result = await docsBatchUpdate(token, documentId, [request]);
+            const addedTab = result?.replies?.[0]?.addDocumentTab?.tabProperties || null;
+
+            if (!addedTab?.tabId) {
+                throw new Error(`Unable to create document tab: ${title}`);
+            }
+
+            return addedTab;
+        }
+
+        async function updateDocumentTabProperties(token, documentId, tabId, properties = {}, fields = '') {
+            const safeTabId = String(tabId || '').trim();
+
+            if (!safeTabId) {
+                throw new Error('Unable to update document tab without a tab ID.');
+            }
+
+            const payload = {
+                tabId: safeTabId,
+                ...properties
+            };
+            const resolvedFields = String(fields || '').trim() || Object.keys(properties).join(',');
+
+            if (!resolvedFields) {
+                return;
+            }
+
+            await docsBatchUpdate(token, documentId, [{
+                updateDocumentTabProperties: {
+                    tabProperties: payload,
+                    fields: resolvedFields
+                }
+            }]);
+        }
+
+        async function updateDocumentTabTitle(token, documentId, tabId, title) {
+            await updateDocumentTabProperties(token, documentId, tabId, { title }, 'title');
+        }
+
+        async function retitleStage2TabContent(token, documentId, tabId, sourceTaskId, targetTaskId, shortTitle) {
+            const safeShortTitle = String(shortTitle || '').trim();
+
+            if (!tabId || !safeShortTitle) {
+                return;
+            }
+
+            const sourceTitle = `Task ${sourceTaskId} — ${safeShortTitle}`;
+            const targetTitle = `Task ${targetTaskId} — ${safeShortTitle}`;
+            const sourceLesson = `LESSON ${sourceTaskId}`;
+            const targetLesson = `LESSON ${targetTaskId}`;
+
+            await docsBatchUpdate(token, documentId, [
+                {
+                    replaceAllText: {
+                        tabsCriteria: { tabIds: [tabId] },
+                        containsText: {
+                            text: sourceTitle,
+                            matchCase: true
+                        },
+                        replaceText: targetTitle
+                    }
+                },
+                {
+                    replaceAllText: {
+                        tabsCriteria: { tabIds: [tabId] },
+                        containsText: {
+                            text: sourceLesson,
+                            matchCase: true
+                        },
+                        replaceText: targetLesson
+                    }
+                }
+            ]);
+        }
+
+        async function deleteDocumentTab(token, documentId, tabId) {
+            await docsBatchUpdate(token, documentId, [{ deleteTab: { tabId } }]);
+        }
+
+        async function insertTabContent(token, documentId, tabId, text) {
+            if (!text) {
+                return;
+            }
+
+            await docsBatchUpdate(token, documentId, [{
+                insertText: {
+                    text,
+                    endOfSegmentLocation: {
+                        tabId,
+                        segmentId: ''
+                    }
+                }
+            }]);
         }
 
         function isPlaceholderClientId() {
@@ -2696,6 +3465,7 @@
             PHASE_DEFINITIONS,
             TASK_DEFINITIONS,
             getTaskDefinition,
+            getProjectTaskDefinitions,
             createDefaultProjectTask,
             isTaskComplete,
             isTaskUnlocked,
@@ -2735,10 +3505,13 @@
 
         window.StrategicMarketingBootcampDrive = {
             DRIVE_API_BASE_URL,
+            DOCS_API_BASE_URL,
             MARKETING_PROJECTS_FOLDER_NAME,
             MASTER_PROJECT_TEMPLATE_FILE_ID,
             PROJECT_DOCUMENT_COPY_COUNT,
             driveRequest,
+            docsRequest,
+            docsBatchUpdate,
             findDriveFolder,
             createDriveFolder,
             getOrCreateDriveFolder,
@@ -2746,7 +3519,12 @@
             copyMasterProjectDoc,
             renameDriveFolder,
             trashDriveFolder,
-            createProjectInDrive
+            createProjectInDrive,
+            listDocumentTabs,
+            addDocumentTab,
+            updateDocumentTabTitle,
+            deleteDocumentTab,
+            insertTabContent
         };
 
         function LoginScreen({ authReady, authLoading, authNotice, onContinueWithGoogle }) {
@@ -2922,6 +3700,180 @@
             );
         }
 
+        function Stage2SetupModal({
+            isOpen,
+            isReconfigure,
+            elements,
+            isSubmitting,
+            error,
+            confirmText,
+            onChangeElement,
+            onAddElement,
+            onRemoveElement,
+            onChangeConfirmText,
+            onCancel,
+            onSubmit
+        }) {
+            const [draftElement, setDraftElement] = useState('');
+            const [editingIndex, setEditingIndex] = useState(null);
+            const canSubmit = !isSubmitting
+                && elements.length > 0
+                && elements.every((elementName) => String(elementName || '').trim())
+                && (!isReconfigure || confirmText.trim().toLowerCase() === STAGE2_CONFIRM_TEXT);
+
+            useEffect(() => {
+                if (!isOpen) {
+                    return;
+                }
+
+                setDraftElement('');
+                setEditingIndex(null);
+            }, [isOpen, isReconfigure]);
+
+            const handleSubmitElementDraft = () => {
+                const safeDraft = String(draftElement || '').trim();
+
+                if (!safeDraft || isSubmitting) {
+                    return;
+                }
+
+                let wasSaved = false;
+
+                if (Number.isInteger(editingIndex)) {
+                    wasSaved = Boolean(onChangeElement(editingIndex, safeDraft));
+                } else {
+                    wasSaved = Boolean(onAddElement(safeDraft));
+                }
+
+                if (wasSaved) {
+                    setDraftElement('');
+                    setEditingIndex(null);
+                }
+            };
+
+            const handleStartEdit = (index) => {
+                setDraftElement(String(elements[index] || ''));
+                setEditingIndex(index);
+            };
+
+            if (!isOpen) {
+                return null;
+            }
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="stage2-setup-title">
+                    <form
+                        className="onboarding-modal"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            if (canSubmit) {
+                                onSubmit();
+                            }
+                        }}
+                    >
+                        <h2 id="stage2-setup-title">{isReconfigure ? 'Reconfigure Stage 2 funnel elements' : 'Set your Stage 2 funnel elements'}</h2>
+                        <p>
+                            Define your funnel elements in order. Each element gets 3 generated tasks based on Task 6/7/8 with numbering that continues from Task 6.
+                        </p>
+
+                        {isReconfigure && (
+                            <div className="delete-modal-warning">
+                                This will erase generated Stage 2 tasks and generated Stage 2 document tabs. Backup your Stage 2 content before continuing.
+                            </div>
+                        )}
+
+                        <div className="stage2-element-builder">
+                            <input
+                                className="project-name-input"
+                                value={draftElement}
+                                onChange={(event) => setDraftElement(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault();
+                                        handleSubmitElementDraft();
+                                    }
+                                }}
+                                placeholder={editingIndex === null ? 'Add funnel element (example: Meta Ad)' : `Edit element ${editingIndex + 1}`}
+                                autoFocus
+                            />
+                            <button
+                                className="stage2-push-button"
+                                type="button"
+                                onClick={handleSubmitElementDraft}
+                                disabled={!String(draftElement || '').trim() || isSubmitting}
+                                title={editingIndex === null ? 'Add element' : 'Save element'}
+                                aria-label={editingIndex === null ? 'Add element' : 'Save element'}
+                            >
+                                ↵
+                            </button>
+                        </div>
+
+                        <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
+                            <span className="project-meta">
+                                {editingIndex === null ? 'Press Enter or arrow to add.' : `Editing element ${editingIndex + 1}. Press Enter or arrow to save.`}
+                            </span>
+                            <span className="project-meta">{elements.length}/{MAX_STAGE2_ELEMENTS}</span>
+                        </div>
+
+                        <div className="stage2-element-list">
+                            {!elements.length && (
+                                <div className="stage2-empty-state">No elements yet. Add your first funnel element above.</div>
+                            )}
+
+                            {elements.map((elementName, index) => (
+                                <div key={`stage2-element-${index}`} className="stage2-element-row">
+                                    <span className="stage2-element-name">{elementName}</span>
+                                    <div className="stage2-element-actions">
+                                        <button
+                                            className="stage2-icon-button"
+                                            type="button"
+                                            onClick={() => handleStartEdit(index)}
+                                            disabled={isSubmitting}
+                                            title={`Edit ${elementName}`}
+                                            aria-label={`Edit ${elementName}`}
+                                        >
+                                            ✎
+                                        </button>
+                                        <button
+                                            className="stage2-icon-button"
+                                            type="button"
+                                            onClick={() => onRemoveElement(index)}
+                                            disabled={isSubmitting}
+                                            title={`Delete ${elementName}`}
+                                            aria-label={`Delete ${elementName}`}
+                                        >
+                                            🗑
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {isReconfigure && (
+                            <>
+                                <p>Type <strong>{STAGE2_CONFIRM_TEXT}</strong> to continue.</p>
+                                <input
+                                    className="project-name-input"
+                                    value={confirmText}
+                                    onChange={(event) => onChangeConfirmText(event.target.value)}
+                                    placeholder="Type backup"
+                                />
+                            </>
+                        )}
+
+                        {error && <div className="error-box">{error}</div>}
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" disabled={isSubmitting} onClick={onCancel}>Cancel</button>
+                            <button className="primary-action" type="submit" disabled={!canSubmit}>
+                                {isSubmitting ? 'Applying...' : 'Submit'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
         function ProjectNavigation({
             projects,
             currentProjectId,
@@ -2945,6 +3897,7 @@
                 <div className="project-accordion-list">
                     {lockedTaskMessage && <div className="locked-task-message" role="status">{lockedTaskMessage}</div>}
                     {projects.map((project) => {
+                        const projectTaskDefinitions = getProjectTaskDefinitions(project);
                         const isCurrentProject = project.id === currentProjectId;
                         const isExpanded = expandedProjectIds.includes(project.id);
                         const completion = getProjectCompletion(project);
@@ -2988,45 +3941,135 @@
                                         </div>
 
                                         <div className="project-phases">
-                                        {PHASE_DEFINITIONS.map((phaseDefinition) => (
-                                            <div className="phase-group" key={`${project.id}-phase-${phaseDefinition.phase}`}>
-                                                <p className="phase-label">Phase {phaseDefinition.phase} · {phaseDefinition.phaseName}</p>
-                                                {TASK_DEFINITIONS
-                                                    .filter((taskDefinition) => taskDefinition.phase === phaseDefinition.phase)
-                                                    .map((taskDefinition) => {
-                                                        const projectTask = getProjectTask(project, taskDefinition.taskId);
-                                                        const isComplete = isTaskComplete(projectTask);
-                                                        const isUnlocked = isTaskUnlocked(project, taskDefinition.taskId);
-                                                        const isActive = isCurrentProject && project.lastOpenedTask === taskDefinition.taskId;
-                                                        const statusIcon = !isUnlocked ? '🔒' : (isComplete ? '✅' : '🔲');
+                                            {PHASE_DEFINITIONS.map((phaseDefinition) => {
+                                                const phaseTasks = projectTaskDefinitions.filter((taskDefinition) => taskDefinition.phase === phaseDefinition.phase);
 
-                                                        return (
-                                                            <button
-                                                                className={`task-nav-button ${isActive ? 'is-active' : ''} ${isUnlocked ? '' : 'is-locked'}`}
-                                                                type="button"
-                                                                key={`${project.id}-task-${taskDefinition.taskId}`}
-                                                                aria-current={isActive ? 'page' : undefined}
-                                                                aria-disabled={!isUnlocked}
-                                                                title={isUnlocked ? taskDefinition.fullDocTitle : `Complete Task ${taskDefinition.taskId - 1} to unlock this task.`}
-                                                                onClick={() => {
-                                                                    if (!isUnlocked) {
-                                                                        onLockedTaskClick(taskDefinition.taskId);
-                                                                        return;
+                                                return (
+                                                    <div className="phase-group" key={`${project.id}-phase-${phaseDefinition.phase}`}>
+                                                        <p className="phase-label">Phase {phaseDefinition.phase} · {phaseDefinition.phaseName}</p>
+
+                                                        {phaseDefinition.phase !== 2 && phaseTasks.map((taskDefinition) => {
+                                                            const projectTask = getProjectTask(project, taskDefinition.taskId);
+                                                            const isComplete = isTaskComplete(projectTask);
+                                                            const isUnlocked = isTaskUnlocked(project, taskDefinition.taskId);
+                                                            const isActive = isCurrentProject && project.lastOpenedTask === taskDefinition.taskId;
+                                                            const statusIcon = !isUnlocked ? '🔒' : (isComplete ? '✅' : '🔲');
+
+                                                            return (
+                                                                <button
+                                                                    className={`task-nav-button ${isActive ? 'is-active' : ''} ${isUnlocked ? '' : 'is-locked'}`}
+                                                                    type="button"
+                                                                    key={`${project.id}-task-${taskDefinition.taskId}`}
+                                                                    aria-current={isActive ? 'page' : undefined}
+                                                                    aria-disabled={!isUnlocked}
+                                                                    title={isUnlocked ? taskDefinition.fullDocTitle : `Complete previous tasks to unlock this task.`}
+                                                                    onClick={() => {
+                                                                        if (!isUnlocked) {
+                                                                            onLockedTaskClick(taskDefinition.taskId);
+                                                                            return;
+                                                                        }
+
+                                                                        onSelectTask(project.id, taskDefinition.taskId);
+                                                                    }}
+                                                                >
+                                                                    <span className="task-status-icon" aria-hidden="true">{statusIcon}</span>
+                                                                    <span>
+                                                                        <span className="task-nav-title">Task {taskDefinition.displayTaskNumber || taskDefinition.taskId}: {taskDefinition.shortTitle}</span>
+                                                                        <span className="task-nav-subtitle">{taskDefinition.lessonNumber}</span>
+                                                                    </span>
+                                                                </button>
+                                                            );
+                                                        })}
+
+                                                        {phaseDefinition.phase === 2 && (
+                                                            <>
+                                                                {phaseTasks
+                                                                    .filter((taskDefinition) => !taskDefinition.isGeneratedStage2)
+                                                                    .map((taskDefinition) => {
+                                                                        const projectTask = getProjectTask(project, taskDefinition.taskId);
+                                                                        const isComplete = isTaskComplete(projectTask);
+                                                                        const isUnlocked = isTaskUnlocked(project, taskDefinition.taskId);
+                                                                        const isActive = isCurrentProject && project.lastOpenedTask === taskDefinition.taskId;
+                                                                        const statusIcon = !isUnlocked ? '🔒' : (isComplete ? '✅' : '🔲');
+
+                                                                        return (
+                                                                            <button
+                                                                                className={`task-nav-button ${isActive ? 'is-active' : ''} ${isUnlocked ? '' : 'is-locked'}`}
+                                                                                type="button"
+                                                                                key={`${project.id}-task-${taskDefinition.taskId}`}
+                                                                                aria-current={isActive ? 'page' : undefined}
+                                                                                aria-disabled={!isUnlocked}
+                                                                                title={isUnlocked ? taskDefinition.fullDocTitle : `Complete previous tasks to unlock this task.`}
+                                                                                onClick={() => {
+                                                                                    if (!isUnlocked) {
+                                                                                        onLockedTaskClick(taskDefinition.taskId);
+                                                                                        return;
+                                                                                    }
+
+                                                                                    onSelectTask(project.id, taskDefinition.taskId);
+                                                                                }}
+                                                                            >
+                                                                                <span className="task-status-icon" aria-hidden="true">{statusIcon}</span>
+                                                                                <span>
+                                                                                    <span className="task-nav-title">Task {taskDefinition.displayTaskNumber || taskDefinition.taskId}: {taskDefinition.shortTitle}</span>
+                                                                                    <span className="task-nav-subtitle">{taskDefinition.lessonNumber}</span>
+                                                                                </span>
+                                                                            </button>
+                                                                        );
+                                                                    })}
+
+                                                                {getProjectStage2Elements(project).map((elementName, elementIndex) => {
+                                                                    const elementTasks = phaseTasks.filter((taskDefinition) => (
+                                                                        taskDefinition.isGeneratedStage2 && taskDefinition.stage2ElementIndex === elementIndex
+                                                                    ));
+
+                                                                    if (!elementTasks.length) {
+                                                                        return null;
                                                                     }
 
-                                                                    onSelectTask(project.id, taskDefinition.taskId);
-                                                                }}
-                                                            >
-                                                                <span className="task-status-icon" aria-hidden="true">{statusIcon}</span>
-                                                                <span>
-                                                                    <span className="task-nav-title">Task {taskDefinition.taskId}: {taskDefinition.shortTitle}</span>
-                                                                    <span className="task-nav-subtitle">{taskDefinition.lessonNumber}</span>
-                                                                </span>
-                                                            </button>
-                                                        );
-                                                    })}
-                                            </div>
-                                        ))}
+                                                                    return (
+                                                                        <div className="phase-group" key={`${project.id}-stage2-element-${elementIndex}`}>
+                                                                            <p className="phase-label">{elementName}</p>
+                                                                            {elementTasks.map((taskDefinition) => {
+                                                                                const projectTask = getProjectTask(project, taskDefinition.taskId);
+                                                                                const isComplete = isTaskComplete(projectTask);
+                                                                                const isUnlocked = isTaskUnlocked(project, taskDefinition.taskId);
+                                                                                const isActive = isCurrentProject && project.lastOpenedTask === taskDefinition.taskId;
+                                                                                const statusIcon = !isUnlocked ? '🔒' : (isComplete ? '✅' : '🔲');
+
+                                                                                return (
+                                                                                    <button
+                                                                                        className={`task-nav-button ${isActive ? 'is-active' : ''} ${isUnlocked ? '' : 'is-locked'}`}
+                                                                                        type="button"
+                                                                                        key={`${project.id}-task-${taskDefinition.taskId}`}
+                                                                                        aria-current={isActive ? 'page' : undefined}
+                                                                                        aria-disabled={!isUnlocked}
+                                                                                        title={isUnlocked ? taskDefinition.fullDocTitle : `Complete previous tasks to unlock this task.`}
+                                                                                        onClick={() => {
+                                                                                            if (!isUnlocked) {
+                                                                                                onLockedTaskClick(taskDefinition.taskId);
+                                                                                                return;
+                                                                                            }
+
+                                                                                            onSelectTask(project.id, taskDefinition.taskId);
+                                                                                        }}
+                                                                                    >
+                                                                                        <span className="task-status-icon" aria-hidden="true">{statusIcon}</span>
+                                                                                        <span>
+                                                                                            <span className="task-nav-title">Task {taskDefinition.displayTaskNumber || taskDefinition.taskId}: {taskDefinition.shortTitle}</span>
+                                                                                            <span className="task-nav-subtitle">{taskDefinition.lessonNumber}</span>
+                                                                                        </span>
+                                                                                    </button>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </>
                                 )}
@@ -3345,6 +4388,83 @@
             );
         }
 
+        function validateStage2Elements(elements) {
+            const safeElements = Array.isArray(elements) ? elements : [];
+
+            if (!safeElements.length) {
+                return 'Add at least one funnel element.';
+            }
+
+            if (safeElements.length > MAX_STAGE2_ELEMENTS) {
+                return `You can add up to ${MAX_STAGE2_ELEMENTS} elements.`;
+            }
+
+            const seenKeys = new Set();
+
+            for (const elementName of safeElements) {
+                const safeName = String(elementName || '').trim();
+
+                if (!safeName) {
+                    return 'Element names cannot be empty.';
+                }
+
+                const key = safeName.toLowerCase();
+
+                if (seenKeys.has(key)) {
+                    return `Duplicate element name found: "${safeName}".`;
+                }
+
+                seenKeys.add(key);
+            }
+
+            return '';
+        }
+
+        function rebuildProjectTasksForStage2(project, elementNames) {
+            const previousTaskDefinitions = getProjectTaskDefinitions(project);
+            const previousTasksByTemplateTaskId = {};
+
+            previousTaskDefinitions.forEach((taskDefinition) => {
+                if (taskDefinition.isGeneratedStage2) {
+                    return;
+                }
+
+                const projectTask = getProjectTask(project, taskDefinition.taskId);
+
+                if (!projectTask) {
+                    return;
+                }
+
+                previousTasksByTemplateTaskId[String(taskDefinition.sourceTemplateTaskId || taskDefinition.taskId)] = projectTask;
+            });
+
+            const nextStage2 = normalizeStage2State({
+                elements: elementNames,
+                taskTabIds: {},
+                generatedTabIds: []
+            });
+            const nextProjectDraft = { ...project, stage2: nextStage2 };
+            const nextTaskDefinitions = getProjectTaskDefinitions(nextProjectDraft);
+            const nextTasks = nextTaskDefinitions.map((taskDefinition) => {
+                if (taskDefinition.isGeneratedStage2) {
+                    return createDefaultProjectTask(taskDefinition.taskId, '', taskDefinition, nextProjectDraft);
+                }
+
+                const preservedTask = previousTasksByTemplateTaskId[String(taskDefinition.sourceTemplateTaskId || taskDefinition.taskId)] || null;
+                return normalizeProjectTask(preservedTask, taskDefinition);
+            });
+
+            const currentTaskStillExists = nextTaskDefinitions.some((taskDefinition) => taskDefinition.taskId === project.lastOpenedTask);
+            const firstGeneratedTaskId = nextTaskDefinitions.find((taskDefinition) => taskDefinition.isGeneratedStage2)?.taskId || STAGE2_START_TASK_ID;
+
+            return {
+                ...project,
+                stage2: nextStage2,
+                tasks: nextTasks,
+                lastOpenedTask: currentTaskStillExists ? project.lastOpenedTask : firstGeneratedTaskId
+            };
+        }
+
         function App() {
             const firstTask = getTaskDefinition(1);
             const [appState, setAppState] = useState(() => loadState());
@@ -3374,6 +4494,14 @@
                 projectId: null,
                 isRenaming: false,
                 error: ''
+            });
+            const [stage2SetupState, setStage2SetupState] = useState({
+                isOpen: false,
+                isReconfigure: false,
+                isSubmitting: false,
+                error: '',
+                elements: [],
+                confirmText: ''
             });
 
             useEffect(() => {
@@ -3502,6 +4630,27 @@
             }, [appState.currentProjectId]);
 
             useEffect(() => {
+                if (!currentProject || !isTaskFiveComplete) {
+                    return;
+                }
+
+                const stage2Elements = getProjectStage2Elements(currentProject);
+
+                if (stage2Elements.length > 0 || stage2SetupState.isOpen) {
+                    return;
+                }
+
+                setStage2SetupState({
+                    isOpen: true,
+                    isReconfigure: false,
+                    isSubmitting: false,
+                    error: '',
+                    elements: [],
+                    confirmText: ''
+                });
+            }, [currentProject, isTaskFiveComplete, stage2SetupState.isOpen]);
+
+            useEffect(() => {
                 window.StrategicMarketingBootcampAuthRuntime = {
                     requireReauth: (reason = 'Your Google session needs to be refreshed. Continue with Google to re-authenticate.') => {
                         setAuthNotice(reason);
@@ -3533,7 +4682,16 @@
 
             const currentProject = useMemo(() => getCurrentProject(appState), [appState]);
             const currentTask = useMemo(() => getCurrentTask(currentProject), [currentProject]);
-            const currentTaskDefinition = useMemo(() => getTaskDefinition(currentTask?.taskId || firstTask.taskId), [currentTask, firstTask.taskId]);
+            const currentTaskDefinition = useMemo(() => (
+                getTaskDefinition(currentTask?.taskId || firstTask.taskId, currentProject)
+            ), [currentTask, currentProject, firstTask.taskId]);
+            const isTaskFiveComplete = useMemo(() => {
+                if (!currentProject) {
+                    return false;
+                }
+
+                return isTaskComplete(getProjectTask(currentProject, 5));
+            }, [currentProject]);
             const projectPendingDelete = useMemo(() => (
                 appState.projects.find((project) => project.id === deleteProjectState.projectId) || null
             ), [appState.projects, deleteProjectState.projectId]);
@@ -3815,6 +4973,432 @@
                 });
             };
 
+            const handleOpenStage2Reconfigure = () => {
+                if (!currentProject || !isTaskFiveComplete) {
+                    return;
+                }
+
+                const existingElements = getProjectStage2Elements(currentProject);
+
+                setStage2SetupState({
+                    isOpen: true,
+                    isReconfigure: existingElements.length > 0,
+                    isSubmitting: false,
+                    error: '',
+                    elements: existingElements,
+                    confirmText: ''
+                });
+            };
+
+            const handleCancelStage2Setup = () => {
+                const shouldBlockCancel = !stage2SetupState.isReconfigure
+                    && currentProject
+                    && isTaskFiveComplete
+                    && getProjectStage2Elements(currentProject).length === 0;
+
+                if (shouldBlockCancel || stage2SetupState.isSubmitting) {
+                    return;
+                }
+
+                setStage2SetupState((previousState) => ({
+                    ...previousState,
+                    isOpen: false,
+                    error: '',
+                    confirmText: ''
+                }));
+            };
+
+            const handleStage2ElementChange = (index, value) => {
+                const nextName = String(value || '').trim();
+                let didUpdate = false;
+
+                setStage2SetupState((previousState) => {
+                    if (!nextName) {
+                        return {
+                            ...previousState,
+                            error: 'Element names cannot be empty.'
+                        };
+                    }
+
+                    const duplicateExists = previousState.elements.some((elementName, elementIndex) => (
+                        elementIndex !== index && String(elementName || '').trim().toLowerCase() === nextName.toLowerCase()
+                    ));
+
+                    if (duplicateExists) {
+                        return {
+                            ...previousState,
+                            error: `Duplicate element name found: "${nextName}".`
+                        };
+                    }
+
+                    didUpdate = true;
+
+                    return {
+                        ...previousState,
+                        elements: previousState.elements.map((elementName, elementIndex) => (
+                            elementIndex === index ? nextName : elementName
+                        )),
+                        error: ''
+                    };
+                });
+
+                return didUpdate;
+            };
+
+            const handleStage2AddElement = (value) => {
+                const nextName = String(value || '').trim();
+                let didAdd = false;
+
+                setStage2SetupState((previousState) => {
+                    if (!nextName) {
+                        return {
+                            ...previousState,
+                            error: 'Enter an element name before adding.'
+                        };
+                    }
+
+                    if (previousState.elements.length >= MAX_STAGE2_ELEMENTS) {
+                        return {
+                            ...previousState,
+                            error: `You can add up to ${MAX_STAGE2_ELEMENTS} elements.`
+                        };
+                    }
+
+                    const duplicateExists = previousState.elements.some((elementName) => (
+                        String(elementName || '').trim().toLowerCase() === nextName.toLowerCase()
+                    ));
+
+                    if (duplicateExists) {
+                        return {
+                            ...previousState,
+                            error: `Duplicate element name found: "${nextName}".`
+                        };
+                    }
+
+                    didAdd = true;
+
+                    return {
+                        ...previousState,
+                        elements: [...previousState.elements, nextName],
+                        error: ''
+                    };
+                });
+
+                return didAdd;
+            };
+
+            const handleStage2RemoveElement = (index) => {
+                setStage2SetupState((previousState) => {
+                    if (!previousState.elements.length) {
+                        return previousState;
+                    }
+
+                    return {
+                        ...previousState,
+                        elements: previousState.elements.filter((_, elementIndex) => elementIndex !== index),
+                        error: ''
+                    };
+                });
+            };
+
+            const syncStage2DocumentTabs = async (driveToken, projectBeforeSync, projectAfterTaskRebuild, elementNames) => {
+                if (!projectAfterTaskRebuild.projectDocId) {
+                    return normalizeStage2State(projectAfterTaskRebuild.stage2);
+                }
+
+                const documentId = projectAfterTaskRebuild.projectDocId;
+                const stage2TemplateTasks = getStage2TemplateTaskDefinitions();
+                const templatePoolRootByTaskId = stage2TemplateTasks.reduce((accumulator, templateTaskDefinition) => {
+                    const templateTaskId = Number(templateTaskDefinition.taskId);
+                    const poolRootTabId = String(getStaticTaskDefinition(templateTaskId)?.tabId || '').trim();
+
+                    if (templateTaskId && poolRootTabId) {
+                        accumulator[String(templateTaskId)] = poolRootTabId;
+                    }
+
+                    return accumulator;
+                }, {});
+                const previousElements = getProjectStage2Elements(projectBeforeSync);
+                const previousGeneratedTaskIds = previousElements.flatMap((_, elementIndex) => (
+                    stage2TemplateTasks.map((__, templateIndex) => STAGE2_START_TASK_ID + (elementIndex * STAGE2_TASKS_PER_ELEMENT) + templateIndex)
+                ));
+
+                // Release previously assigned Stage 2 child tabs back into their template pools.
+                if (previousGeneratedTaskIds.length) {
+                    const tabsBeforeRelease = await listDocumentTabs(driveToken, documentId);
+                    const tabById = new Map(tabsBeforeRelease.map((tab) => [tab.tabId, tab]));
+                    const nextPoolIndexByTaskId = stage2TemplateTasks.reduce((accumulator, templateTaskDefinition) => {
+                        const templateTaskId = Number(templateTaskDefinition.taskId);
+                        const poolRootTabId = templatePoolRootByTaskId[String(templateTaskId)];
+                        const existingPoolChildrenCount = tabsBeforeRelease.filter((tab) => tab.parentTabId === poolRootTabId).length;
+
+                        accumulator[String(templateTaskId)] = existingPoolChildrenCount;
+                        return accumulator;
+                    }, {});
+
+                    for (const generatedTaskId of previousGeneratedTaskIds) {
+                        const assignedTabId = String(projectBeforeSync.stage2?.taskTabIds?.[String(generatedTaskId)] || '').trim();
+
+                        if (!assignedTabId || !tabById.has(assignedTabId)) {
+                            continue;
+                        }
+
+                        const templateIndex = (generatedTaskId - STAGE2_START_TASK_ID) % STAGE2_TASKS_PER_ELEMENT;
+                        const templateTaskDefinition = stage2TemplateTasks[templateIndex] || null;
+                        const templateTaskId = Number(templateTaskDefinition?.taskId) || 0;
+                        const templateTaskTitle = String(templateTaskDefinition?.shortTitle || '').trim();
+                        const poolRootTabId = templatePoolRootByTaskId[String(templateTaskId)] || '';
+
+                        if (!templateTaskId || !poolRootTabId) {
+                            continue;
+                        }
+
+                        const slotIndex = Number(nextPoolIndexByTaskId[String(templateTaskId)] || 0);
+                        const poolTitle = `Task ${templateTaskId} Template ${String(slotIndex + 1).padStart(2, '0')}`;
+
+                        try {
+                            await updateDocumentTabProperties(
+                                driveToken,
+                                documentId,
+                                assignedTabId,
+                                {
+                                    parentTabId: poolRootTabId,
+                                    index: slotIndex,
+                                    title: poolTitle
+                                },
+                                'parentTabId,index,title'
+                            );
+
+                            if (templateTaskTitle) {
+                                await retitleStage2TabContent(
+                                    driveToken,
+                                    documentId,
+                                    assignedTabId,
+                                    generatedTaskId,
+                                    templateTaskId,
+                                    templateTaskTitle
+                                );
+                            }
+
+                            nextPoolIndexByTaskId[String(templateTaskId)] = slotIndex + 1;
+                        } catch (error) {
+                            // Keep flow resilient if a previously assigned tab is missing or protected.
+                        }
+                    }
+                }
+
+                // Delete only previously generated parent tabs after children are returned to pools.
+                const existingGeneratedTabIds = [...(projectBeforeSync.stage2?.generatedTabIds || [])].reverse();
+
+                if (existingGeneratedTabIds.length) {
+                    const tabsAfterRelease = await listDocumentTabs(driveToken, documentId);
+                    const tabsAfterReleaseMap = new Map(tabsAfterRelease.map((tab) => [tab.tabId, tab]));
+                    const previousElementNameKeys = new Set(previousElements.map((elementName) => String(elementName || '').trim().toLowerCase()));
+
+                    for (const tabId of existingGeneratedTabIds) {
+                        const tabMeta = tabsAfterReleaseMap.get(tabId);
+
+                        if (!tabMeta || tabMeta.parentTabId) {
+                            continue;
+                        }
+
+                        const titleKey = String(tabMeta.title || '').trim().toLowerCase();
+
+                        if (!titleKey || !previousElementNameKeys.has(titleKey)) {
+                            continue;
+                        }
+
+                        try {
+                            await deleteDocumentTab(driveToken, documentId, tabId);
+                        } catch (error) {
+                            // Ignore stale tab IDs from earlier runs.
+                        }
+                    }
+                }
+
+                const tabsAfterCleanup = await listDocumentTabs(driveToken, documentId);
+                const taskFiveTabId = String(getStaticTaskDefinition(5)?.tabId || '').trim();
+                const taskFiveTabMeta = tabsAfterCleanup.find((tab) => tab.tabId === taskFiveTabId && !tab.parentTabId);
+                const stage2RootStartIndex = Number.isInteger(taskFiveTabMeta?.index) ? taskFiveTabMeta.index + 1 : null;
+                const generatedTabIds = [];
+                const taskTabIds = {};
+
+                const templatePoolChildrenByTaskId = stage2TemplateTasks.reduce((accumulator, templateTaskDefinition) => {
+                    const templateTaskId = Number(templateTaskDefinition.taskId);
+                    const poolRootTabId = templatePoolRootByTaskId[String(templateTaskId)] || '';
+                    const candidates = tabsAfterCleanup
+                        .filter((tab) => tab.parentTabId === poolRootTabId)
+                        .sort((leftTab, rightTab) => leftTab.index - rightTab.index);
+
+                    accumulator[String(templateTaskId)] = candidates;
+                    return accumulator;
+                }, {});
+
+                for (const templateTaskDefinition of stage2TemplateTasks) {
+                    const templateTaskId = Number(templateTaskDefinition.taskId);
+                    const availableTemplateTabs = templatePoolChildrenByTaskId[String(templateTaskId)] || [];
+
+                    if (availableTemplateTabs.length < elementNames.length) {
+                        if (previousElements.length > 0) {
+                            throw new Error(
+                                'Stage 2 templates were already consumed and removed in this project. Restore Task 6/7/8 template pools before reconfiguring Stage 2.'
+                            );
+                        }
+
+                        throw new Error(
+                            `Not enough Task ${templateTaskId} template duplicates. Expected ${elementNames.length}, found ${availableTemplateTabs.length}.`
+                        );
+                    }
+                }
+
+                for (let elementIndex = 0; elementIndex < elementNames.length; elementIndex += 1) {
+                    const elementName = elementNames[elementIndex];
+                    const parentTab = await addDocumentTab(driveToken, documentId, elementName, {
+                        index: Number.isInteger(stage2RootStartIndex) ? stage2RootStartIndex + elementIndex : undefined
+                    });
+                    generatedTabIds.push(parentTab.tabId);
+
+                    for (let templateIndex = 0; templateIndex < stage2TemplateTasks.length; templateIndex += 1) {
+                        const templateTaskDefinition = stage2TemplateTasks[templateIndex];
+                        const templateTaskId = Number(templateTaskDefinition.taskId);
+                        const poolCandidate = templatePoolChildrenByTaskId[String(templateTaskId)]?.[elementIndex] || null;
+                        const generatedTaskId = STAGE2_START_TASK_ID + (elementIndex * STAGE2_TASKS_PER_ELEMENT) + templateIndex;
+                        const childTitle = getStage2SubtaskTitle(generatedTaskId, templateTaskDefinition);
+
+                        if (!poolCandidate?.tabId) {
+                            throw new Error(`Unable to locate a Task ${templateTaskId} template tab for funnel element ${elementIndex + 1}.`);
+                        }
+
+                        await updateDocumentTabProperties(
+                            driveToken,
+                            documentId,
+                            poolCandidate.tabId,
+                            {
+                                parentTabId: parentTab.tabId,
+                                index: templateIndex,
+                                title: childTitle
+                            },
+                            'parentTabId,index,title'
+                        );
+                        await retitleStage2TabContent(
+                            driveToken,
+                            documentId,
+                            poolCandidate.tabId,
+                            templateTaskId,
+                            generatedTaskId,
+                            templateTaskDefinition.shortTitle
+                        );
+                        taskTabIds[String(generatedTaskId)] = poolCandidate.tabId;
+                    }
+                }
+
+                const stage2Offset = (elementNames.length * STAGE2_TASKS_PER_ELEMENT) - STAGE2_TASKS_PER_ELEMENT;
+                const downstreamTasks = TASK_DEFINITIONS.filter((taskDefinition) => taskDefinition.taskId >= 9);
+
+                for (const downstreamTaskDefinition of downstreamTasks) {
+                    const shiftedTaskId = downstreamTaskDefinition.taskId + stage2Offset;
+                    const shiftedTitle = `Task ${shiftedTaskId} — ${downstreamTaskDefinition.shortTitle}`;
+                    const tabId = String(downstreamTaskDefinition.tabId || '').trim();
+
+                    if (!tabId) {
+                        continue;
+                    }
+
+                    try {
+                        await updateDocumentTabTitle(driveToken, documentId, tabId, shiftedTitle);
+                    } catch (error) {
+                        // Keep flow resilient if a downstream tab is missing.
+                    }
+
+                    taskTabIds[String(shiftedTaskId)] = tabId;
+                }
+
+                const isFirstStage2Setup = previousElements.length === 0;
+
+                if (isFirstStage2Setup) {
+                    for (const templateTaskDefinition of stage2TemplateTasks) {
+                        const templateTaskId = Number(templateTaskDefinition.taskId);
+                        const poolRootTabId = templatePoolRootByTaskId[String(templateTaskId)] || '';
+
+                        if (!poolRootTabId) {
+                            continue;
+                        }
+
+                        try {
+                            await deleteDocumentTab(driveToken, documentId, poolRootTabId);
+                        } catch (error) {
+                            // Ignore if template root was already removed.
+                        }
+                    }
+                }
+
+                return normalizeStage2State({
+                    elements: elementNames,
+                    generatedTabIds,
+                    taskTabIds
+                });
+            };
+
+            const handleSubmitStage2Setup = async () => {
+                if (!currentProject || !isTaskFiveComplete || stage2SetupState.isSubmitting) {
+                    return;
+                }
+
+                const normalizedElements = stage2SetupState.elements.map((elementName) => String(elementName || '').trim());
+                const validationError = validateStage2Elements(normalizedElements);
+
+                if (validationError) {
+                    setStage2SetupState((previousState) => ({ ...previousState, error: validationError }));
+                    return;
+                }
+
+                if (stage2SetupState.isReconfigure && stage2SetupState.confirmText.trim().toLowerCase() !== STAGE2_CONFIRM_TEXT) {
+                    setStage2SetupState((previousState) => ({ ...previousState, error: `Type ${STAGE2_CONFIRM_TEXT} to continue.` }));
+                    return;
+                }
+
+                setStage2SetupState((previousState) => ({ ...previousState, isSubmitting: true, error: '' }));
+
+                try {
+                    const nextProjectTaskState = rebuildProjectTasksForStage2(currentProject, normalizedElements);
+                    let nextStage2State = normalizeStage2State(nextProjectTaskState.stage2);
+
+                    if (nextProjectTaskState.projectDocId) {
+                        const driveToken = await getValidGoogleToken('Reconnect Google before applying Stage 2 tabs. Your project has not been changed yet.');
+                        nextStage2State = await syncStage2DocumentTabs(driveToken, currentProject, nextProjectTaskState, normalizedElements);
+                    }
+
+                    const finalProject = {
+                        ...nextProjectTaskState,
+                        stage2: nextStage2State
+                    };
+
+                    const nextState = {
+                        ...appState,
+                        projects: appState.projects.map((project) => (
+                            project.id === currentProject.id ? finalProject : project
+                        ))
+                    };
+
+                    persistState(nextState);
+                    setStage2SetupState({
+                        isOpen: false,
+                        isReconfigure: false,
+                        isSubmitting: false,
+                        error: '',
+                        elements: [],
+                        confirmText: ''
+                    });
+                    setLockedTaskMessage('Stage 2 funnel elements saved and synced to your document tabs.');
+                } catch (error) {
+                    setStage2SetupState((previousState) => ({
+                        ...previousState,
+                        isSubmitting: false,
+                        error: error.message || 'Unable to apply Stage 2 setup. Please retry.'
+                    }));
+                }
+            };
+
             const resetCreationState = () => {
                 setCreationState({
                     isCreating: false,
@@ -3925,6 +5509,11 @@
                         <div className="brand-block">
                             <h1 className="brand-label">Strategic Marketing Bootcamp</h1>
                             <button className="new-project-button" type="button" onClick={handleOpenNewProject}>+ New Project</button>
+                            {currentProject && isTaskFiveComplete && (
+                                <button className="new-project-button" type="button" onClick={handleOpenStage2Reconfigure}>
+                                    {getProjectStage2Elements(currentProject).length ? 'Reconfigure Stage 2' : 'Set Stage 2 Elements'}
+                                </button>
+                            )}
                         </div>
 
                         <section className="project-section project-navigation-section" aria-label="Projects">
@@ -4003,6 +5592,21 @@
                             onConfirm={handleConfirmRenameProject}
                         />
                     )}
+
+                    <Stage2SetupModal
+                        isOpen={stage2SetupState.isOpen}
+                        isReconfigure={stage2SetupState.isReconfigure}
+                        elements={stage2SetupState.elements}
+                        isSubmitting={stage2SetupState.isSubmitting}
+                        error={stage2SetupState.error}
+                        confirmText={stage2SetupState.confirmText}
+                        onChangeElement={handleStage2ElementChange}
+                        onAddElement={handleStage2AddElement}
+                        onRemoveElement={handleStage2RemoveElement}
+                        onChangeConfirmText={(value) => setStage2SetupState((previousState) => ({ ...previousState, confirmText: value, error: '' }))}
+                        onCancel={handleCancelStage2Setup}
+                        onSubmit={handleSubmitStage2Setup}
+                    />
                 </main>
             );
         }
