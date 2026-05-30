@@ -287,6 +287,15 @@
             background: rgba(255, 255, 255, 0.03);
         }
 
+        .stage2-element-row.dragging {
+            opacity: 0.6;
+        }
+
+        .stage2-element-row.drag-over {
+            border-color: rgba(212, 168, 67, 0.7);
+            background: rgba(212, 168, 67, 0.1);
+        }
+
         .stage2-element-name {
             color: var(--text-primary);
             font-size: 14px;
@@ -477,6 +486,13 @@
             gap: 12px;
         }
 
+        .brand-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: start;
+        }
+
         .brand-label {
             margin: 0;
             color: var(--text-primary);
@@ -484,6 +500,87 @@
             font-weight: 700;
             line-height: 1.4;
             letter-spacing: -0.02em;
+        }
+
+        .stage2-menu-wrap {
+            position: relative;
+        }
+
+        .stage2-gear-button {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .stage2-gear-button:hover,
+        .stage2-gear-button:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.4);
+            outline: none;
+        }
+
+        .stage2-gear-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 15;
+            width: 240px;
+            display: grid;
+            gap: 6px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #181818;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .stage2-menu-divider {
+            height: 1px;
+            margin: 2px 0;
+            background: var(--border);
+        }
+
+        .stage2-menu-item {
+            width: 100%;
+            padding: 9px 10px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .stage2-menu-item:hover,
+        .stage2-menu-item:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.35);
+            outline: none;
+        }
+
+        .stage2-menu-item.is-danger {
+            color: #ffb8b8;
+        }
+
+        .stage2-menu-item.is-danger:hover,
+        .stage2-menu-item.is-danger:focus-visible {
+            border-color: rgba(255, 120, 120, 0.42);
+            background: rgba(255, 120, 120, 0.08);
+        }
+
+        .stage2-menu-item:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
         }
 
         .new-project-button {
@@ -820,6 +917,141 @@
         .auth-refresh-banner button:disabled {
             cursor: not-allowed;
             opacity: 0.6;
+        }
+
+        .gws-floating-wrap {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 50;
+        }
+
+        .gws-fab {
+            min-width: 58px;
+            width: 58px;
+            height: 58px;
+            display: inline-grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid rgba(212, 168, 67, 0.44);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.25), rgba(212, 168, 67, 0.12));
+            color: var(--text-primary);
+            box-shadow: 0 14px 26px rgba(0, 0, 0, 0.34);
+            cursor: pointer;
+            transition: width 180ms ease, min-width 180ms ease, padding 180ms ease, border-radius 180ms ease, background 180ms ease, border-color 180ms ease, transform 150ms ease;
+        }
+
+        .gws-fab:hover {
+            transform: translateY(-1px);
+            border-color: rgba(212, 168, 67, 0.58);
+        }
+
+        .gws-fab.is-running {
+            width: auto;
+            min-width: 118px;
+            padding: 0 14px;
+            border-radius: 16px;
+        }
+
+        .gws-fab.is-paused {
+            border-color: rgba(212, 168, 67, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .gws-fab-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .gws-fab-time {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            line-height: 1;
+        }
+
+        .gws-popup {
+            position: absolute;
+            right: 0;
+            bottom: calc(100% + 10px);
+            width: 248px;
+            display: grid;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #1a1a1a;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
+        }
+
+        .gws-popup-title {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .gws-option-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .gws-option-button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .gws-option-button.is-active {
+            border-color: rgba(212, 168, 67, 0.62);
+            background: rgba(212, 168, 67, 0.16);
+        }
+
+        .gws-popup-actions {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 8px;
+        }
+
+        .gws-action-button {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid rgba(212, 168, 67, 0.42);
+            border-radius: 10px;
+            background: rgba(212, 168, 67, 0.16);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .gws-action-button:hover {
+            background: rgba(212, 168, 67, 0.23);
+            border-color: rgba(212, 168, 67, 0.56);
+        }
+
+        .gws-action-button.is-secondary {
+            border-color: var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+        }
+
+        .gws-action-button.is-secondary:hover {
+            color: var(--text-primary);
+            border-color: rgba(212, 168, 67, 0.34);
+            background: var(--hover);
         }
 
         .mini-actions,
@@ -1560,6 +1792,11 @@
 
             .center-panel {
                 padding: 16px;
+            }
+
+            .gws-floating-wrap {
+                right: 16px;
+                bottom: 16px;
             }
         }
     </style>
@@ -3710,12 +3947,15 @@
             onChangeElement,
             onAddElement,
             onRemoveElement,
+            onReorderElements,
             onChangeConfirmText,
             onCancel,
             onSubmit
         }) {
             const [draftElement, setDraftElement] = useState('');
             const [editingIndex, setEditingIndex] = useState(null);
+            const [dragIndex, setDragIndex] = useState(null);
+            const [dragOverIndex, setDragOverIndex] = useState(null);
             const canSubmit = !isSubmitting
                 && elements.length > 0
                 && elements.every((elementName) => String(elementName || '').trim())
@@ -3728,6 +3968,8 @@
 
                 setDraftElement('');
                 setEditingIndex(null);
+                setDragIndex(null);
+                setDragOverIndex(null);
             }, [isOpen, isReconfigure]);
 
             const handleSubmitElementDraft = () => {
@@ -3754,6 +3996,49 @@
             const handleStartEdit = (index) => {
                 setDraftElement(String(elements[index] || ''));
                 setEditingIndex(index);
+            };
+
+            const handleDragStart = (event, index) => {
+                if (isSubmitting) {
+                    event.preventDefault();
+                    return;
+                }
+
+                setDragIndex(index);
+                setDragOverIndex(index);
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', String(index));
+            };
+
+            const handleDragOver = (event, index) => {
+                if (isSubmitting || dragIndex === null) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                if (dragOverIndex !== index) {
+                    setDragOverIndex(index);
+                }
+            };
+
+            const handleDrop = (event, index) => {
+                event.preventDefault();
+
+                if (isSubmitting || dragIndex === null || dragIndex === index) {
+                    setDragIndex(null);
+                    setDragOverIndex(null);
+                    return;
+                }
+
+                onReorderElements(dragIndex, index);
+                setDragIndex(null);
+                setDragOverIndex(null);
+            };
+
+            const handleDragEnd = () => {
+                setDragIndex(null);
+                setDragOverIndex(null);
             };
 
             if (!isOpen) {
@@ -3821,7 +4106,15 @@
                             )}
 
                             {elements.map((elementName, index) => (
-                                <div key={`stage2-element-${index}`} className="stage2-element-row">
+                                <div
+                                    key={`stage2-element-${index}-${elementName}`}
+                                    className={`stage2-element-row${dragIndex === index ? ' dragging' : ''}${dragOverIndex === index && dragIndex !== index ? ' drag-over' : ''}`}
+                                    draggable={!isSubmitting}
+                                    onDragStart={(event) => handleDragStart(event, index)}
+                                    onDragOver={(event) => handleDragOver(event, index)}
+                                    onDrop={(event) => handleDrop(event, index)}
+                                    onDragEnd={handleDragEnd}
+                                >
                                     <span className="stage2-element-name">{elementName}</span>
                                     <div className="stage2-element-actions">
                                         <button
@@ -4465,6 +4758,55 @@
             };
         }
 
+        function formatCountdownTime(totalSeconds) {
+            const safeSeconds = Math.max(0, Number(totalSeconds) || 0);
+            const minutes = Math.floor(safeSeconds / 60);
+            const seconds = safeSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        async function playGwsCompletionRingtone(audioContextRef) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+            if (!AudioContextClass) {
+                return;
+            }
+
+            if (!audioContextRef.current) {
+                audioContextRef.current = new AudioContextClass();
+            }
+
+            const audioContext = audioContextRef.current;
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            const startAt = audioContext.currentTime;
+            const chimeOffsets = [0, 0.28, 0.56, 0.9, 1.18, 1.46];
+
+            chimeOffsets.forEach((offset, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const frequency = index % 2 === 0 ? 880 : 660;
+                const toneStart = startAt + offset;
+                const toneEnd = toneStart + 0.18;
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(frequency, toneStart);
+
+                gainNode.gain.setValueAtTime(0.0001, toneStart);
+                gainNode.gain.exponentialRampToValueAtTime(0.2, toneStart + 0.03);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, toneEnd);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.start(toneStart);
+                oscillator.stop(toneEnd);
+            });
+        }
+
         function App() {
             const firstTask = getTaskDefinition(1);
             const [appState, setAppState] = useState(() => loadState());
@@ -4475,7 +4817,16 @@
             const [authNotice, setAuthNotice] = useState(() => INITIAL_AUTH_NOTICE || (isPlaceholderClientId() ? 'Google OAuth is implemented, but the client ID is still a placeholder.' : ''));
             const authRequestRef = useRef(null);
             const lastVisitedTaskIdRef = useRef(null);
+            const stage2MenuRef = useRef(null);
+            const gwsMenuRef = useRef(null);
+            const gwsAudioContextRef = useRef(null);
             const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+            const [isStage2MenuOpen, setIsStage2MenuOpen] = useState(false);
+            const [isGwsMenuOpen, setIsGwsMenuOpen] = useState(false);
+            const [gwsMinutes, setGwsMinutes] = useState(60);
+            const [gwsRemainingSeconds, setGwsRemainingSeconds] = useState(0);
+            const [isGwsRunning, setIsGwsRunning] = useState(false);
+            const [isGwsPaused, setIsGwsPaused] = useState(false);
             const [creationState, setCreationState] = useState({
                 isCreating: false,
                 createdCount: 0,
@@ -4629,6 +4980,81 @@
                         : [...previousProjectIds, appState.currentProjectId]
                 ));
             }, [appState.currentProjectId]);
+
+            useEffect(() => {
+                if (!isStage2MenuOpen) {
+                    return;
+                }
+
+                const handleGlobalPointerDown = (event) => {
+                    if (!stage2MenuRef.current?.contains(event.target)) {
+                        setIsStage2MenuOpen(false);
+                    }
+                };
+
+                const handleGlobalEscape = (event) => {
+                    if (event.key === 'Escape') {
+                        setIsStage2MenuOpen(false);
+                    }
+                };
+
+                document.addEventListener('mousedown', handleGlobalPointerDown);
+                document.addEventListener('keydown', handleGlobalEscape);
+
+                return () => {
+                    document.removeEventListener('mousedown', handleGlobalPointerDown);
+                    document.removeEventListener('keydown', handleGlobalEscape);
+                };
+            }, [isStage2MenuOpen]);
+
+            useEffect(() => {
+                if (!isGwsMenuOpen) {
+                    return;
+                }
+
+                const handleOutsideClick = (event) => {
+                    if (!gwsMenuRef.current?.contains(event.target)) {
+                        setIsGwsMenuOpen(false);
+                    }
+                };
+
+                const handleEscape = (event) => {
+                    if (event.key === 'Escape') {
+                        setIsGwsMenuOpen(false);
+                    }
+                };
+
+                document.addEventListener('mousedown', handleOutsideClick);
+                document.addEventListener('keydown', handleEscape);
+
+                return () => {
+                    document.removeEventListener('mousedown', handleOutsideClick);
+                    document.removeEventListener('keydown', handleEscape);
+                };
+            }, [isGwsMenuOpen]);
+
+            useEffect(() => {
+                if (!isGwsRunning) {
+                    return;
+                }
+
+                const timerId = window.setInterval(() => {
+                    setGwsRemainingSeconds((previousSeconds) => Math.max(previousSeconds - 1, 0));
+                }, 1000);
+
+                return () => window.clearInterval(timerId);
+            }, [isGwsRunning]);
+
+            useEffect(() => {
+                if (!isGwsRunning || gwsRemainingSeconds > 0) {
+                    return;
+                }
+
+                setIsGwsRunning(false);
+                setIsGwsPaused(false);
+                setLockedTaskMessage('GWS complete. Great session.');
+                playGwsCompletionRingtone(gwsAudioContextRef).catch(() => {});
+            }, [isGwsRunning, gwsRemainingSeconds]);
 
             useEffect(() => {
                 const currentTaskId = Number(currentTask?.taskId) || 0;
@@ -5102,6 +5528,33 @@
                 });
             };
 
+            const handleStage2ReorderElements = (fromIndex, toIndex) => {
+                if (!Number.isInteger(fromIndex) || !Number.isInteger(toIndex) || fromIndex === toIndex) {
+                    return;
+                }
+
+                setStage2SetupState((previousState) => {
+                    if (
+                        fromIndex < 0
+                        || toIndex < 0
+                        || fromIndex >= previousState.elements.length
+                        || toIndex >= previousState.elements.length
+                    ) {
+                        return previousState;
+                    }
+
+                    const nextElements = [...previousState.elements];
+                    const [movedElement] = nextElements.splice(fromIndex, 1);
+                    nextElements.splice(toIndex, 0, movedElement);
+
+                    return {
+                        ...previousState,
+                        elements: nextElements,
+                        error: ''
+                    };
+                });
+            };
+
             const syncStage2DocumentTabs = async (driveToken, projectBeforeSync, projectAfterTaskRebuild, elementNames) => {
                 if (!projectAfterTaskRebuild.projectDocId) {
                     return normalizeStage2State(projectAfterTaskRebuild.stage2);
@@ -5484,6 +5937,39 @@
                 setAuthNotice('You have been signed out. Continue with Google to sign in again.');
             };
 
+            const handleStartGwsSession = () => {
+                const durationMinutes = gwsMinutes === 90 ? 90 : 60;
+                setGwsRemainingSeconds(durationMinutes * 60);
+                setIsGwsRunning(true);
+                setIsGwsPaused(false);
+                setIsGwsMenuOpen(false);
+            };
+
+            const handlePauseGwsSession = () => {
+                if (!isGwsRunning || gwsRemainingSeconds <= 0) {
+                    return;
+                }
+
+                setIsGwsRunning(false);
+                setIsGwsPaused(true);
+            };
+
+            const handleResumeGwsSession = () => {
+                if (!isGwsPaused || gwsRemainingSeconds <= 0) {
+                    return;
+                }
+
+                setIsGwsRunning(true);
+                setIsGwsPaused(false);
+            };
+
+            const handleStopGwsSession = () => {
+                setIsGwsRunning(false);
+                setIsGwsPaused(false);
+                setGwsRemainingSeconds(0);
+                setIsGwsMenuOpen(false);
+            };
+
             if (!authToken) {
                 return (
                     <LoginScreen
@@ -5508,13 +5994,80 @@
 
                     <aside className="left-sidebar" aria-label="Project navigation">
                         <div className="brand-block">
-                            <h1 className="brand-label">Strategic Marketing Bootcamp</h1>
-                            <button className="new-project-button" type="button" onClick={handleOpenNewProject}>+ New Project</button>
-                            {currentProject && isTaskFiveComplete && (
-                                <button className="new-project-button" type="button" onClick={handleOpenStage2Reconfigure}>
-                                    {getProjectStage2Elements(currentProject).length ? 'Reconfigure Stage 2' : 'Set Stage 2 Elements'}
-                                </button>
-                            )}
+                            <div className="brand-header">
+                                <h1 className="brand-label">Strategic Marketing Bootcamp</h1>
+                                <div className="stage2-menu-wrap" ref={stage2MenuRef}>
+                                    <button
+                                        className="stage2-gear-button"
+                                        type="button"
+                                        aria-label="Open quick actions menu"
+                                        title="Quick actions"
+                                        onClick={() => setIsStage2MenuOpen((isOpen) => !isOpen)}
+                                    >
+                                        ⚙
+                                    </button>
+                                    {isStage2MenuOpen && (
+                                        <div className="stage2-gear-menu" role="menu" aria-label="Quick actions">
+                                            <button
+                                                className="stage2-menu-item"
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={() => {
+                                                    setIsStage2MenuOpen(false);
+                                                    handleOpenNewProject();
+                                                }}
+                                            >
+                                                Create New Project
+                                            </button>
+                                            <button
+                                                className="stage2-menu-item is-danger"
+                                                type="button"
+                                                role="menuitem"
+                                                disabled={!currentProject}
+                                                onClick={() => {
+                                                    if (!currentProject) {
+                                                        return;
+                                                    }
+
+                                                    setIsStage2MenuOpen(false);
+                                                    handleDeleteProject(currentProject.id);
+                                                }}
+                                            >
+                                                Delete Current Project
+                                            </button>
+
+                                            <div className="stage2-menu-divider" aria-hidden="true" />
+
+                                            <button
+                                                className="stage2-menu-item"
+                                                type="button"
+                                                role="menuitem"
+                                                disabled={!currentProject || !isTaskFiveComplete}
+                                                onClick={() => {
+                                                    setIsStage2MenuOpen(false);
+                                                    handleOpenStage2Reconfigure();
+                                                }}
+                                            >
+                                                {currentProject && getProjectStage2Elements(currentProject).length ? 'Reconfigure Funnel' : 'Set Funnel Elements'}
+                                            </button>
+
+                                            <div className="stage2-menu-divider" aria-hidden="true" />
+
+                                            <button
+                                                className="stage2-menu-item is-danger"
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={() => {
+                                                    setIsStage2MenuOpen(false);
+                                                    handleSignOut();
+                                                }}
+                                            >
+                                                Sign Out
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <section className="project-section project-navigation-section" aria-label="Projects">
@@ -5530,13 +6083,6 @@
                                 onRenameProject={handleRenameProject}
                                 onDeleteProject={handleDeleteProject}
                             />
-                        </section>
-
-                        <section className="project-section auth-section" aria-label="Authentication status">
-                            <h2 className="section-heading">Authentication</h2>
-                            <div className="status-card">
-                                <button className="simple-sign-out-button" type="button" onClick={handleSignOut}>Sign out</button>
-                            </div>
                         </section>
 
                     </aside>
@@ -5557,6 +6103,66 @@
                             onToggleChecklistItem={handleToggleChecklistItem}
                         />
                     </aside>
+
+                    <div className="gws-floating-wrap" ref={gwsMenuRef}>
+                        {isGwsMenuOpen && (
+                            <div className="gws-popup" role="dialog" aria-modal="false" aria-label="G work session timer">
+                                <p className="gws-popup-title">GWS Timer</p>
+                                <div className="gws-option-row" role="radiogroup" aria-label="Session duration">
+                                    <button
+                                        className={`gws-option-button${gwsMinutes === 60 ? ' is-active' : ''}`}
+                                        type="button"
+                                        role="radio"
+                                        aria-checked={gwsMinutes === 60}
+                                        onClick={() => setGwsMinutes(60)}
+                                    >
+                                        60 min
+                                    </button>
+                                    <button
+                                        className={`gws-option-button${gwsMinutes === 90 ? ' is-active' : ''}`}
+                                        type="button"
+                                        role="radio"
+                                        aria-checked={gwsMinutes === 90}
+                                        onClick={() => setGwsMinutes(90)}
+                                    >
+                                        90 min
+                                    </button>
+                                </div>
+                                <div className="gws-popup-actions">
+                                    <button className="gws-action-button" type="button" onClick={handleStartGwsSession}>
+                                        Start Session
+                                    </button>
+                                    {isGwsRunning && (
+                                        <button className="gws-action-button is-secondary" type="button" onClick={handlePauseGwsSession}>
+                                            Pause Session
+                                        </button>
+                                    )}
+                                    {isGwsPaused && (
+                                        <button className="gws-action-button is-secondary" type="button" onClick={handleResumeGwsSession}>
+                                            Resume Session
+                                        </button>
+                                    )}
+                                    {(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0) && (
+                                        <button className="gws-action-button is-secondary" type="button" onClick={handleStopGwsSession}>
+                                            Stop Session
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        <button
+                            className={`gws-fab${(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0) ? ' is-running' : ''}${isGwsPaused ? ' is-paused' : ''}`}
+                            type="button"
+                            aria-label="Open G work session timer"
+                            title="G work session timer"
+                            onClick={() => setIsGwsMenuOpen((isOpen) => !isOpen)}
+                        >
+                            {(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0)
+                                ? <span className="gws-fab-time">{formatCountdownTime(gwsRemainingSeconds)}</span>
+                                : <span className="gws-fab-icon">⏱</span>}
+                        </button>
+                    </div>
 
                     {diagramLightboxTask && (
                         <DiagramLightbox
@@ -5604,6 +6210,7 @@
                         onChangeElement={handleStage2ElementChange}
                         onAddElement={handleStage2AddElement}
                         onRemoveElement={handleStage2RemoveElement}
+                        onReorderElements={handleStage2ReorderElements}
                         onChangeConfirmText={(value) => setStage2SetupState((previousState) => ({ ...previousState, confirmText: value, error: '' }))}
                         onCancel={handleCancelStage2Setup}
                         onSubmit={handleSubmitStage2Setup}
