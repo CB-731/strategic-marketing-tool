@@ -11,11 +11,11 @@ Use this file to record completed work after every implementation task.
 
 ## Current Sprint
 
-Sprint 11 — Manual Testing and Hardening — Complete
+Sprint 12 — GWS Visualization and Session Management — Planned
 
 ## Next Sprint
 
-No planned sprint. All planned implementation sprints are complete.
+Sprint 13 — TBD after Sprint 12 completion.
 
 ## Log
 
@@ -59,10 +59,12 @@ No planned sprint. All planned implementation sprints are complete.
 | 2026-05-07 | CR-012 | Legacy 12-doc project compatibility | Complete | Added centralized document-reference selection so one-doc projects use `projectDocId` + `tabId`, old projects fall back to per-task `docId`, and recovery copy distinguishes missing project docs from missing legacy task docs. |
 | 2026-05-07 | CR-013 | Cleanup old 12-template system | Complete | Removed stale per-task template IDs and unused old template helpers, made the remaining Drive copy helper explicitly copy the master project document, and preserved legacy project viewing fallback. |
 | 2026-05-07 | CR-014 | Silent Google token refresh | Complete | Added promise-based Google token requests, silent `prompt: ''` refresh before Drive create/rename/delete, startup silent refresh for remembered expired access tokens, and reconnect guidance only when silent refresh fails. |
+| 2026-05-31 | CR-017 | GWS planned-vs-actual dashboard and analytics | Complete | Added planned vs actual task comparison with match/gap visuals, persisted `pauseCount` and `achievedTasks`, added summary metrics (total time, session count, pause count, project breakdown, cadence trend), and extended dashboard CSV export fields. |
+| 2026-05-31 | Sprint 12 | Plan graph views and session deletion | Complete | Added Sprint 12 plan in `docs/SPRINTS.md` and created CR-018 scope in `docs/CHANGE_REQUESTS.md` for Overview/Workload/Cadence graph views, cadence risk indicators, filter model, and safe session deletion. |
 
 ## Next Task
 
-No pending planned change request remains. Use `docs/CHANGE_REQUESTS.md` for future small edits.
+Implement CR-018 in `public/index.html`: add dashboard graph views, cadence/workload insights, and session deletion with confirmation.
 
 Recommended next prompt:
 

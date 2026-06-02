@@ -949,6 +949,32 @@
             right: 24px;
             bottom: 24px;
             z-index: 50;
+            display: inline-flex;
+            align-items: end;
+            gap: 10px;
+        }
+
+        .gws-history-fab {
+            width: 44px;
+            height: 44px;
+            display: inline-grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(20, 20, 20, 0.86);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: var(--text-secondary);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: border-color 150ms ease, color 150ms ease, transform 150ms ease;
+        }
+
+        .gws-history-fab:hover {
+            color: var(--text-primary);
+            border-color: rgba(212, 168, 67, 0.4);
+            transform: translateY(-1px);
         }
 
         .gws-fab {
@@ -1049,10 +1075,450 @@
             background: rgba(212, 168, 67, 0.16);
         }
 
+        .gws-checklist {
+            display: grid;
+            gap: 10px;
+        }
+
+        .gws-checklist-item {
+            display: grid;
+            grid-template-columns: 20px minmax(0, 1fr);
+            gap: 12px;
+            align-items: start;
+            padding: 14px 14px 13px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            line-height: 1.5;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+        }
+
+        .gws-checklist-item:hover {
+            border-color: rgba(212, 168, 67, 0.24);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .gws-checklist-item.is-active {
+            border-color: rgba(212, 168, 67, 0.48);
+            background: rgba(212, 168, 67, 0.12);
+            box-shadow: 0 10px 26px rgba(212, 168, 67, 0.08);
+        }
+
+        .gws-checklist-item input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .gws-checklist-item .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            border-radius: 7px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.05);
+            color: #111111;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .gws-checklist-item input:checked + .custom-checkbox {
+            border-color: rgba(212, 168, 67, 0.72);
+            background: var(--accent);
+        }
+
+        .gws-checklist-item input:focus-visible + .custom-checkbox {
+            outline: 2px solid rgba(212, 168, 67, 0.5);
+            outline-offset: 2px;
+        }
+
+        .gws-checklist-item span:last-child {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.55;
+            color: var(--text-primary);
+        }
+
         .gws-popup-actions {
             display: grid;
             grid-template-columns: minmax(0, 1fr);
             gap: 8px;
+        }
+
+        .gws-history-modal {
+            width: min(680px, calc(100vw - 48px));
+            max-height: calc(100vh - 40px);
+        }
+
+        .gws-history-toolbar {
+            display: grid;
+            gap: 10px;
+        }
+
+        .gws-history-toolbar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .gws-history-filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .gws-history-filter-label {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .gws-history-filter-chip {
+            padding: 9px 11px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+        }
+
+        .gws-history-filter-chip:hover {
+            border-color: rgba(212, 168, 67, 0.4);
+            background: var(--hover);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .gws-history-filter-chip.is-active {
+            border-color: rgba(212, 168, 67, 0.62);
+            background: rgba(212, 168, 67, 0.16);
+            color: var(--text-primary);
+        }
+
+        .gws-history-select {
+            min-width: min(240px, 100%);
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font: inherit;
+        }
+
+        .gws-history-select:focus {
+            outline: none;
+            border-color: rgba(212, 168, 67, 0.6);
+            box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+        }
+
+        .gws-history-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-history-stat {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gws-history-stat-label {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .gws-history-stat-value {
+            margin: 6px 0 0;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .gws-history-list {
+            display: grid;
+            gap: 10px;
+            max-height: 360px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .gws-history-empty {
+            padding: 13px;
+            border: 1px dashed rgba(255, 255, 255, 0.16);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .gws-history-item {
+            position: relative;
+            display: grid;
+            gap: 7px;
+            padding: 12px;
+            padding-right: 56px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gws-history-item-button {
+            display: grid;
+            gap: 7px;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .gws-history-item-button:focus-visible {
+            outline: 2px solid rgba(212, 168, 67, 0.5);
+            outline-offset: 4px;
+            border-radius: 10px;
+        }
+
+        .gws-history-item-toggle {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .gws-history-item-details {
+            display: grid;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gws-history-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-history-detail-card {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gws-history-detail-card h4 {
+            margin: 0 0 6px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .gws-history-detail-card p,
+        .gws-history-detail-card ul {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .gws-history-detail-card ul {
+            padding-left: 18px;
+        }
+
+        .gws-history-detail-card li + li {
+            margin-top: 4px;
+        }
+
+        .gws-history-detail-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-history-metric {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gws-history-metric-label {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .gws-history-metric-value {
+            margin: 5px 0 0;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .gws-history-detail-empty {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .gws-history-item-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gws-history-item-title {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .gws-history-item-meta {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .gws-history-item-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            z-index: 2;
+        }
+
+        .gws-history-item-delete {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            display: inline-grid;
+            place-items: center;
+            padding: 0;
+            border-radius: 10px;
+            border-color: rgba(255, 120, 120, 0.34);
+            background: rgba(255, 120, 120, 0.08);
+            color: #ffd1d1;
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        .gws-history-item-delete:hover {
+            border-color: rgba(255, 120, 120, 0.56);
+            background: rgba(255, 120, 120, 0.16);
+        }
+
+        .gws-history-inline-confirm {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            padding: 9px 10px;
+            width: min(280px, calc(100vw - 64px));
+            border: 1px solid rgba(255, 120, 120, 0.34);
+            border-radius: 10px;
+            background: rgba(34, 18, 18, 0.56);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+        }
+
+        .gws-history-inline-confirm p {
+            margin: 0;
+            color: #ffd1d1;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .gws-history-inline-confirm .gws-action-button {
+            width: auto;
+            min-width: 0;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .gws-history-inline-confirm .gws-action-button.is-danger {
+            border-color: rgba(255, 120, 120, 0.56);
+            background: rgba(255, 120, 120, 0.18);
+            color: #ffd1d1;
+        }
+
+        .gws-status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gws-status-badge.is-completed {
+            border-color: rgba(88, 194, 125, 0.42);
+            color: #9be7b4;
+            background: rgba(88, 194, 125, 0.12);
+        }
+
+        .gws-status-badge.is-stopped {
+            border-color: rgba(255, 120, 120, 0.42);
+            color: #ffd1d1;
+            background: rgba(255, 120, 120, 0.12);
+        }
+
+        @media (max-width: 760px) {
+            .gws-history-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .gws-history-detail-grid,
+            .gws-history-detail-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .gws-dashboard-visual-grid,
+            .gws-dashboard-cadence-bands {
+                grid-template-columns: 1fr;
+            }
+
+            .gws-dashboard-weekday-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
         }
 
         .gws-action-button {
@@ -1368,6 +1834,611 @@
             padding: 24px 20px;
             background: var(--right-sidebar);
             border-left: 1px solid var(--border);
+        }
+
+        .right-sidebar-shell {
+            display: grid;
+            gap: 16px;
+            min-height: 0;
+        }
+
+        .right-sidebar-profile {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: start;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .right-sidebar-profile-copy {
+            display: grid;
+            gap: 4px;
+        }
+
+        .right-sidebar-profile-label {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .right-sidebar-profile-name {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .right-sidebar-profile-email {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .profile-menu-wrap {
+            position: relative;
+        }
+
+        .profile-avatar-button {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid rgba(212, 168, 67, 0.32);
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.2), rgba(212, 168, 67, 0.08));
+            color: #111111;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        .profile-avatar-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-fallback {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+        }
+
+        .profile-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            z-index: 20;
+            width: 240px;
+            display: grid;
+            gap: 6px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #181818;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
+        }
+
+        .profile-menu-item {
+            width: 100%;
+            padding: 9px 10px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .profile-menu-item:hover,
+        .profile-menu-item:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.35);
+            outline: none;
+        }
+
+        .profile-menu-item.is-danger {
+            color: #ffb8b8;
+        }
+
+        .profile-menu-item.is-danger:hover,
+        .profile-menu-item.is-danger:focus-visible {
+            border-color: rgba(255, 120, 120, 0.42);
+            background: rgba(255, 120, 120, 0.08);
+        }
+
+        .center-workspace-tabs {
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            gap: 14px;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .center-workspace-tabbar {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 6px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.03);
+            width: fit-content;
+        }
+
+        .center-workspace-tab {
+            padding: 10px 14px;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+        }
+
+        .center-workspace-tab:hover,
+        .center-workspace-tab:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.32);
+            color: var(--text-primary);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .center-workspace-tab.is-active {
+            border-color: rgba(212, 168, 67, 0.42);
+            background: rgba(212, 168, 67, 0.12);
+            color: var(--text-primary);
+        }
+
+        .center-workspace-tab-with-close {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 4px 2px 2px;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            background: transparent;
+        }
+
+        .center-workspace-tab-with-close.is-active {
+            border-color: rgba(212, 168, 67, 0.42);
+            background: rgba(212, 168, 67, 0.12);
+        }
+
+        .center-workspace-tab-label {
+            border-radius: 999px;
+        }
+
+        .center-workspace-tab-with-close.is-active .center-workspace-tab-label {
+            border-color: transparent;
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .center-workspace-tab-close {
+            width: 24px;
+            height: 24px;
+            display: inline-grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .center-workspace-tab-close:hover,
+        .center-workspace-tab-close:focus-visible {
+            border-color: rgba(255, 120, 120, 0.42);
+            background: rgba(255, 120, 120, 0.08);
+            color: #ffd1d1;
+            outline: none;
+        }
+
+        .center-workspace-tab-panel {
+            display: grid;
+            height: 100%;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .gws-dashboard-panel {
+            display: grid;
+            gap: 14px;
+            min-width: 0;
+            min-height: 0;
+            padding-right: 8px;
+            overflow: auto;
+        }
+
+        .gws-dashboard-panel .gws-history-list {
+            max-height: none;
+        }
+
+        .gws-dashboard-header {
+            display: grid;
+            gap: 6px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.1), rgba(255, 255, 255, 0.025));
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+        }
+
+        .gws-dashboard-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 22px;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+        }
+
+        .gws-dashboard-header p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .gws-dashboard-topline {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-dashboard-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-dashboard-summary-card {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            display: grid;
+            gap: 8px;
+        }
+
+        .gws-dashboard-summary-card h4 {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .gws-dashboard-summary-card p {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .gws-dashboard-breakdown-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .gws-dashboard-breakdown-list li + li {
+            margin-top: 4px;
+        }
+
+        .gws-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-comparison-column {
+            display: grid;
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .gws-comparison-column h5 {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .gws-comparison-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .gws-comparison-item {
+            list-style: disc;
+        }
+
+        .gws-comparison-item + .gws-comparison-item {
+            margin-top: 4px;
+        }
+
+        .gws-comparison-item.is-match {
+            color: #9be7b4;
+        }
+
+        .gws-comparison-item.is-gap {
+            color: #ffd1d1;
+        }
+
+        .gws-comparison-item.is-extra {
+            color: #9fd2ff;
+        }
+
+        .gws-dashboard-header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .gws-dashboard-header-timer {
+            margin-top: 2px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .gws-dashboard-view-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .gws-dashboard-view-chip {
+            width: auto;
+            min-width: 0;
+            padding: 8px 11px;
+            border-radius: 999px;
+        }
+
+        .gws-dashboard-view-chip.is-active {
+            border-color: rgba(212, 168, 67, 0.62);
+            background: rgba(212, 168, 67, 0.16);
+            color: var(--text-primary);
+        }
+
+        .gws-dashboard-visuals {
+            display: grid;
+            gap: 10px;
+        }
+
+        .gws-dashboard-visual-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-dashboard-visual-card {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            display: grid;
+            gap: 10px;
+        }
+
+        .gws-dashboard-visual-card h4 {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .gws-dashboard-visual-card p {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .gws-dashboard-graph {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(18px, 1fr));
+            gap: 6px;
+            align-items: end;
+            min-height: 108px;
+            padding: 12px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .gws-dashboard-graph-column {
+            display: grid;
+            gap: 6px;
+            justify-items: center;
+            min-width: 0;
+        }
+
+        .gws-dashboard-graph-bar {
+            width: 100%;
+            min-height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(212, 168, 67, 0.92), rgba(212, 168, 67, 0.36));
+        }
+
+        .gws-dashboard-graph-bar.is-secondary {
+            background: linear-gradient(180deg, rgba(94, 161, 255, 0.92), rgba(94, 161, 255, 0.34));
+        }
+
+        .gws-dashboard-graph-label {
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .gws-dashboard-insights-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .gws-dashboard-insights-list li + li {
+            margin-top: 4px;
+        }
+
+        .gws-dashboard-cadence-bands {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .gws-dashboard-cadence-band {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            display: grid;
+            gap: 6px;
+        }
+
+        .gws-dashboard-cadence-band strong {
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .gws-dashboard-cadence-progress {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .gws-dashboard-cadence-progress span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, rgba(212, 168, 67, 0.92), rgba(94, 161, 255, 0.92));
+        }
+
+        .gws-dashboard-weekday-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .gws-dashboard-weekday-cell {
+            padding: 8px 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            background: rgba(212, 168, 67, 0.08);
+            display: grid;
+            gap: 4px;
+            justify-items: center;
+            text-align: center;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .gws-dashboard-weekday-cell span {
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .gws-dashboard-weekday-cell strong {
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .gws-dashboard-current {
+            display: grid;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gws-dashboard-current h3,
+        .gws-dashboard-recent h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .gws-dashboard-current p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .gws-dashboard-current .gws-dashboard-current-title {
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .gws-dashboard-recent {
+            display: grid;
+            gap: 10px;
+        }
+
+        .gws-history-inline-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .guidance-card {
@@ -1761,6 +2832,113 @@
             line-height: 1.5;
         }
 
+
+        .gws-task-builder {
+            display: grid;
+            gap: 12px;
+        }
+
+        .gws-task-input-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .gws-task-list {
+            display: grid;
+            gap: 8px;
+            max-height: 280px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .gws-task-row {
+            display: grid;
+            grid-template-columns: 24px minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 12px 12px 10px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+        }
+
+        .gws-task-row:hover {
+            border-color: rgba(212, 168, 67, 0.22);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .gws-task-row.dragging {
+            opacity: 0.68;
+        }
+
+        .gws-task-row.drag-over {
+            border-color: rgba(212, 168, 67, 0.7);
+            background: rgba(212, 168, 67, 0.12);
+        }
+
+        .gws-task-handle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            user-select: none;
+            cursor: grab;
+        }
+
+        .gws-task-text {
+            min-width: 0;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .gws-task-actions {
+            display: inline-flex;
+            gap: 8px;
+        }
+
+        .gws-task-icon-button {
+            width: 34px;
+            height: 34px;
+            display: inline-grid;
+            place-items: center;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+        }
+
+        .gws-task-icon-button:hover {
+            border-color: rgba(212, 168, 67, 0.42);
+            background: rgba(212, 168, 67, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .gws-task-icon-button.is-danger:hover {
+            border-color: rgba(255, 120, 120, 0.5);
+            background: rgba(255, 120, 120, 0.12);
+        }
+
+        .gws-task-empty {
+            padding: 12px 13px;
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
         .guidance-card h3 {
             margin: 0 0 10px;
             font-size: 16px;
@@ -1804,6 +2982,11 @@
         @media (max-width: 900px) {
             .app-shell {
                 grid-template-columns: 220px minmax(0, 1fr) 280px;
+
+            .gws-dashboard-summary-grid,
+            .gws-comparison-grid {
+                grid-template-columns: 1fr;
+            }
             }
 
             .center-panel {
@@ -1844,7 +3027,10 @@
         const GOOGLE_OAUTH_SCOPES = [
             'https://www.googleapis.com/auth/drive',
             'https://www.googleapis.com/auth/documents',
-            'https://www.googleapis.com/auth/gmail.readonly'
+            'https://www.googleapis.com/auth/gmail.readonly',
+            'openid',
+            'email',
+            'profile'
         ].join(' ');
         const TOKEN_EXPIRY_BUFFER_MS = 60000;
         const AUTH_REMEMBER_DURATION_MS = 90 * 24 * 60 * 60 * 1000;
@@ -2559,6 +3745,92 @@
             };
         }
 
+        function normalizeGwsSession(session) {
+            if (!session || typeof session !== 'object') {
+                return null;
+            }
+
+            const safeSessionId = String(session.sessionId || '').trim();
+            const safeProjectId = String(session.projectId || '').trim();
+            const safeTaskId = Number(session.taskId) || 0;
+
+            if (!safeSessionId || !safeProjectId || !safeTaskId) {
+                return null;
+            }
+
+            return {
+                sessionId: safeSessionId,
+                projectId: safeProjectId,
+                taskId: safeTaskId,
+                taskTitle: String(session.taskTitle || '').trim(),
+                taskDocTabId: String(session.taskDocTabId || '').trim(),
+                objective: String(session.objective || '').trim(),
+                plannedTasks: Array.isArray(session.plannedTasks)
+                    ? session.plannedTasks.map((taskName) => String(taskName || '').trim()).filter(Boolean)
+                    : [],
+                ritual: {
+                    attitude: String(session.ritual?.attitude || '').trim(),
+                    hydrated: Boolean(session.ritual?.hydrated),
+                    caffeinated: Boolean(session.ritual?.caffeinated),
+                    distractionsCleared: Boolean(session.ritual?.distractionsCleared),
+                    timerMinutes: Number(session.ritual?.timerMinutes) === 90 ? 90 : 60
+                },
+                startAt: Number(session.startAt) || 0,
+                pauseAt: Number(session.pauseAt) || 0,
+                resumeAt: Number(session.resumeAt) || 0,
+                endAt: Number(session.endAt) || 0,
+                remainingSeconds: Math.max(0, Number(session.remainingSeconds) || 0),
+                plannedMinutes: Number(session.plannedMinutes) === 90 ? 90 : 60,
+                actualSeconds: Math.max(0, Number(session.actualSeconds) || 0),
+                pauseSeconds: Math.max(0, Number(session.pauseSeconds) || 0),
+                pauseCount: Math.max(0, Number(session.pauseCount) || 0),
+                status: ['running', 'paused', 'completed', 'stopped', 'abandoned'].includes(session.status)
+                    ? session.status
+                    : 'running',
+                checklistSnapshot: Array.isArray(session.checklistSnapshot)
+                    ? session.checklistSnapshot.map(Boolean)
+                    : [],
+                completedChecklistItems: Array.isArray(session.completedChecklistItems)
+                    ? session.completedChecklistItems.map((item) => String(item || '').trim()).filter(Boolean)
+                    : [],
+                achievedTasks: Array.isArray(session.achievedTasks)
+                    ? session.achievedTasks.map((item) => String(item || '').trim()).filter(Boolean)
+                    : [],
+                notes: String(session.notes || '').trim(),
+                reviewScore: Number(session.reviewScore) || 0,
+                analyze: String(session.analyze || '').trim(),
+                quickTweaks: String(session.quickTweaks || '').trim()
+            };
+        }
+
+        function normalizeGwsState(gws) {
+            const activeSession = normalizeGwsSession(gws?.activeSession);
+            const sessions = Array.isArray(gws?.sessions)
+                ? gws.sessions.map(normalizeGwsSession).filter(Boolean)
+                : [];
+
+            return {
+                activeSession,
+                sessions
+            };
+        }
+
+        function normalizeGwsWizard(draft) {
+            const plannedTasks = Array.isArray(draft?.plannedTasks)
+                ? draft.plannedTasks.map((taskName) => String(taskName || '').trim()).filter(Boolean)
+                : [];
+
+            return {
+                objective: String(draft?.objective || ''),
+                plannedTasks,
+                attitude: String(draft?.attitude || ''),
+                hydrated: Boolean(draft?.hydrated),
+                caffeinated: Boolean(draft?.caffeinated),
+                distractionsCleared: Boolean(draft?.distractionsCleared),
+                timerMinutes: Number(draft?.timerMinutes) === 90 ? 90 : 60
+            };
+        }
+
         function getProjectStage2Elements(project) {
             return normalizeStage2State(project?.stage2).elements;
         }
@@ -2767,6 +4039,7 @@
                 : `Project ${index + 1}`;
             const stage2 = normalizeStage2State(project.stage2);
             const drafting = normalizeDraftingState(project.drafting);
+            const gws = normalizeGwsState(project.gws);
             const rawTasks = Array.isArray(project.tasks) ? project.tasks : [];
             const taskDefinitions = getProjectTaskDefinitions({ ...project, stage2 });
             const tasks = taskDefinitions.map((taskDefinition) => {
@@ -2786,6 +4059,7 @@
                 lastOpenedTask: recoveredLastOpenedTask,
                 stage2,
                 drafting,
+                gws,
                 tasks
             };
         }
@@ -3235,6 +4509,7 @@
                 lastOpenedTask: 1,
                 stage2: normalizeStage2State({}),
                 drafting: normalizeDraftingState({}),
+                gws: normalizeGwsState({}),
                 tasks: projectTasks
             };
         }
@@ -3839,6 +5114,46 @@
 
         function isAuthFailureStatus(status) {
             return status === 401 || status === 403;
+        }
+
+        async function fetchGoogleUserProfile(accessToken) {
+            if (!accessToken) {
+                return null;
+            }
+
+            const response = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) {
+                return null;
+            }
+
+            const profile = await response.json();
+
+            return {
+                name: String(profile.name || profile.given_name || profile.email || '').trim(),
+                email: String(profile.email || '').trim(),
+                picture: String(profile.picture || '').trim()
+            };
+        }
+
+        function getProfileInitials(profile) {
+            const safeName = String(profile?.name || profile?.email || 'G').trim();
+
+            if (!safeName) {
+                return 'G';
+            }
+
+            const nameParts = safeName.split(/\s+/).filter(Boolean);
+
+            if (nameParts.length >= 2) {
+                return `${nameParts[0][0] || ''}${nameParts[1][0] || ''}`.toUpperCase();
+            }
+
+            return safeName.slice(0, 1).toUpperCase();
         }
 
         const INITIAL_STORED_AUTH_TOKEN = loadAuthToken();
@@ -4532,6 +5847,1402 @@
             );
         }
 
+        function GwsWizardModal({
+            isOpen,
+            step,
+            draft,
+            wizardTaskKey,
+            onChangeDraft,
+            onBack,
+            onNext,
+            onCancel,
+            onStart
+        }) {
+            if (!isOpen) {
+                return null;
+            }
+
+            const [ritualChecks, setRitualChecks] = useState(() => ({
+                outcome: false,
+                attitude: false,
+                fuel: false,
+                distractions: false,
+                timer: false,
+                start: false,
+                review: false
+            }));
+            const [taskInput, setTaskInput] = useState('');
+            const [taskEditingIndex, setTaskEditingIndex] = useState(null);
+            const [taskDragIndex, setTaskDragIndex] = useState(null);
+            const [taskDragOverIndex, setTaskDragOverIndex] = useState(null);
+            const stepTitles = ['Objective', 'Tasks', 'Ritual', 'Confirm'];
+            const ritualItems = [
+                {
+                    key: 'outcome',
+                    label: 'Set a desired outcome and plan actions'
+                },
+                {
+                    key: 'attitude',
+                    label: 'Pick an attitude (in 5 seconds Imagine myself hyper-focused or whatever the attitude I want to bring to my GWS)'
+                },
+                {
+                    key: 'fuel',
+                    label: 'Hydrate, Caffeinate, Get the blood flowing'
+                },
+                {
+                    key: 'distractions',
+                    label: 'Remove distractions'
+                },
+                {
+                    key: 'timer',
+                    label: 'Set a timer for 60-90 mins'
+                },
+                {
+                    key: 'start',
+                    label: 'Get started'
+                },
+                {
+                    key: 'review',
+                    label: 'Evaluate afterwards (Review > Analyze > Make some quick tweaks)'
+                }
+            ];
+
+            useEffect(() => {
+                if (!isOpen) {
+                    return;
+                }
+
+                setRitualChecks({
+                    outcome: false,
+                    attitude: false,
+                    fuel: false,
+                    distractions: false,
+                    timer: false,
+                    start: false,
+                    review: false
+                });
+            }, [isOpen, wizardTaskKey]);
+
+            useEffect(() => {
+                if (!isOpen) {
+                    return;
+                }
+
+                setTaskInput('');
+                setTaskEditingIndex(null);
+                setTaskDragIndex(null);
+                setTaskDragOverIndex(null);
+            }, [isOpen, wizardTaskKey]);
+
+            const taskItems = Array.isArray(draft.plannedTasks) ? draft.plannedTasks : [];
+
+            const updateTaskItems = (nextTaskItems) => {
+                onChangeDraft({
+                    plannedTasks: nextTaskItems.map((taskItem) => String(taskItem || '').trim()).filter(Boolean)
+                });
+            };
+
+            const handleCommitTask = () => {
+                const normalizedTaskInput = String(taskInput || '').trim();
+
+                if (!normalizedTaskInput) {
+                    return;
+                }
+
+                const nextTaskItems = [...taskItems];
+
+                if (Number.isInteger(taskEditingIndex) && taskEditingIndex >= 0 && taskEditingIndex < nextTaskItems.length) {
+                    nextTaskItems[taskEditingIndex] = normalizedTaskInput;
+                } else {
+                    nextTaskItems.push(normalizedTaskInput);
+                }
+
+                updateTaskItems(nextTaskItems);
+                setTaskInput('');
+                setTaskEditingIndex(null);
+            };
+
+            const handleStartTaskEdit = (index) => {
+                setTaskInput(String(taskItems[index] || ''));
+                setTaskEditingIndex(index);
+            };
+
+            const handleDeleteTask = (index) => {
+                const nextTaskItems = taskItems.filter((_, taskIndex) => taskIndex !== index);
+
+                updateTaskItems(nextTaskItems);
+
+                if (taskEditingIndex === index) {
+                    setTaskInput('');
+                    setTaskEditingIndex(null);
+                } else if (Number.isInteger(taskEditingIndex) && taskEditingIndex > index) {
+                    setTaskEditingIndex(taskEditingIndex - 1);
+                }
+            };
+
+            const handleTaskDragStart = (event, index) => {
+                setTaskDragIndex(index);
+                setTaskDragOverIndex(index);
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', String(index));
+            };
+
+            const handleTaskDragOver = (event, index) => {
+                if (taskDragIndex === null) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                if (taskDragOverIndex !== index) {
+                    setTaskDragOverIndex(index);
+                }
+            };
+
+            const handleTaskDrop = (event, index) => {
+                event.preventDefault();
+
+                if (taskDragIndex === null || taskDragIndex === index) {
+                    setTaskDragIndex(null);
+                    setTaskDragOverIndex(null);
+                    return;
+                }
+
+                const nextTaskItems = [...taskItems];
+                const [draggedTask] = nextTaskItems.splice(taskDragIndex, 1);
+                nextTaskItems.splice(index, 0, draggedTask);
+                updateTaskItems(nextTaskItems);
+                setTaskDragIndex(null);
+                setTaskDragOverIndex(null);
+            };
+
+            const handleTaskDragEnd = () => {
+                setTaskDragIndex(null);
+                setTaskDragOverIndex(null);
+            };
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gws-wizard-title">
+                    <form
+                        className="onboarding-modal"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+
+                            if (step < 3) {
+                                onNext();
+                                return;
+                            }
+
+                            onStart();
+                        }}
+                    >
+                        <h2 id="gws-wizard-title">GWS Wizard</h2>
+                        <p>{stepTitles[step] || 'GWS'}</p>
+
+                        {step === 0 && (
+                            <>
+                                <label className="project-meta">Objective</label>
+                                <textarea
+                                    className="project-name-input"
+                                    rows="4"
+                                    value={draft.objective}
+                                    onChange={(event) => onChangeDraft({ objective: event.target.value })}
+                                    placeholder="What do you want this session to produce?"
+                                    autoFocus
+                                />
+                            </>
+                        )}
+
+                        {step === 1 && (
+                            <>
+                                <label className="project-meta">Tasks to complete</label>
+                                <div className="gws-task-builder">
+                                    <div className="gws-task-input-row">
+                                        <input
+                                            className="project-name-input"
+                                            value={taskInput}
+                                            onChange={(event) => setTaskInput(event.target.value)}
+                                            onKeyDown={(event) => {
+                                                if (event.key !== 'Enter') {
+                                                    return;
+                                                }
+
+                                                event.preventDefault();
+                                                handleCommitTask();
+                                            }}
+                                            placeholder="Add a task to complete"
+                                            autoFocus
+                                        />
+                                        <button
+                                            className="primary-action gws-task-add-button"
+                                            type="button"
+                                            onClick={handleCommitTask}
+                                            disabled={!String(taskInput || '').trim()}
+                                        >
+                                            {Number.isInteger(taskEditingIndex) ? 'Save' : 'Add'}
+                                        </button>
+                                    </div>
+
+                                    <p className="muted-note">Drag to reorder, edit what is already listed, or remove tasks you do not want in this session.</p>
+
+                                    {taskItems.length === 0 && (
+                                        <div className="gws-task-empty">No tasks yet. Add one above or leave it empty if you only want the ritual checklist.</div>
+                                    )}
+
+                                    {taskItems.length > 0 && (
+                                        <div className="gws-task-list">
+                                            {taskItems.map((taskItem, index) => {
+                                                const isDragging = taskDragIndex === index;
+                                                const isDragOver = taskDragOverIndex === index && taskDragIndex !== index;
+
+                                                return (
+                                                    <div
+                                                        className={`gws-task-row${isDragging ? ' dragging' : ''}${isDragOver ? ' drag-over' : ''}`}
+                                                        key={`${taskItem}-${index}`}
+                                                        draggable
+                                                        onDragStart={(event) => handleTaskDragStart(event, index)}
+                                                        onDragOver={(event) => handleTaskDragOver(event, index)}
+                                                        onDrop={(event) => handleTaskDrop(event, index)}
+                                                        onDragEnd={handleTaskDragEnd}
+                                                    >
+                                                        <span className="gws-task-handle" aria-hidden="true">⋮⋮</span>
+                                                        <span className="gws-task-text">{taskItem}</span>
+                                                        <div className="gws-task-actions">
+                                                            <button
+                                                                className="gws-task-icon-button"
+                                                                type="button"
+                                                                onClick={() => handleStartTaskEdit(index)}
+                                                                title={`Edit ${taskItem}`}
+                                                                aria-label={`Edit ${taskItem}`}
+                                                            >
+                                                                ✎
+                                                            </button>
+                                                            <button
+                                                                className="gws-task-icon-button is-danger"
+                                                                type="button"
+                                                                onClick={() => handleDeleteTask(index)}
+                                                                title={`Delete ${taskItem}`}
+                                                                aria-label={`Delete ${taskItem}`}
+                                                            >
+                                                                🗑
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {step === 2 && (
+                            <>
+                                <label className="project-meta">Ritual</label>
+                                <div className="gws-checklist" style={{ marginTop: '8px' }}>
+                                    {ritualItems.map((item) => {
+                                        const isChecked = Boolean(ritualChecks[item.key]);
+
+                                        return (
+                                            <label className={`gws-checklist-item${isChecked ? ' is-active' : ''}`} key={item.key}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={(event) => {
+                                                        const nextChecked = event.target.checked;
+
+                                                        setRitualChecks((previousState) => ({
+                                                            ...previousState,
+                                                            [item.key]: nextChecked
+                                                        }));
+
+                                                        if (item.key === 'attitude') {
+                                                            onChangeDraft({ attitude: nextChecked ? 'Hyper-focused' : '' });
+                                                        }
+
+                                                        if (item.key === 'fuel') {
+                                                            onChangeDraft({
+                                                                hydrated: nextChecked,
+                                                                caffeinated: nextChecked
+                                                            });
+                                                        }
+
+                                                        if (item.key === 'distractions') {
+                                                            onChangeDraft({ distractionsCleared: nextChecked });
+                                                        }
+
+                                                        if (item.key === 'timer') {
+                                                            onChangeDraft({ timerMinutes: nextChecked ? 90 : 60 });
+                                                        }
+                                                    }}
+                                                />
+                                                <span className="custom-checkbox" aria-hidden="true">{isChecked ? '✓' : ''}</span>
+                                                <span>{item.label}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
+
+                        {step === 3 && (
+                            <>
+                                <div className="delete-modal-warning">
+                                    Objective: {draft.objective || 'Not set'}
+                                    <br />
+                                    Tasks: {draft.plannedTasks.length ? draft.plannedTasks.join(' • ') : 'Not set'}
+                                    <br />
+                                    Ritual: {ritualItems.filter((item) => ritualChecks[item.key]).map((item) => item.label).join(' • ') || 'Not set'}
+                                    <br />
+                                    Duration: {draft.timerMinutes} minutes
+                                </div>
+                                <p>Start sound will play when the session begins.</p>
+                            </>
+                        )}
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" onClick={onCancel}>Cancel</button>
+                            {step > 0 && (
+                                <button className="secondary-action" type="button" onClick={onBack}>Back</button>
+                            )}
+                            {step < 3 && (
+                                <button className="primary-action" type="button" onClick={onNext}>Next</button>
+                            )}
+                            {step === 3 && (
+                                <button className="primary-action" type="submit">Start Session</button>
+                            )}
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
+        function GwsHistoryModal({ isOpen, sessions, activeSession, onClose }) {
+            if (!isOpen) {
+                return null;
+            }
+
+            const [statusFilter, setStatusFilter] = useState('all');
+            const [taskFilter, setTaskFilter] = useState('all');
+            const [expandedSessionIds, setExpandedSessionIds] = useState(() => new Set());
+
+            useEffect(() => {
+                if (!isOpen) {
+                    return;
+                }
+
+                setStatusFilter('all');
+                setTaskFilter('all');
+                setExpandedSessionIds(new Set());
+            }, [isOpen]);
+
+            const baseSessions = [activeSession, ...(Array.isArray(sessions) ? sessions : [])]
+                .map(normalizeGwsSession)
+                .filter(Boolean);
+
+            const sortedSessions = [...baseSessions]
+                .sort((leftSession, rightSession) => (
+                    (rightSession.endAt || rightSession.startAt || 0) - (leftSession.endAt || leftSession.startAt || 0)
+                ));
+
+            const taskOptions = Array.from(new Map(sortedSessions.map((session) => [String(session.taskId || ''), {
+                value: String(session.taskId || ''),
+                label: session.taskTitle || `Task ${session.taskId}`
+            }])).values());
+
+            const visibleSessions = sortedSessions.filter((session) => {
+                const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
+                const matchesTask = taskFilter === 'all' || String(session.taskId || '') === taskFilter;
+
+                return matchesStatus && matchesTask;
+            });
+
+            const exportCsv = () => {
+                const escapeCsv = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+                const rows = [
+                    ['sessionId', 'status', 'taskId', 'taskTitle', 'objective', 'plannedMinutes', 'actualSeconds', 'remainingSeconds', 'startAt', 'endAt', 'notes', 'analyze', 'quickTweaks'],
+                    ...visibleSessions.map((session) => ([
+                        session.sessionId,
+                        session.status,
+                        session.taskId,
+                        session.taskTitle,
+                        session.objective,
+                        Number(session.plannedMinutes) === 90 ? 90 : 60,
+                        Math.max(0, Number(session.actualSeconds) || 0),
+                        Math.max(0, Number(session.remainingSeconds) || 0),
+                        Number(session.startAt) || 0,
+                        Number(session.endAt) || 0,
+                        session.notes,
+                        session.analyze,
+                        session.quickTweaks
+                    ]))
+                ];
+
+                const csvContent = rows.map((row) => row.map(escapeCsv).join(',')).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const downloadUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+
+                link.href = downloadUrl;
+                link.download = `gws-history-${Date.now()}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(downloadUrl);
+            };
+
+            const toggleSessionDetails = (sessionId) => {
+                setExpandedSessionIds((previousExpanded) => {
+                    const nextExpanded = new Set(previousExpanded);
+
+                    if (nextExpanded.has(sessionId)) {
+                        nextExpanded.delete(sessionId);
+                    } else {
+                        nextExpanded.add(sessionId);
+                    }
+
+                    return nextExpanded;
+                });
+            };
+
+            const completedCount = visibleSessions.filter((session) => session.status === 'completed').length;
+            const totalPlannedSeconds = visibleSessions.reduce((accumulator, session) => (
+                accumulator + ((Number(session.plannedMinutes) === 90 ? 90 : 60) * 60)
+            ), 0);
+            const totalActualSeconds = visibleSessions.reduce((accumulator, session) => (
+                accumulator + Math.max(0, Number(session.actualSeconds) || 0)
+            ), 0);
+            const avgFocusMinutes = visibleSessions.length
+                ? Math.round((totalActualSeconds / visibleSessions.length) / 60)
+                : 0;
+            const adherencePercent = totalPlannedSeconds > 0
+                ? Math.min(100, Math.round((totalActualSeconds / totalPlannedSeconds) * 100))
+                : 0;
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gws-history-title">
+                    <div className="onboarding-modal gws-history-modal">
+                        <h2 id="gws-history-title">GWS History</h2>
+                        <p>Track your recent sessions and compare planned versus actual focus time.</p>
+
+                        <div className="gws-history-toolbar">
+                            <div className="gws-history-toolbar-row">
+                                <div className="gws-history-filter-group" aria-label="History status filters">
+                                    {['all', 'running', 'completed', 'paused', 'stopped', 'abandoned'].map((statusKey) => (
+                                        <button
+                                            key={statusKey}
+                                            className={`gws-history-filter-chip${statusFilter === statusKey ? ' is-active' : ''}`}
+                                            type="button"
+                                            onClick={() => setStatusFilter(statusKey)}
+                                        >
+                                            {statusKey === 'all' ? 'All' : statusKey}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button className="gws-action-button" type="button" onClick={exportCsv} disabled={visibleSessions.length === 0}>
+                                    Export CSV
+                                </button>
+                            </div>
+
+                            <div className="gws-history-toolbar-row">
+                                <div style={{ display: 'grid', gap: '6px', width: '100%' }}>
+                                    <p className="gws-history-filter-label">Task filter</p>
+                                    <select
+                                        className="gws-history-select"
+                                        value={taskFilter}
+                                        onChange={(event) => setTaskFilter(event.target.value)}
+                                    >
+                                        <option value="all">All tasks</option>
+                                        {taskOptions.map((taskOption) => (
+                                            <option key={taskOption.value} value={taskOption.value}>
+                                                {taskOption.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="gws-history-stats">
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Total Sessions</p>
+                                <p className="gws-history-stat-value">{visibleSessions.length}</p>
+                            </div>
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Completed</p>
+                                <p className="gws-history-stat-value">{completedCount}</p>
+                            </div>
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Avg Focus</p>
+                                <p className="gws-history-stat-value">{avgFocusMinutes}m</p>
+                            </div>
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Adherence</p>
+                                <p className="gws-history-stat-value">{adherencePercent}%</p>
+                            </div>
+                        </div>
+
+                        {visibleSessions.length === 0 ? (
+                            <div className="gws-history-empty">No sessions yet. Start and finish a GWS to populate history.</div>
+                        ) : (
+                            <div className="gws-history-list">
+                                {visibleSessions.slice(0, 30).map((session) => {
+                                    const plannedMinutes = Number(session.plannedMinutes) === 90 ? 90 : 60;
+                                    const actualMinutes = Math.round((Math.max(0, Number(session.actualSeconds) || 0)) / 60);
+                                    const plannedSeconds = plannedMinutes * 60;
+                                    const actualSeconds = Math.max(0, Number(session.actualSeconds) || 0);
+                                    const timeDeltaSeconds = plannedSeconds - actualSeconds;
+                                    const sessionDate = new Date(Number(session.endAt) || Number(session.startAt) || Date.now());
+                                    const statusClass = session.status === 'completed'
+                                        ? 'is-completed'
+                                        : (session.status === 'stopped' ? 'is-stopped' : '');
+                                    const isExpanded = expandedSessionIds.has(session.sessionId);
+                                    const ritualLines = [
+                                        session.ritual?.attitude ? `Attitude: ${session.ritual.attitude}` : null,
+                                        session.ritual?.hydrated ? 'Hydrated' : null,
+                                        session.ritual?.caffeinated ? 'Caffeinated' : null,
+                                        session.ritual?.distractionsCleared ? 'No distractions' : null,
+                                        Number(session.ritual?.timerMinutes) === 90 ? 'Timer: 90 min' : 'Timer: 60 min'
+                                    ].filter(Boolean);
+                                    const taskLines = Array.isArray(session.plannedTasks) && session.plannedTasks.length
+                                        ? session.plannedTasks
+                                        : [];
+
+                                    return (
+                                        <article className="gws-history-item" key={session.sessionId}>
+                                            <button
+                                                className="gws-history-item-button"
+                                                type="button"
+                                                onClick={() => toggleSessionDetails(session.sessionId)}
+                                                aria-expanded={isExpanded}
+                                            >
+                                                <div className="gws-history-item-head">
+                                                    <p className="gws-history-item-title">{session.taskTitle || `Task ${session.taskId}`}</p>
+                                                    <span className={`gws-status-badge ${statusClass}`}>{session.status}</span>
+                                                </div>
+                                                <p className="gws-history-item-meta">
+                                                    {sessionDate.toLocaleString()} • Planned {plannedMinutes}m • Actual {actualMinutes}m
+                                                </p>
+                                                <span className="gws-history-item-toggle">
+                                                    {isExpanded ? 'Hide details' : 'Show details'}
+                                                </span>
+                                            </button>
+
+                                            {isExpanded && (
+                                                <div className="gws-history-item-details">
+                                                    <div className="gws-history-detail-grid">
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Objective</h4>
+                                                            <p>{session.objective || 'Not set'}</p>
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Ritual</h4>
+                                                            {ritualLines.length ? (
+                                                                <ul>
+                                                                    {ritualLines.map((ritualLine) => <li key={ritualLine}>{ritualLine}</li>)}
+                                                                </ul>
+                                                            ) : (
+                                                                <p className="gws-history-detail-empty">No ritual saved.</p>
+                                                            )}
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Tasks</h4>
+                                                            {taskLines.length ? (
+                                                                <ul>
+                                                                    {taskLines.map((taskLine) => <li key={taskLine}>{taskLine}</li>)}
+                                                                </ul>
+                                                            ) : (
+                                                                <p className="gws-history-detail-empty">No planned tasks saved.</p>
+                                                            )}
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Review Notes</h4>
+                                                            <p>{session.notes || 'No review notes saved.'}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="gws-history-detail-metrics">
+                                                        <div className="gws-history-metric">
+                                                            <p className="gws-history-metric-label">Planned vs Actual</p>
+                                                            <p className="gws-history-metric-value">
+                                                                {plannedMinutes}m / {actualMinutes}m
+                                                            </p>
+                                                        </div>
+                                                        <div className="gws-history-metric">
+                                                            <p className="gws-history-metric-label">Time Delta</p>
+                                                            <p className="gws-history-metric-value">
+                                                                {timeDeltaSeconds >= 0 ? '-' : '+'}{Math.abs(Math.round(timeDeltaSeconds / 60))}m
+                                                            </p>
+                                                        </div>
+                                                        <div className="gws-history-metric">
+                                                            <p className="gws-history-metric-label">Progress</p>
+                                                            <p className="gws-history-metric-value">
+                                                                {Array.isArray(session.completedChecklistItems) && session.completedChecklistItems.length
+                                                                    ? `${session.completedChecklistItems.length} checklist items`
+                                                                    : 'No checklist snapshot'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="gws-history-detail-grid">
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Analyze</h4>
+                                                            <p>{session.analyze || 'No analysis saved.'}</p>
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Quick Tweaks</h4>
+                                                            <p>{session.quickTweaks || 'No quick tweaks saved.'}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </article>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" onClick={() => {
+                                setStatusFilter('all');
+                                setTaskFilter('all');
+                            }}>
+                                Reset Filters
+                            </button>
+                            <button className="primary-action" type="button" onClick={onClose}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function GwsDashboardPanel({
+            currentProject,
+            sessions,
+            activeSession,
+            currentTaskDefinition,
+            isGwsRunning,
+            isGwsPaused,
+            gwsRemainingSeconds,
+            onStartSession,
+            onPauseSession,
+            onResumeSession,
+            onEndSession,
+            onDeleteSession
+        }) {
+            const [statusFilter, setStatusFilter] = useState('all');
+            const [taskFilter, setTaskFilter] = useState('all');
+            const [rangeFilter, setRangeFilter] = useState('30d');
+            const [dashboardView, setDashboardView] = useState('overview');
+            const [expandedSessionIds, setExpandedSessionIds] = useState(() => new Set());
+            const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState('');
+
+            useEffect(() => {
+                setStatusFilter('all');
+                setTaskFilter('all');
+                setRangeFilter('30d');
+                setDashboardView('overview');
+                setExpandedSessionIds(new Set());
+                setPendingDeleteSessionId('');
+            }, [currentProject?.id]);
+
+            const baseSessions = [activeSession, ...(Array.isArray(sessions) ? sessions : [])]
+                .map(normalizeGwsSession)
+                .filter(Boolean);
+
+            const sortedSessions = [...baseSessions]
+                .sort((leftSession, rightSession) => (
+                    (rightSession.endAt || rightSession.startAt || 0) - (leftSession.endAt || leftSession.startAt || 0)
+                ));
+
+            const rangeDays = rangeFilter === '7d'
+                ? 7
+                : (rangeFilter === '30d'
+                    ? 30
+                    : (rangeFilter === '90d' ? 90 : 0));
+            const now = Date.now();
+            const rangeStartTimestamp = rangeDays > 0
+                ? now - ((rangeDays - 1) * 24 * 60 * 60 * 1000)
+                : 0;
+            const rangeSessions = rangeDays > 0
+                ? sortedSessions.filter((session) => {
+                    const timestamp = Number(session.endAt) || Number(session.startAt) || 0;
+                    return timestamp >= rangeStartTimestamp;
+                })
+                : sortedSessions;
+
+            const taskOptions = Array.from(new Map(rangeSessions.map((session) => [String(session.taskId || ''), {
+                value: String(session.taskId || ''),
+                label: session.taskTitle || `Task ${session.taskId}`
+            }])).values());
+
+            const visibleSessions = rangeSessions.filter((session) => {
+                const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
+                const matchesTask = taskFilter === 'all' || String(session.taskId || '') === taskFilter;
+                return matchesStatus && matchesTask;
+            });
+
+            const completedCount = visibleSessions.filter((session) => session.status === 'completed').length;
+            const totalPlannedSeconds = visibleSessions.reduce((accumulator, session) => accumulator + ((Number(session.plannedMinutes) === 90 ? 90 : 60) * 60), 0);
+            const totalActualSeconds = visibleSessions.reduce((accumulator, session) => accumulator + Math.max(0, Number(session.actualSeconds) || 0), 0);
+            const avgFocusMinutes = visibleSessions.length
+                ? Math.round((totalActualSeconds / visibleSessions.length) / 60)
+                : 0;
+            const adherencePercent = totalPlannedSeconds > 0
+                ? Math.min(100, Math.round((totalActualSeconds / totalPlannedSeconds) * 100))
+                : 0;
+            const totalTimeMinutes = Math.round(totalActualSeconds / 60);
+            const totalPauseCount = visibleSessions.reduce((accumulator, session) => accumulator + Math.max(0, Number(session.pauseCount) || 0), 0);
+            const taskBreakdown = Array.from(visibleSessions.reduce((accumulator, session) => {
+                const key = String(session.taskTitle || `Task ${session.taskId}`).trim();
+                const currentEntry = accumulator.get(key) || { count: 0, seconds: 0 };
+                accumulator.set(key, {
+                    count: currentEntry.count + 1,
+                    seconds: currentEntry.seconds + Math.max(0, Number(session.actualSeconds) || 0)
+                });
+                return accumulator;
+            }, new Map()).entries())
+                .map(([taskTitle, stats]) => ({ taskTitle, ...stats }))
+                .sort((leftEntry, rightEntry) => rightEntry.seconds - leftEntry.seconds)
+                .slice(0, 4);
+            const sessionsByDay = visibleSessions.reduce((accumulator, session) => {
+                const timestamp = Number(session.endAt) || Number(session.startAt) || 0;
+                const dateKey = timestamp ? new Date(timestamp).toISOString().slice(0, 10) : '';
+
+                if (!dateKey) {
+                    return accumulator;
+                }
+
+                accumulator[dateKey] = (accumulator[dateKey] || 0) + 1;
+                return accumulator;
+            }, {});
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const last7DaysCount = Array.from({ length: 7 }).reduce((accumulator, _, dayOffset) => {
+                const date = new Date(today);
+                date.setDate(today.getDate() - dayOffset);
+                const key = date.toISOString().slice(0, 10);
+                return accumulator + (sessionsByDay[key] || 0);
+            }, 0);
+            const previous7DaysCount = Array.from({ length: 7 }).reduce((accumulator, _, dayOffset) => {
+                const date = new Date(today);
+                date.setDate(today.getDate() - (dayOffset + 7));
+                const key = date.toISOString().slice(0, 10);
+                return accumulator + (sessionsByDay[key] || 0);
+            }, 0);
+            const cadenceDelta = last7DaysCount - previous7DaysCount;
+            const cadenceTrendLabel = cadenceDelta > 0
+                ? `Up by ${cadenceDelta} sessions vs previous 7 days`
+                : (cadenceDelta < 0
+                    ? `Down by ${Math.abs(cadenceDelta)} sessions vs previous 7 days`
+                    : 'Flat vs previous 7 days');
+
+            const taskWorkloadRows = Array.from(visibleSessions.reduce((accumulator, session) => {
+                const key = String(session.taskTitle || `Task ${session.taskId}`).trim();
+                const currentEntry = accumulator.get(key) || { count: 0, plannedSeconds: 0, actualSeconds: 0 };
+                accumulator.set(key, {
+                    count: currentEntry.count + 1,
+                    plannedSeconds: currentEntry.plannedSeconds + ((Number(session.plannedMinutes) === 90 ? 90 : 60) * 60),
+                    actualSeconds: currentEntry.actualSeconds + Math.max(0, Number(session.actualSeconds) || 0)
+                });
+                return accumulator;
+            }, new Map()).entries())
+                .map(([taskTitle, stats]) => ({ taskTitle, ...stats }))
+                .sort((leftRow, rightRow) => rightRow.actualSeconds - leftRow.actualSeconds)
+                .slice(0, 6);
+
+            const maxTaskSeconds = Math.max(
+                1,
+                ...taskWorkloadRows.map((row) => Math.max(row.plannedSeconds, row.actualSeconds))
+            );
+
+            const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const weekdayCounts = weekdayLabels.map((label, dayIndex) => {
+                const count = visibleSessions.reduce((accumulator, session) => {
+                    const timestamp = Number(session.endAt) || Number(session.startAt) || 0;
+
+                    if (!timestamp) {
+                        return accumulator;
+                    }
+
+                    return accumulator + (new Date(timestamp).getDay() === dayIndex ? 1 : 0);
+                }, 0);
+
+                return { label, count };
+            });
+            const maxWeekdayCount = Math.max(1, ...weekdayCounts.map((entry) => entry.count));
+
+            const overrunCount = visibleSessions.filter((session) => {
+                const plannedSeconds = (Number(session.plannedMinutes) === 90 ? 90 : 60) * 60;
+                return Math.max(0, Number(session.actualSeconds) || 0) > plannedSeconds;
+            }).length;
+            const interruptionHeavyCount = visibleSessions.filter((session) => Math.max(0, Number(session.pauseCount) || 0) >= 2).length;
+            const lowOutputCount = visibleSessions.filter((session) => {
+                const plannedSeconds = (Number(session.plannedMinutes) === 90 ? 90 : 60) * 60;
+                return Math.max(0, Number(session.actualSeconds) || 0) < (plannedSeconds * 0.55);
+            }).length;
+            const cadenceRiskLabel = overrunCount >= 3
+                ? 'Cadence risk: frequent overruns'
+                : (interruptionHeavyCount >= 3
+                    ? 'Cadence risk: high interruption density'
+                    : (lowOutputCount >= 3 ? 'Cadence risk: under-delivery pattern' : 'Cadence stable this range'));
+            const canStartSession = Boolean(currentTaskDefinition && onStartSession);
+
+            const exportCsv = () => {
+                const csvRows = [
+                    ['sessionId', 'status', 'taskId', 'taskTitle', 'startAt', 'endAt', 'plannedMinutes', 'actualSeconds', 'pauseCount', 'plannedTasks', 'achievedTasks', 'objective']
+                ];
+
+                visibleSessions.forEach((session) => {
+                    csvRows.push([
+                        session.sessionId,
+                        session.status,
+                        session.taskId,
+                        session.taskTitle || '',
+                        session.startAt || '',
+                        session.endAt || '',
+                        session.plannedMinutes || '',
+                        session.actualSeconds || '',
+                        session.pauseCount || 0,
+                        Array.isArray(session.plannedTasks) ? session.plannedTasks.join(' | ') : '',
+                        Array.isArray(session.achievedTasks) ? session.achievedTasks.join(' | ') : '',
+                        session.objective || ''
+                    ]);
+                });
+
+                const csvContent = csvRows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const downloadUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+
+                link.href = downloadUrl;
+                link.download = `gws-history-${Date.now()}.csv`;
+                link.click();
+                URL.revokeObjectURL(downloadUrl);
+            };
+
+            const toggleSessionDetails = (sessionId) => {
+                setExpandedSessionIds((previousExpanded) => {
+                    const nextExpanded = new Set(previousExpanded);
+
+                    if (nextExpanded.has(sessionId)) {
+                        nextExpanded.delete(sessionId);
+                    } else {
+                        nextExpanded.add(sessionId);
+                    }
+
+                    return nextExpanded;
+                });
+            };
+
+            const handleConfirmDeleteSession = (sessionId) => {
+                const safeSessionId = String(sessionId || '').trim();
+
+                if (!safeSessionId || typeof onDeleteSession !== 'function') {
+                    setPendingDeleteSessionId('');
+                    return;
+                }
+
+                onDeleteSession(safeSessionId);
+                setPendingDeleteSessionId('');
+                setExpandedSessionIds((previousExpanded) => {
+                    if (!previousExpanded.has(safeSessionId)) {
+                        return previousExpanded;
+                    }
+
+                    const nextExpanded = new Set(previousExpanded);
+                    nextExpanded.delete(safeSessionId);
+                    return nextExpanded;
+                });
+            };
+
+            return (
+                <section className="gws-dashboard-panel" aria-label="GWS dashboard">
+                    <header className="gws-dashboard-header">
+                        <h2>GWS Dashboard</h2>
+                        <p>Review your active session, recent history, and focus patterns without leaving the main workspace.</p>
+                        <div className="gws-dashboard-view-controls" aria-label="Dashboard view selector">
+                            {[
+                                { key: 'overview', label: 'Overview' },
+                                { key: 'workload', label: 'Workload' },
+                                { key: 'cadence', label: 'Cadence' }
+                            ].map((viewOption) => (
+                                <button
+                                    key={viewOption.key}
+                                    className={`gws-action-button is-secondary gws-dashboard-view-chip${dashboardView === viewOption.key ? ' is-active' : ''}`}
+                                    type="button"
+                                    onClick={() => setDashboardView(viewOption.key)}
+                                >
+                                    {viewOption.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="gws-dashboard-view-controls" aria-label="Dashboard date range selector">
+                            {[
+                                { key: '7d', label: '7d' },
+                                { key: '30d', label: '30d' },
+                                { key: '90d', label: '90d' },
+                                { key: 'all', label: 'All' }
+                            ].map((rangeOption) => (
+                                <button
+                                    key={rangeOption.key}
+                                    className={`gws-action-button is-secondary gws-dashboard-view-chip${rangeFilter === rangeOption.key ? ' is-active' : ''}`}
+                                    type="button"
+                                    onClick={() => setRangeFilter(rangeOption.key)}
+                                >
+                                    {rangeOption.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="gws-dashboard-header-actions">
+                            {!isGwsRunning && !isGwsPaused && (
+                                <button
+                                    className="gws-action-button"
+                                    type="button"
+                                    disabled={!canStartSession}
+                                    onClick={() => onStartSession?.()}
+                                >
+                                    Start Session
+                                </button>
+                            )}
+                            {isGwsRunning && (
+                                <button className="gws-action-button is-secondary" type="button" onClick={() => onPauseSession?.()}>
+                                    Pause Session
+                                </button>
+                            )}
+                            {isGwsPaused && (
+                                <button className="gws-action-button is-secondary" type="button" onClick={() => onResumeSession?.()}>
+                                    Resume Session
+                                </button>
+                            )}
+                            {(isGwsRunning || isGwsPaused) && (
+                                <button className="gws-action-button is-secondary" type="button" onClick={() => onEndSession?.()}>
+                                    End Session
+                                </button>
+                            )}
+                        </div>
+                        {(isGwsRunning || isGwsPaused) && (
+                            <p className="gws-dashboard-header-timer">
+                                Live timer: {formatCountdownTime(gwsRemainingSeconds)}
+                            </p>
+                        )}
+                        <div className="gws-dashboard-topline">
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Sessions</p>
+                                <p className="gws-history-stat-value">{visibleSessions.length}</p>
+                            </div>
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Completed</p>
+                                <p className="gws-history-stat-value">{completedCount}</p>
+                            </div>
+                            <div className="gws-history-stat">
+                                <p className="gws-history-stat-label">Avg Focus</p>
+                                <p className="gws-history-stat-value">{avgFocusMinutes}m</p>
+                            </div>
+                        </div>
+                        <div className="gws-dashboard-summary-grid">
+                            <div className="gws-dashboard-summary-card">
+                                <h4>Summary Metrics</h4>
+                                <p>Total time: {totalTimeMinutes}m</p>
+                                <p>Session count: {visibleSessions.length}</p>
+                                <p>Pause count: {totalPauseCount}</p>
+                                <p>Adherence: {adherencePercent}%</p>
+                            </div>
+                            <div className="gws-dashboard-summary-card">
+                                <h4>Project Breakdown</h4>
+                                {taskBreakdown.length ? (
+                                    <ul className="gws-dashboard-breakdown-list">
+                                        {taskBreakdown.map((entry) => (
+                                            <li key={entry.taskTitle}>{entry.taskTitle} - {Math.round(entry.seconds / 60)}m across {entry.count} sessions</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No session data yet.</p>
+                                )}
+                            </div>
+                            <div className="gws-dashboard-summary-card">
+                                <h4>Cadence Trend</h4>
+                                <p>Last 7 days: {last7DaysCount} sessions</p>
+                                <p>Previous 7 days: {previous7DaysCount} sessions</p>
+                                <p>{cadenceTrendLabel}</p>
+                            </div>
+                        </div>
+                    </header>
+
+                    <section className="gws-dashboard-visuals" aria-label="GWS visual analytics">
+                        {dashboardView === 'overview' && (
+                            <div className="gws-dashboard-visual-grid">
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Cadence Insight</h4>
+                                    <p>{cadenceRiskLabel}</p>
+                                    <ul className="gws-dashboard-insights-list">
+                                        <li>Overrun sessions: {overrunCount}</li>
+                                        <li>High interruption sessions: {interruptionHeavyCount}</li>
+                                        <li>Low-output sessions: {lowOutputCount}</li>
+                                    </ul>
+                                </article>
+
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Range Snapshot</h4>
+                                    <p>Completion rate: {visibleSessions.length ? Math.round((completedCount / visibleSessions.length) * 100) : 0}%</p>
+                                    <p>Average focus per session: {avgFocusMinutes}m</p>
+                                    <p>Pause density: {visibleSessions.length ? (totalPauseCount / visibleSessions.length).toFixed(1) : '0.0'} pauses / session</p>
+                                </article>
+                            </div>
+                        )}
+
+                        {dashboardView === 'workload' && (
+                            <div className="gws-dashboard-visual-grid">
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Focus Distribution by Task</h4>
+                                    {taskWorkloadRows.length ? (
+                                        <div className="gws-dashboard-graph" role="img" aria-label="Task focus distribution chart">
+                                            {taskWorkloadRows.map((row) => (
+                                                <div className="gws-dashboard-graph-column" key={`task-focus-${row.taskTitle}`}>
+                                                    <div
+                                                        className="gws-dashboard-graph-bar"
+                                                        style={{ height: `${Math.max(8, Math.round((row.actualSeconds / maxTaskSeconds) * 84))}px` }}
+                                                        title={`${Math.round(row.actualSeconds / 60)}m`}
+                                                    ></div>
+                                                    <span className="gws-dashboard-graph-label">{(row.taskTitle || '').slice(0, 6)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p>No workload data in the current filters.</p>
+                                    )}
+                                </article>
+
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Planned vs Actual by Task</h4>
+                                    {taskWorkloadRows.length ? (
+                                        <div className="gws-history-detail-grid">
+                                            {taskWorkloadRows.map((row) => (
+                                                <div className="gws-history-detail-card" key={`task-compare-${row.taskTitle}`}>
+                                                    <h4>{row.taskTitle}</h4>
+                                                    <p>Planned: {Math.round(row.plannedSeconds / 60)}m</p>
+                                                    <div className="gws-dashboard-cadence-progress" aria-hidden="true">
+                                                        <span style={{ width: `${Math.max(3, Math.round((row.plannedSeconds / maxTaskSeconds) * 100))}%` }}></span>
+                                                    </div>
+                                                    <p>Actual: {Math.round(row.actualSeconds / 60)}m</p>
+                                                    <div className="gws-dashboard-cadence-progress" aria-hidden="true">
+                                                        <span style={{ width: `${Math.max(3, Math.round((row.actualSeconds / maxTaskSeconds) * 100))}%` }}></span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p>No workload comparison data in the current filters.</p>
+                                    )}
+                                </article>
+                            </div>
+                        )}
+
+                        {dashboardView === 'cadence' && (
+                            <div className="gws-dashboard-visual-grid">
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Cadence Comparison</h4>
+                                    <div className="gws-dashboard-cadence-bands">
+                                        <div className="gws-dashboard-cadence-band">
+                                            <span>Last 7 days</span>
+                                            <strong>{last7DaysCount} sessions</strong>
+                                            <div className="gws-dashboard-cadence-progress" aria-hidden="true">
+                                                <span style={{ width: `${Math.max(3, Math.round((last7DaysCount / Math.max(1, last7DaysCount, previous7DaysCount)) * 100))}%` }}></span>
+                                            </div>
+                                        </div>
+                                        <div className="gws-dashboard-cadence-band">
+                                            <span>Previous 7 days</span>
+                                            <strong>{previous7DaysCount} sessions</strong>
+                                            <div className="gws-dashboard-cadence-progress" aria-hidden="true">
+                                                <span style={{ width: `${Math.max(3, Math.round((previous7DaysCount / Math.max(1, last7DaysCount, previous7DaysCount)) * 100))}%` }}></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>{cadenceTrendLabel}</p>
+                                </article>
+
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Weekly Rhythm Matrix</h4>
+                                    <div className="gws-dashboard-weekday-grid" role="img" aria-label="Sessions per weekday rhythm chart">
+                                        {weekdayCounts.map((entry) => (
+                                            <div
+                                                className="gws-dashboard-weekday-cell"
+                                                key={`weekday-${entry.label}`}
+                                                style={{
+                                                    background: `rgba(212, 168, 67, ${0.08 + ((entry.count / maxWeekdayCount) * 0.42)})`,
+                                                    borderColor: `rgba(212, 168, 67, ${0.12 + ((entry.count / maxWeekdayCount) * 0.5)})`
+                                                }}
+                                            >
+                                                <span>{entry.label}</span>
+                                                <strong>{entry.count}</strong>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </article>
+
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Cadence Warnings</h4>
+                                    <ul className="gws-dashboard-insights-list">
+                                        <li>{overrunCount > 0 ? `${overrunCount} sessions exceeded planned duration.` : 'No overrun tendency detected.'}</li>
+                                        <li>{interruptionHeavyCount > 0 ? `${interruptionHeavyCount} sessions had 2+ pauses.` : 'Interruptions are currently low.'}</li>
+                                        <li>{lowOutputCount > 0 ? `${lowOutputCount} sessions finished far below planned output.` : 'Output consistency is healthy.'}</li>
+                                    </ul>
+                                </article>
+
+                                <article className="gws-dashboard-visual-card">
+                                    <h4>Consistency Score</h4>
+                                    <p>
+                                        {Math.max(0, 100 - (overrunCount * 8) - (interruptionHeavyCount * 6) - (lowOutputCount * 5))}%
+                                    </p>
+                                    <p>{cadenceRiskLabel}</p>
+                                </article>
+                            </div>
+                        )}
+                    </section>
+
+                    <section className="gws-dashboard-current">
+                        <h3>Current Session</h3>
+                        {activeSession ? (
+                            <>
+                                <p className="gws-dashboard-current-title">{activeSession.taskTitle || `Task ${activeSession.taskId}`}</p>
+                                <p>{activeSession.objective || 'No objective saved yet.'}</p>
+                                <p>Status: {activeSession.status} • Planned {Number(activeSession.plannedMinutes) || 60}m</p>
+                            </>
+                        ) : (
+                            <p>No session is currently running. Start one from the timer to see it appear here.</p>
+                        )}
+                    </section>
+
+                    <section className="gws-dashboard-recent">
+                        <div className="gws-history-toolbar">
+                            <div className="gws-history-toolbar-row">
+                                <div className="gws-history-filter-group" aria-label="Dashboard status filters">
+                                    {['all', 'running', 'completed', 'paused', 'stopped', 'abandoned'].map((statusKey) => (
+                                        <button
+                                            className={`gws-history-filter-chip${statusFilter === statusKey ? ' is-active' : ''}`}
+                                            key={statusKey}
+                                            type="button"
+                                            onClick={() => setStatusFilter(statusKey)}
+                                        >
+                                            {statusKey}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button className="gws-action-button is-secondary" type="button" onClick={exportCsv}>
+                                    Export CSV
+                                </button>
+                            </div>
+
+                            <div className="gws-history-toolbar-row">
+                                <div>
+                                    <p className="gws-history-filter-label">Task filter</p>
+                                    <select
+                                        className="gws-history-select"
+                                        value={taskFilter}
+                                        onChange={(event) => setTaskFilter(event.target.value)}
+                                    >
+                                        <option value="all">All tasks</option>
+                                        {taskOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {visibleSessions.length === 0 ? (
+                            <div className="gws-history-empty">No sessions yet. Start and finish a GWS to populate history.</div>
+                        ) : (
+                            <div className="gws-history-list">
+                                {visibleSessions.slice(0, 20).map((session) => {
+                                    const plannedMinutes = Number(session.plannedMinutes) === 90 ? 90 : 60;
+                                    const actualMinutes = Math.round((Math.max(0, Number(session.actualSeconds) || 0)) / 60);
+                                    const plannedSeconds = plannedMinutes * 60;
+                                    const actualSeconds = Math.max(0, Number(session.actualSeconds) || 0);
+                                    const timeDeltaSeconds = plannedSeconds - actualSeconds;
+                                    const sessionDate = new Date(Number(session.endAt) || Number(session.startAt) || Date.now());
+                                    const statusClass = session.status === 'completed'
+                                        ? 'is-completed'
+                                        : (session.status === 'stopped' ? 'is-stopped' : '');
+                                    const isExpanded = expandedSessionIds.has(session.sessionId);
+                                    const ritualLines = [
+                                        session.ritual?.attitude ? `Attitude: ${session.ritual.attitude}` : null,
+                                        session.ritual?.hydrated ? 'Hydrated' : null,
+                                        session.ritual?.caffeinated ? 'Caffeinated' : null,
+                                        session.ritual?.distractionsCleared ? 'No distractions' : null,
+                                        Number(session.ritual?.timerMinutes) === 90 ? 'Timer: 90 min' : 'Timer: 60 min'
+                                    ].filter(Boolean);
+                                    const plannedTaskLines = Array.isArray(session.plannedTasks) ? session.plannedTasks : [];
+                                    const achievedTaskLines = Array.isArray(session.achievedTasks) ? session.achievedTasks : [];
+                                    const normalizeTaskKey = (taskName) => String(taskName || '').trim().toLowerCase();
+                                    const achievedTaskKeys = new Set(achievedTaskLines.map((taskName) => normalizeTaskKey(taskName)).filter(Boolean));
+                                    const plannedTaskKeys = new Set(plannedTaskLines.map((taskName) => normalizeTaskKey(taskName)).filter(Boolean));
+                                    const isDeleteConfirmOpen = pendingDeleteSessionId === session.sessionId;
+
+                                    return (
+                                        <article className="gws-history-item" key={session.sessionId}>
+                                            <button
+                                                className="gws-history-item-button"
+                                                type="button"
+                                                onClick={() => toggleSessionDetails(session.sessionId)}
+                                                aria-expanded={isExpanded}
+                                            >
+                                                <div className="gws-history-item-head">
+                                                    <p className="gws-history-item-title">{session.taskTitle || `Task ${session.taskId}`}</p>
+                                                    <span className={`gws-status-badge ${statusClass}`}>{session.status}</span>
+                                                </div>
+                                                <p className="gws-history-item-meta">
+                                                    {sessionDate.toLocaleString()} • Planned {plannedMinutes}m • Actual {actualMinutes}m
+                                                </p>
+                                                <span className="gws-history-item-toggle">{isExpanded ? 'Hide details' : 'Show details'}</span>
+                                            </button>
+
+                                            <div className="gws-history-item-actions">
+                                                {!isDeleteConfirmOpen ? (
+                                                    <button
+                                                        className="gws-action-button gws-history-item-delete"
+                                                        type="button"
+                                                        aria-label="Delete session"
+                                                        title="Delete session"
+                                                        onClick={() => setPendingDeleteSessionId(session.sessionId)}
+                                                    >
+                                                        <span aria-hidden="true">🗑</span>
+                                                    </button>
+                                                ) : (
+                                                    <div className="gws-history-inline-confirm" role="alert">
+                                                        <p>Delete this session permanently?</p>
+                                                        <button
+                                                            className="gws-action-button is-danger"
+                                                            type="button"
+                                                            onClick={() => handleConfirmDeleteSession(session.sessionId)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                        <button
+                                                            className="gws-action-button is-secondary"
+                                                            type="button"
+                                                            onClick={() => setPendingDeleteSessionId('')}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {isExpanded && (
+                                                <div className="gws-history-item-details">
+                                                    <div className="gws-history-detail-grid">
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Objective</h4>
+                                                            <p>{session.objective || 'Not set'}</p>
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Ritual</h4>
+                                                            {ritualLines.length ? (
+                                                                <ul>
+                                                                    {ritualLines.map((ritualLine) => <li key={ritualLine}>{ritualLine}</li>)}
+                                                                </ul>
+                                                            ) : (
+                                                                <p className="gws-history-detail-empty">No ritual saved.</p>
+                                                            )}
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Planned vs Actual Tasks</h4>
+                                                            <div className="gws-comparison-grid">
+                                                                <div className="gws-comparison-column">
+                                                                    <h5>Planned at Start</h5>
+                                                                    {plannedTaskLines.length ? (
+                                                                        <ul className="gws-comparison-list">
+                                                                            {plannedTaskLines.map((taskLine, taskIndex) => {
+                                                                                const key = normalizeTaskKey(taskLine);
+                                                                                const isMatch = key && achievedTaskKeys.has(key);
+
+                                                                                return (
+                                                                                    <li
+                                                                                        className={`gws-comparison-item ${isMatch ? 'is-match' : 'is-gap'}`}
+                                                                                        key={`${taskLine}-${taskIndex}`}
+                                                                                    >
+                                                                                        {isMatch ? '✓ ' : '✕ '}{taskLine}
+                                                                                    </li>
+                                                                                );
+                                                                            })}
+                                                                        </ul>
+                                                                    ) : (
+                                                                        <p className="gws-history-detail-empty">No planned tasks saved.</p>
+                                                                    )}
+                                                                </div>
+                                                                <div className="gws-comparison-column">
+                                                                    <h5>Actually Achieved</h5>
+                                                                    {achievedTaskLines.length ? (
+                                                                        <ul className="gws-comparison-list">
+                                                                            {achievedTaskLines.map((taskLine, taskIndex) => {
+                                                                                const key = normalizeTaskKey(taskLine);
+                                                                                const isMatch = key && plannedTaskKeys.has(key);
+
+                                                                                return (
+                                                                                    <li
+                                                                                        className={`gws-comparison-item ${isMatch ? 'is-match' : 'is-extra'}`}
+                                                                                        key={`${taskLine}-${taskIndex}`}
+                                                                                    >
+                                                                                        {isMatch ? '✓ ' : '+ '}{taskLine}
+                                                                                    </li>
+                                                                                );
+                                                                            })}
+                                                                        </ul>
+                                                                    ) : (
+                                                                        <p className="gws-history-detail-empty">No achieved tasks captured yet.</p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Review Notes</h4>
+                                                            <p>{session.notes || 'No review notes saved.'}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="gws-history-detail-metrics">
+                                                        <div className="gws-history-metric">
+                                                            <p className="gws-history-metric-label">Planned vs Actual</p>
+                                                            <p className="gws-history-metric-value">{plannedMinutes}m / {actualMinutes}m</p>
+                                                        </div>
+                                                        <div className="gws-history-metric">
+                                                            <p className="gws-history-metric-label">Time Delta</p>
+                                                            <p className="gws-history-metric-value">{timeDeltaSeconds >= 0 ? '-' : '+'}{Math.abs(Math.round(timeDeltaSeconds / 60))}m</p>
+                                                        </div>
+                                                        <div className="gws-history-metric">
+                                                            <p className="gws-history-metric-label">Progress</p>
+                                                            <p className="gws-history-metric-value">
+                                                                {Array.isArray(session.completedChecklistItems) && session.completedChecklistItems.length
+                                                                    ? `${session.completedChecklistItems.length} checklist items`
+                                                                    : 'No checklist snapshot'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="gws-history-detail-grid">
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Analyze</h4>
+                                                            <p>{session.analyze || 'No analysis saved.'}</p>
+                                                        </div>
+                                                        <div className="gws-history-detail-card">
+                                                            <h4>Quick Tweaks</h4>
+                                                            <p>{session.quickTweaks || 'No quick tweaks saved.'}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </article>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </section>
+                </section>
+            );
+        }
+
         function ProjectNavigation({
             projects,
             currentProjectId,
@@ -4738,13 +7449,30 @@
             );
         }
 
-        function CenterWorkspace({ currentProject, currentTask, currentTaskDefinition }) {
+        function CenterWorkspace({
+            currentProject,
+            currentTask,
+            currentTaskDefinition,
+            workspaceTab,
+            isDashboardTabOpen,
+            isGwsRunning,
+            isGwsPaused,
+            gwsRemainingSeconds,
+            onStartSession,
+            onPauseSession,
+            onResumeSession,
+            onEndSession,
+            onDeleteSession,
+            onSelectWorkspaceTab,
+            onCloseDashboardTab
+        }) {
             const [isFrameLoading, setIsFrameLoading] = useState(false);
             const [showFrameFallback, setShowFrameFallback] = useState(false);
             const fallbackTimerRef = useRef(null);
             const documentReference = getProjectDocumentReference(currentProject, currentTask, currentTaskDefinition);
             const docUrl = getGoogleDocEditUrl(documentReference.docId, false, documentReference.tabId);
             const embeddedDocUrl = getGoogleDocEditUrl(documentReference.docId, true, documentReference.tabId);
+            const isDashboardTab = isDashboardTabOpen && workspaceTab === 'gws';
 
             useEffect(() => {
                 if (fallbackTimerRef.current) {
@@ -4783,15 +7511,13 @@
                 );
             }
 
-            if (!currentTask || !currentTaskDefinition || !embeddedDocUrl) {
-                const isOneDocProject = Boolean(currentProject.projectDocId);
-
-                return (
+            const docsTabPanel = !currentTask || !currentTaskDefinition || !embeddedDocUrl
+                ? (
                     <div className="center-placeholder recovery-card">
                         <div className="placeholder-kicker">Recovery State</div>
-                        <h2>{isOneDocProject ? 'Project document is missing' : 'Task document is missing'}</h2>
+                        <h2>{currentProject.projectDocId ? 'Project document is missing' : 'Task document is missing'}</h2>
                         <p>
-                            {isOneDocProject
+                            {currentProject.projectDocId
                                 ? 'This project exists, but its project-level Google Doc ID is missing or invalid. Create a new project or restore this project from a valid saved state.'
                                 : 'This legacy project exists, but the selected task is missing its Google Doc ID. Create a new project or restore this project from a valid saved state.'}
                         </p>
@@ -4799,50 +7525,151 @@
                             <span className="recovery-action-link">Use + New Project in the sidebar</span>
                         </div>
                     </div>
+                )
+                : (
+                    <div className="doc-workspace">
+                        <div className="doc-frame-shell">
+                            <iframe
+                                className="doc-frame"
+                                key={embeddedDocUrl}
+                                title={`${currentProject.name} — ${currentTaskDefinition.fullDocTitle}`}
+                                src={embeddedDocUrl}
+                                onLoad={() => {
+                                    if (fallbackTimerRef.current) {
+                                        window.clearTimeout(fallbackTimerRef.current);
+                                    }
+
+                                    setIsFrameLoading(false);
+                                    setShowFrameFallback(false);
+                                }}
+                            ></iframe>
+
+                            <a className="open-doc-button floating-open-doc-button" href={docUrl} target="_blank" rel="noopener noreferrer">
+                                Open in Google Docs ↗
+                            </a>
+
+                            {isFrameLoading && (
+                                <div className="doc-loading-overlay" aria-live="polite">
+                                    <div className="doc-loading-card">
+                                        <div className="spinner" aria-hidden="true"></div>
+                                        <p>Loading {currentTaskDefinition.fullDocTitle}...</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {showFrameFallback && (
+                                <div className="doc-fallback-overlay" aria-live="polite">
+                                    <div className="doc-fallback-card">
+                                        <p>If Google Docs is blocked in the iframe, open the task directly in Google Docs.</p>
+                                        <a className="open-doc-button" href={docUrl} target="_blank" rel="noopener noreferrer">
+                                            Open in Google Docs ↗
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+
+            const dashboardPanel = (
+                <GwsDashboardPanel
+                    currentProject={currentProject}
+                    activeSession={currentProject?.gws?.activeSession || null}
+                    sessions={currentProject?.gws?.sessions || []}
+                    currentTaskDefinition={currentTaskDefinition}
+                    isGwsRunning={isGwsRunning}
+                    isGwsPaused={isGwsPaused}
+                    gwsRemainingSeconds={gwsRemainingSeconds}
+                    onStartSession={onStartSession}
+                    onPauseSession={onPauseSession}
+                    onResumeSession={onResumeSession}
+                    onEndSession={onEndSession}
+                    onDeleteSession={onDeleteSession}
+                />
+            );
+
+            if (!isDashboardTabOpen) {
+                return docsTabPanel;
+            }
+
+            if (!currentTask || !currentTaskDefinition || !embeddedDocUrl) {
+                return (
+                    <div className="center-workspace-tabs">
+                        <div className="center-workspace-tabbar" role="tablist" aria-label="Workspace tabs">
+                            <button
+                                className={`center-workspace-tab${!isDashboardTab ? ' is-active' : ''}`}
+                                type="button"
+                                role="tab"
+                                aria-selected={!isDashboardTab}
+                                onClick={() => onSelectWorkspaceTab('docs')}
+                            >
+                                Google Docs
+                            </button>
+                            <div className={`center-workspace-tab-with-close${isDashboardTab ? ' is-active' : ''}`}>
+                                <button
+                                    className={`center-workspace-tab center-workspace-tab-label${isDashboardTab ? ' is-active' : ''}`}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={isDashboardTab}
+                                    onClick={() => onSelectWorkspaceTab('gws')}
+                                >
+                                    GWS Dashboard
+                                </button>
+                                <button
+                                    className="center-workspace-tab-close"
+                                    type="button"
+                                    aria-label="Close GWS dashboard tab"
+                                    title="Close dashboard tab"
+                                    onClick={onCloseDashboardTab}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="center-workspace-tab-panel">
+                            {isDashboardTab ? dashboardPanel : docsTabPanel}
+                        </div>
+                    </div>
                 );
             }
 
             return (
-                <div className="doc-workspace">
-                    <div className="doc-frame-shell">
-                        <iframe
-                            className="doc-frame"
-                            key={embeddedDocUrl}
-                            title={`${currentProject.name} — ${currentTaskDefinition.fullDocTitle}`}
-                            src={embeddedDocUrl}
-                            onLoad={() => {
-                                if (fallbackTimerRef.current) {
-                                    window.clearTimeout(fallbackTimerRef.current);
-                                }
+                <div className="center-workspace-tabs">
+                    <div className="center-workspace-tabbar" role="tablist" aria-label="Workspace tabs">
+                        <button
+                            className={`center-workspace-tab${!isDashboardTab ? ' is-active' : ''}`}
+                            type="button"
+                            role="tab"
+                            aria-selected={!isDashboardTab}
+                            onClick={() => onSelectWorkspaceTab('docs')}
+                        >
+                            Google Docs
+                        </button>
+                        <div className={`center-workspace-tab-with-close${isDashboardTab ? ' is-active' : ''}`}>
+                            <button
+                                className={`center-workspace-tab center-workspace-tab-label${isDashboardTab ? ' is-active' : ''}`}
+                                type="button"
+                                role="tab"
+                                aria-selected={isDashboardTab}
+                                onClick={() => onSelectWorkspaceTab('gws')}
+                            >
+                                GWS Dashboard
+                            </button>
+                            <button
+                                className="center-workspace-tab-close"
+                                type="button"
+                                aria-label="Close GWS dashboard tab"
+                                title="Close dashboard tab"
+                                onClick={onCloseDashboardTab}
+                            >
+                                ×
+                            </button>
+                        </div>
+                    </div>
 
-                                setIsFrameLoading(false);
-                                setShowFrameFallback(false);
-                            }}
-                        ></iframe>
-
-                        <a className="open-doc-button floating-open-doc-button" href={docUrl} target="_blank" rel="noopener noreferrer">
-                            Open in Google Docs ↗
-                        </a>
-
-                        {isFrameLoading && (
-                            <div className="doc-loading-overlay" aria-live="polite">
-                                <div className="doc-loading-card">
-                                    <div className="spinner" aria-hidden="true"></div>
-                                    <p>Loading {currentTaskDefinition.fullDocTitle}...</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {showFrameFallback && (
-                            <div className="doc-fallback-overlay" aria-live="polite">
-                                <div className="doc-fallback-card">
-                                    <p>If Google Docs is blocked in the iframe, open the task directly in Google Docs.</p>
-                                    <a className="open-doc-button" href={docUrl} target="_blank" rel="noopener noreferrer">
-                                        Open in Google Docs ↗
-                                    </a>
-                                </div>
-                            </div>
-                        )}
+                    <div className="center-workspace-tab-panel">
+                        {isDashboardTab ? dashboardPanel : docsTabPanel}
                     </div>
                 </div>
             );
@@ -5251,7 +8078,21 @@
             return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
+        const GWS_BELL_SOUND_URL = 'https://cdn.freesound.org/previews/810/810191_17437502-lq.mp3';
+
         async function playGwsCompletionRingtone(audioContextRef) {
+            try {
+                const ringAudio = new Audio(GWS_BELL_SOUND_URL);
+                ringAudio.preload = 'auto';
+                ringAudio.loop = false;
+                ringAudio.volume = 0.9;
+
+                await ringAudio.play();
+                return;
+            } catch (error) {
+                // Fall back to the synthetic completion ringtone when remote audio cannot play.
+            }
+
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
             if (!AudioContextClass) {
@@ -5293,6 +8134,56 @@
             });
         }
 
+        async function playGwsStartTone(audioContextRef) {
+            try {
+                const ringAudio = new Audio(GWS_BELL_SOUND_URL);
+                ringAudio.preload = 'auto';
+                ringAudio.loop = false;
+                ringAudio.volume = 0.9;
+
+                await ringAudio.play();
+                return;
+            } catch (error) {
+                // Fall back to a single synthetic bell if the public sound cannot play.
+            }
+
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+            if (!AudioContextClass) {
+                return;
+            }
+
+            if (!audioContextRef.current) {
+                audioContextRef.current = new AudioContextClass();
+            }
+
+            const audioContext = audioContextRef.current;
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            const startAt = audioContext.currentTime;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const toneStart = startAt;
+            const toneEnd = toneStart + 0.55;
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, toneStart);
+            oscillator.frequency.exponentialRampToValueAtTime(660, toneStart + 0.12);
+
+            gainNode.gain.setValueAtTime(0.0001, toneStart);
+            gainNode.gain.exponentialRampToValueAtTime(0.22, toneStart + 0.03);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, toneEnd);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start(toneStart);
+            oscillator.stop(toneEnd);
+        }
+
         function App() {
             const firstTask = getTaskDefinition(1);
             const [appState, setAppState] = useState(() => loadState());
@@ -5300,20 +8191,39 @@
             const [authReady, setAuthReady] = useState(false);
             const [authLoading, setAuthLoading] = useState(false);
             const [authTokenClient, setAuthTokenClient] = useState(null);
+            const [authProfile, setAuthProfile] = useState(null);
             const [authNotice, setAuthNotice] = useState(() => INITIAL_AUTH_NOTICE || (isPlaceholderClientId() ? 'Google OAuth is implemented, but the client ID is still a placeholder.' : ''));
             const authRequestRef = useRef(null);
             const lastStage2PromptKeyRef = useRef('');
             const lastDraftPromptKeyRef = useRef('');
             const stage2MenuRef = useRef(null);
+            const profileMenuRef = useRef(null);
             const gwsMenuRef = useRef(null);
             const gwsAudioContextRef = useRef(null);
+            const gwsWizardTaskIdRef = useRef(null);
+            const gwsActiveSessionRef = useRef(null);
             const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
             const [isStage2MenuOpen, setIsStage2MenuOpen] = useState(false);
+            const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
             const [isGwsMenuOpen, setIsGwsMenuOpen] = useState(false);
+            const [isGwsHistoryOpen, setIsGwsHistoryOpen] = useState(false);
             const [gwsMinutes, setGwsMinutes] = useState(60);
             const [gwsRemainingSeconds, setGwsRemainingSeconds] = useState(0);
             const [isGwsRunning, setIsGwsRunning] = useState(false);
             const [isGwsPaused, setIsGwsPaused] = useState(false);
+            const [isGwsWizardOpen, setIsGwsWizardOpen] = useState(false);
+            const [gwsWizardStep, setGwsWizardStep] = useState(0);
+            const [gwsWizardDraft, setGwsWizardDraft] = useState(() => normalizeGwsWizard({
+                objective: '',
+                plannedTasks: [],
+                attitude: '',
+                hydrated: false,
+                caffeinated: false,
+                distractionsCleared: false,
+                timerMinutes: 60
+            }));
+            const [isGwsDashboardOpen, setIsGwsDashboardOpen] = useState(false);
+            const [workspaceTab, setWorkspaceTab] = useState('docs');
             const [creationState, setCreationState] = useState({
                 isCreating: false,
                 createdCount: 0,
@@ -5348,6 +8258,124 @@
                 error: '',
                 assetAssignments: {}
             });
+
+            const createGwsWizardDraftForTask = (taskDefinition, task, timerMinutes = 60) => {
+                const taskChecklist = Array.isArray(taskDefinition?.checklist) ? taskDefinition.checklist : [];
+                const taskProgress = Array.isArray(task?.checklist) ? task.checklist : [];
+
+                const uncheckedItems = taskChecklist
+                    .map((item, index) => (taskProgress[index] ? null : String(item || '').trim()))
+                    .filter(Boolean);
+
+                return normalizeGwsWizard({
+                objective: '',
+                plannedTasks: uncheckedItems,
+                attitude: '',
+                hydrated: false,
+                caffeinated: false,
+                distractionsCleared: false,
+                timerMinutes: timerMinutes === 90 ? 90 : 60
+                });
+            };
+
+            function updateProjectGws(projectId, updater) {
+                if (!projectId) {
+                    return;
+                }
+
+                setAppState((previousState) => {
+                    const nextState = {
+                        ...previousState,
+                        projects: previousState.projects.map((project) => {
+                            if (project.id !== projectId) {
+                                return project;
+                            }
+
+                            const currentGws = normalizeGwsState(project.gws);
+                            const nextGws = normalizeGwsState(updater(currentGws, project));
+
+                            return {
+                                ...project,
+                                gws: nextGws
+                            };
+                        })
+                    };
+
+                    return saveState(nextState);
+                });
+            }
+
+            function closeGwsSession(status) {
+                const activeSession = gwsActiveSessionRef.current;
+
+                if (!activeSession?.projectId || !activeSession?.sessionId) {
+                    return;
+                }
+
+                const endedAt = Date.now();
+                const remainingSeconds = Math.max(0, Number(gwsRemainingSeconds) || 0);
+                const plannedSeconds = (Number(activeSession.plannedMinutes) === 90 ? 90 : 60) * 60;
+                const actualSeconds = Math.max(0, plannedSeconds - remainingSeconds);
+
+                updateProjectGws(activeSession.projectId, (currentGws, project) => {
+                    const latestTask = getProjectTask(project, activeSession.taskId);
+                    const latestTaskDefinition = getTaskDefinition(activeSession.taskId, project);
+                    const checklistItems = Array.isArray(latestTaskDefinition?.checklist) ? latestTaskDefinition.checklist : [];
+                    const latestChecklistState = Array.isArray(latestTask?.checklist) ? latestTask.checklist.map(Boolean) : [];
+                    const checklistSnapshot = Array.isArray(activeSession.checklistSnapshot)
+                        ? activeSession.checklistSnapshot.map(Boolean)
+                        : [];
+                    const achievedChecklistItems = checklistItems
+                        .filter((item, index) => !Boolean(checklistSnapshot[index]) && Boolean(latestChecklistState[index]))
+                        .map((item) => String(item || '').trim())
+                        .filter(Boolean);
+                    const completedChecklistItems = checklistItems
+                        .filter((item, index) => Boolean(latestChecklistState[index]))
+                        .map((item) => String(item || '').trim())
+                        .filter(Boolean);
+
+                    const finalizedSession = normalizeGwsSession({
+                        ...activeSession,
+                        endAt: endedAt,
+                        remainingSeconds,
+                        actualSeconds,
+                        completedChecklistItems,
+                        achievedTasks: achievedChecklistItems,
+                        status
+                    });
+
+                    if (!finalizedSession) {
+                        return {
+                            ...currentGws,
+                            activeSession: null
+                        };
+                    }
+
+                    return {
+                        ...currentGws,
+                        activeSession: null,
+                        sessions: [finalizedSession, ...(currentGws.sessions || [])].slice(0, 80)
+                    };
+                });
+
+                gwsActiveSessionRef.current = null;
+            }
+
+            useEffect(() => {
+                if (!isGwsWizardOpen) {
+                    return;
+                }
+
+                const nextTaskId = Number(currentTaskDefinition?.taskId || 0);
+
+                if (gwsWizardTaskIdRef.current === nextTaskId) {
+                    return;
+                }
+
+                gwsWizardTaskIdRef.current = nextTaskId;
+                setGwsWizardDraft(createGwsWizardDraftForTask(currentTaskDefinition, currentTask, gwsMinutes));
+                setGwsWizardStep(0);
+            }, [isGwsWizardOpen, currentTaskDefinition, gwsMinutes]);
 
             useEffect(() => {
                 let isActive = true;
@@ -5425,6 +8453,31 @@
             }, []);
 
             useEffect(() => {
+                if (!authToken || isTokenExpired(authToken)) {
+                    setAuthProfile(null);
+                    return;
+                }
+
+                let isActive = true;
+
+                fetchGoogleUserProfile(authToken.access_token)
+                    .then((profile) => {
+                        if (isActive) {
+                            setAuthProfile(profile);
+                        }
+                    })
+                    .catch(() => {
+                        if (isActive) {
+                            setAuthProfile(null);
+                        }
+                    });
+
+                return () => {
+                    isActive = false;
+                };
+            }, [authToken]);
+
+            useEffect(() => {
                 const handleStorage = (event) => {
                     if (event.key === STATE_STORAGE_KEY) {
                         setAppState(loadState());
@@ -5439,6 +8492,32 @@
                 window.addEventListener('storage', handleStorage);
                 return () => window.removeEventListener('storage', handleStorage);
             }, []);
+
+            useEffect(() => {
+                if (!isProfileMenuOpen) {
+                    return;
+                }
+
+                const handleOutsideClick = (event) => {
+                    if (!profileMenuRef.current?.contains(event.target)) {
+                        setIsProfileMenuOpen(false);
+                    }
+                };
+
+                const handleEscape = (event) => {
+                    if (event.key === 'Escape') {
+                        setIsProfileMenuOpen(false);
+                    }
+                };
+
+                document.addEventListener('mousedown', handleOutsideClick);
+                document.addEventListener('keydown', handleEscape);
+
+                return () => {
+                    document.removeEventListener('mousedown', handleOutsideClick);
+                    document.removeEventListener('keydown', handleEscape);
+                };
+            }, [isProfileMenuOpen]);
 
             useEffect(() => {
                 if (authToken && appState.projects.length === 0) {
@@ -5532,11 +8611,37 @@
                 }
 
                 const timerId = window.setInterval(() => {
-                    setGwsRemainingSeconds((previousSeconds) => Math.max(previousSeconds - 1, 0));
+                    setGwsRemainingSeconds((previousSeconds) => {
+                        const nextSeconds = Math.max(previousSeconds - 1, 0);
+                        const activeSession = gwsActiveSessionRef.current;
+
+                        if (activeSession?.projectId && activeSession?.sessionId) {
+                            const plannedSeconds = (Number(activeSession.plannedMinutes) === 90 ? 90 : 60) * 60;
+
+                            updateProjectGws(activeSession.projectId, (currentGws) => ({
+                                ...currentGws,
+                                activeSession: normalizeGwsSession({
+                                    ...activeSession,
+                                    remainingSeconds: nextSeconds,
+                                    actualSeconds: Math.max(0, plannedSeconds - nextSeconds),
+                                    status: isGwsPaused ? 'paused' : 'running'
+                                })
+                            }));
+
+                            gwsActiveSessionRef.current = {
+                                ...activeSession,
+                                remainingSeconds: nextSeconds,
+                                actualSeconds: Math.max(0, plannedSeconds - nextSeconds),
+                                status: isGwsPaused ? 'paused' : 'running'
+                            };
+                        }
+
+                        return nextSeconds;
+                    });
                 }, 1000);
 
                 return () => window.clearInterval(timerId);
-            }, [isGwsRunning]);
+            }, [isGwsRunning, isGwsPaused]);
 
             useEffect(() => {
                 if (!isGwsRunning || gwsRemainingSeconds > 0) {
@@ -5545,6 +8650,7 @@
 
                 setIsGwsRunning(false);
                 setIsGwsPaused(false);
+                closeGwsSession('completed');
                 setLockedTaskMessage('GWS complete. Great session.');
                 playGwsCompletionRingtone(gwsAudioContextRef).catch(() => {});
             }, [isGwsRunning, gwsRemainingSeconds]);
@@ -5554,6 +8660,42 @@
             const currentTaskDefinition = useMemo(() => (
                 getTaskDefinition(currentTask?.taskId || firstTask.taskId, currentProject)
             ), [currentTask, currentProject, firstTask.taskId]);
+
+            useEffect(() => {
+                const activeSession = normalizeGwsSession(currentProject?.gws?.activeSession);
+
+                if (!activeSession) {
+                    gwsActiveSessionRef.current = null;
+                    return;
+                }
+
+                if (gwsActiveSessionRef.current?.sessionId === activeSession.sessionId
+                    && gwsRemainingSeconds === activeSession.remainingSeconds
+                    && ((activeSession.status === 'paused' && isGwsPaused) || (activeSession.status !== 'paused' && isGwsRunning))) {
+                    return;
+                }
+
+                gwsActiveSessionRef.current = activeSession;
+                setGwsMinutes(activeSession.plannedMinutes === 90 ? 90 : 60);
+                setGwsRemainingSeconds(Math.max(0, Number(activeSession.remainingSeconds) || 0));
+                setIsGwsWizardOpen(false);
+                setIsGwsMenuOpen(false);
+
+                if (activeSession.status === 'paused') {
+                    setIsGwsRunning(false);
+                    setIsGwsPaused(true);
+                    return;
+                }
+
+                setIsGwsRunning(true);
+                setIsGwsPaused(false);
+            }, [
+                currentProject?.gws?.activeSession?.sessionId,
+                currentProject?.gws?.activeSession?.remainingSeconds,
+                currentProject?.gws?.activeSession?.status,
+                currentProject?.id
+            ]);
+
             const isTaskFiveComplete = useMemo(() => {
                 if (!currentProject) {
                     return false;
@@ -7066,15 +10208,108 @@
             const handleSignOut = () => {
                 clearAuthToken();
                 setAuthToken(null);
+                setAuthProfile(null);
+                setIsProfileMenuOpen(false);
+                setIsGwsDashboardOpen(false);
+                setWorkspaceTab('docs');
+                setIsGwsHistoryOpen(false);
                 setAuthNotice('You have been signed out. Continue with Google to sign in again.');
             };
 
+            const handleOpenGwsWizard = () => {
+                gwsWizardTaskIdRef.current = Number(currentTaskDefinition?.taskId || 0);
+                setGwsWizardDraft(createGwsWizardDraftForTask(currentTaskDefinition, currentTask, gwsMinutes));
+                setGwsWizardStep(0);
+                setIsGwsWizardOpen(true);
+                setIsGwsMenuOpen(false);
+            };
+
+            const handleCancelGwsWizard = () => {
+                setIsGwsWizardOpen(false);
+                setGwsWizardStep(0);
+                gwsWizardTaskIdRef.current = null;
+            };
+
+            const handleChangeGwsWizardDraft = (updates) => {
+                setGwsWizardDraft((previousState) => normalizeGwsWizard({
+                    ...previousState,
+                    ...updates
+                }));
+            };
+
+            const handleGwsWizardBack = () => {
+                setGwsWizardStep((previousStep) => Math.max(previousStep - 1, 0));
+            };
+
+            const handleGwsWizardNext = () => {
+                setGwsWizardStep((previousStep) => Math.min(previousStep + 1, 3));
+            };
+
+            const handleOpenGwsHistory = () => {
+                setIsGwsMenuOpen(false);
+                setIsGwsDashboardOpen(true);
+                setWorkspaceTab('gws');
+                setIsGwsHistoryOpen(true);
+            };
+
+            const handleCloseGwsHistory = () => {
+                setIsGwsDashboardOpen(false);
+                setWorkspaceTab('docs');
+                setIsGwsHistoryOpen(false);
+            };
+
             const handleStartGwsSession = () => {
-                const durationMinutes = gwsMinutes === 90 ? 90 : 60;
+                if (!currentProject || !currentTaskDefinition) {
+                    return;
+                }
+
+                const durationMinutes = gwsWizardDraft.timerMinutes === 90 ? 90 : 60;
+                const startedAt = Date.now();
+                const sessionId = `gws-${startedAt}-${Math.random().toString(36).slice(2, 8)}`;
+                const sessionSnapshot = normalizeGwsSession({
+                    sessionId,
+                    projectId: currentProject.id,
+                    taskId: Number(currentTaskDefinition.taskId) || 0,
+                    taskTitle: String(currentTaskDefinition.shortTitle || currentTaskDefinition.fullDocTitle || '').trim(),
+                    taskDocTabId: String(currentTaskDefinition.tabId || '').trim(),
+                    objective: gwsWizardDraft.objective,
+                    plannedTasks: gwsWizardDraft.plannedTasks,
+                    ritual: {
+                        attitude: gwsWizardDraft.attitude,
+                        hydrated: gwsWizardDraft.hydrated,
+                        caffeinated: gwsWizardDraft.caffeinated,
+                        distractionsCleared: gwsWizardDraft.distractionsCleared,
+                        timerMinutes: durationMinutes
+                    },
+                    startAt: startedAt,
+                    remainingSeconds: durationMinutes * 60,
+                    plannedMinutes: durationMinutes,
+                    actualSeconds: 0,
+                    pauseCount: 0,
+                    status: 'running',
+                    checklistSnapshot: Array.isArray(currentTask?.checklist) ? currentTask.checklist.map(Boolean) : [],
+                    completedChecklistItems: [],
+                    achievedTasks: []
+                });
+
+                gwsActiveSessionRef.current = sessionSnapshot;
+
+                if (sessionSnapshot) {
+                    updateProjectGws(currentProject.id, (currentGws) => ({
+                        ...currentGws,
+                        activeSession: sessionSnapshot
+                    }));
+                }
+
+                playGwsStartTone(gwsAudioContextRef).catch(() => {});
                 setGwsRemainingSeconds(durationMinutes * 60);
                 setIsGwsRunning(true);
                 setIsGwsPaused(false);
+                setGwsMinutes(durationMinutes);
+                setIsGwsWizardOpen(false);
                 setIsGwsMenuOpen(false);
+                setIsGwsHistoryOpen(false);
+                gwsWizardTaskIdRef.current = null;
             };
 
             const handlePauseGwsSession = () => {
@@ -7084,6 +10319,27 @@
 
                 setIsGwsRunning(false);
                 setIsGwsPaused(true);
+
+                if (gwsActiveSessionRef.current?.projectId && gwsActiveSessionRef.current?.sessionId) {
+                    updateProjectGws(gwsActiveSessionRef.current.projectId, (currentGws) => ({
+                        ...currentGws,
+                        activeSession: normalizeGwsSession({
+                            ...gwsActiveSessionRef.current,
+                            remainingSeconds: Math.max(0, Number(gwsRemainingSeconds) || 0),
+                            actualSeconds: Math.max(0, ((Number(gwsActiveSessionRef.current.plannedMinutes) === 90 ? 90 : 60) * 60) - Math.max(0, Number(gwsRemainingSeconds) || 0)),
+                            pauseCount: Math.max(0, Number(gwsActiveSessionRef.current.pauseCount) || 0) + 1,
+                            status: 'paused'
+                        })
+                    }));
+
+                    gwsActiveSessionRef.current = {
+                        ...gwsActiveSessionRef.current,
+                        remainingSeconds: Math.max(0, Number(gwsRemainingSeconds) || 0),
+                        actualSeconds: Math.max(0, ((Number(gwsActiveSessionRef.current.plannedMinutes) === 90 ? 90 : 60) * 60) - Math.max(0, Number(gwsRemainingSeconds) || 0)),
+                        pauseCount: Math.max(0, Number(gwsActiveSessionRef.current.pauseCount) || 0) + 1,
+                        status: 'paused'
+                    };
+                }
             };
 
             const handleResumeGwsSession = () => {
@@ -7093,13 +10349,66 @@
 
                 setIsGwsRunning(true);
                 setIsGwsPaused(false);
+
+                if (gwsActiveSessionRef.current?.projectId && gwsActiveSessionRef.current?.sessionId) {
+                    updateProjectGws(gwsActiveSessionRef.current.projectId, (currentGws) => ({
+                        ...currentGws,
+                        activeSession: normalizeGwsSession({
+                            ...gwsActiveSessionRef.current,
+                            remainingSeconds: Math.max(0, Number(gwsRemainingSeconds) || 0),
+                            actualSeconds: Math.max(0, ((Number(gwsActiveSessionRef.current.plannedMinutes) === 90 ? 90 : 60) * 60) - Math.max(0, Number(gwsRemainingSeconds) || 0)),
+                            status: 'running'
+                        })
+                    }));
+
+                    gwsActiveSessionRef.current = {
+                        ...gwsActiveSessionRef.current,
+                        remainingSeconds: Math.max(0, Number(gwsRemainingSeconds) || 0),
+                        actualSeconds: Math.max(0, ((Number(gwsActiveSessionRef.current.plannedMinutes) === 90 ? 90 : 60) * 60) - Math.max(0, Number(gwsRemainingSeconds) || 0)),
+                        status: 'running'
+                    };
+                }
             };
 
             const handleStopGwsSession = () => {
                 setIsGwsRunning(false);
                 setIsGwsPaused(false);
+                closeGwsSession('stopped');
                 setGwsRemainingSeconds(0);
                 setIsGwsMenuOpen(false);
+            };
+
+            const handleDeleteGwsSession = (sessionId) => {
+                const safeSessionId = String(sessionId || '').trim();
+
+                if (!currentProject?.id || !safeSessionId) {
+                    return;
+                }
+
+                const isDeletingActiveSession = String(gwsActiveSessionRef.current?.sessionId || '').trim() === safeSessionId
+                    || String(currentProject?.gws?.activeSession?.sessionId || '').trim() === safeSessionId;
+
+                updateProjectGws(currentProject.id, (currentGws) => {
+                    const nextSessions = (currentGws.sessions || []).filter((session) => String(session?.sessionId || '').trim() !== safeSessionId);
+                    const nextActiveSession = isDeletingActiveSession
+                        ? null
+                        : currentGws.activeSession;
+
+                    return {
+                        ...currentGws,
+                        activeSession: nextActiveSession,
+                        sessions: nextSessions
+                    };
+                });
+
+                if (isDeletingActiveSession) {
+                    gwsActiveSessionRef.current = null;
+                    setIsGwsRunning(false);
+                    setIsGwsPaused(false);
+                    setGwsRemainingSeconds(0);
+                    setIsGwsMenuOpen(false);
+                    setLockedTaskMessage('Active session deleted from dashboard history.');
+                }
             };
 
             if (!authToken) {
@@ -7194,20 +10503,6 @@
                                             >
                                                 {currentProject && getProjectDraftAssets(currentProject).length ? 'Reconfigure Draft Assets' : 'Set Draft Assets'}
                                             </button>
-
-                                            <div className="stage2-menu-divider" aria-hidden="true" />
-
-                                            <button
-                                                className="stage2-menu-item is-danger"
-                                                type="button"
-                                                role="menuitem"
-                                                onClick={() => {
-                                                    setIsStage2MenuOpen(false);
-                                                    handleSignOut();
-                                                }}
-                                            >
-                                                Sign Out
-                                            </button>
                                         </div>
                                     )}
                                 </div>
@@ -7236,16 +10531,86 @@
                             currentProject={currentProject}
                             currentTask={currentTask}
                             currentTaskDefinition={currentTaskDefinition}
+                            workspaceTab={workspaceTab}
+                            isDashboardTabOpen={isGwsDashboardOpen}
+                            isGwsRunning={isGwsRunning}
+                            isGwsPaused={isGwsPaused}
+                            gwsRemainingSeconds={gwsRemainingSeconds}
+                            onStartSession={handleOpenGwsWizard}
+                            onPauseSession={handlePauseGwsSession}
+                            onResumeSession={handleResumeGwsSession}
+                            onEndSession={handleStopGwsSession}
+                            onDeleteSession={handleDeleteGwsSession}
+                            onSelectWorkspaceTab={(nextTab) => setWorkspaceTab(nextTab === 'gws' ? 'gws' : 'docs')}
+                            onCloseDashboardTab={() => {
+                                setIsGwsDashboardOpen(false);
+                                setWorkspaceTab('docs');
+                                setIsGwsHistoryOpen(false);
+                            }}
                         />
                     </section>
 
                     <aside className="right-sidebar" aria-label="Task guidance panel">
-                        <GuidancePanel
-                            currentTask={currentProject ? currentTask : null}
-                            currentTaskDefinition={currentProject ? currentTaskDefinition : null}
-                            onOpenDiagram={handleOpenDiagram}
-                            onToggleChecklistItem={handleToggleChecklistItem}
-                        />
+                        <div className="right-sidebar-shell">
+                            <div className="right-sidebar-profile">
+                                <div className="right-sidebar-profile-copy">
+                                    <p className="right-sidebar-profile-label">Account</p>
+                                    <p className="right-sidebar-profile-name">{authProfile?.name || 'Google account'}</p>
+                                    <p className="right-sidebar-profile-email">{authProfile?.email || 'Signed in with Google'}</p>
+                                </div>
+                                <div className="profile-menu-wrap" ref={profileMenuRef}>
+                                    <button
+                                        className="profile-avatar-button"
+                                        type="button"
+                                        aria-label="Open profile menu"
+                                        title="Profile menu"
+                                        onClick={() => setIsProfileMenuOpen((isOpen) => !isOpen)}
+                                    >
+                                        {authProfile?.picture ? (
+                                            <img src={authProfile.picture} alt="Profile avatar" />
+                                        ) : (
+                                            <span className="profile-avatar-fallback">{getProfileInitials(authProfile)}</span>
+                                        )}
+                                    </button>
+
+                                    {isProfileMenuOpen && (
+                                        <div className="profile-menu" role="menu" aria-label="Profile menu">
+                                            <button
+                                                className="profile-menu-item"
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={() => {
+                                                    setIsProfileMenuOpen(false);
+                                                    setIsGwsDashboardOpen(true);
+                                                    setWorkspaceTab('gws');
+                                                    setIsGwsHistoryOpen(true);
+                                                }}
+                                            >
+                                                GWS Dashboard
+                                            </button>
+                                            <button
+                                                className="profile-menu-item is-danger"
+                                                type="button"
+                                                role="menuitem"
+                                                onClick={() => {
+                                                    setIsProfileMenuOpen(false);
+                                                    handleSignOut();
+                                                }}
+                                            >
+                                                Logout
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <GuidancePanel
+                                currentTask={currentProject ? currentTask : null}
+                                currentTaskDefinition={currentProject ? currentTaskDefinition : null}
+                                onOpenDiagram={handleOpenDiagram}
+                                onToggleChecklistItem={handleToggleChecklistItem}
+                            />
+                        </div>
                     </aside>
 
                     <div className="gws-floating-wrap" ref={gwsMenuRef}>
@@ -7286,9 +10651,9 @@
                                             Resume Session
                                         </button>
                                     )}
-                                    {(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0) && (
+                                    {isGwsPaused && (
                                         <button className="gws-action-button is-secondary" type="button" onClick={handleStopGwsSession}>
-                                            Stop Session
+                                            End Session
                                         </button>
                                     )}
                                 </div>
@@ -7300,7 +10665,14 @@
                             type="button"
                             aria-label="Open G work session timer"
                             title="G work session timer"
-                            onClick={() => setIsGwsMenuOpen((isOpen) => !isOpen)}
+                            onClick={() => {
+                                if (isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0) {
+                                    setIsGwsMenuOpen((isOpen) => !isOpen);
+                                    return;
+                                }
+
+                                handleOpenGwsWizard();
+                            }}
                         >
                             {(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0)
                                 ? <span className="gws-fab-time">{formatCountdownTime(gwsRemainingSeconds)}</span>
@@ -7372,6 +10744,19 @@
                         onCancel={handleCancelDraftAssetsSetup}
                         onSubmit={handleSubmitDraftAssetsSetup}
                     />
+
+                    <GwsWizardModal
+                        isOpen={isGwsWizardOpen}
+                        step={gwsWizardStep}
+                        draft={gwsWizardDraft}
+                        wizardTaskKey={String(currentTask?.taskId || currentTaskDefinition?.taskId || 0)}
+                        onChangeDraft={handleChangeGwsWizardDraft}
+                        onBack={handleGwsWizardBack}
+                        onNext={handleGwsWizardNext}
+                        onCancel={handleCancelGwsWizard}
+                        onStart={handleStartGwsSession}
+                    />
+
                 </main>
             );
         }

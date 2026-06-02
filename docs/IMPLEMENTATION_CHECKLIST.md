@@ -97,3 +97,36 @@
 - [x] Multiple tabs sync state.
 - [x] Token expiry prompts re-auth.
 - [x] Corrupted localStorage does not crash app.
+
+## GWS Dashboard Analytics
+
+- [x] Planned tasks at session start are displayed.
+- [x] Actually achieved tasks are displayed.
+- [x] Planned vs actual matches and gaps are visually marked.
+- [x] Total time metric is displayed.
+- [x] Session count metric is displayed.
+- [x] Pause count metric is displayed.
+- [x] Project breakdown metric is displayed.
+- [x] Cadence trend metric is displayed.
+- [x] Dashboard CSV export includes planned and achieved task fields.
+
+## GWS Validation Runbook
+
+- [x] Code paths for start, pause, resume, and finish were validated in source.
+- [x] Active session resume persistence path remains intact.
+- [x] Start sound is configured for single playback (`loop = false`).
+- [ ] Full manual browser QA pass completed for start/pause/close/reopen/finish/reflection/dashboard click-through.
+
+## Sprint 12 — GWS Visualization Suite (Planned)
+
+- [ ] Dashboard view switcher is implemented (`Overview`, `Workload`, `Cadence`).
+- [ ] Shared date-range filters (`7d`, `30d`, `90d`, `all`) drive all graph views.
+- [ ] Overview trend graph and KPI cards are implemented.
+- [ ] Workload distribution graph by task is implemented.
+- [ ] Planned-vs-actual workload comparison graph is implemented.
+- [ ] Cadence comparison graph (last 7 days vs previous 7 days) is implemented.
+- [ ] Cadence warning signals are implemented (overrun, interruption density, irregular rhythm).
+- [ ] Session deletion with confirmation is implemented in dashboard history.
+- [ ] Graph and KPI datasets remain consistent after deletion and filter changes.
+- [ ] CSV export stays aligned with active filters.
+- [ ] Manual QA completed for empty, mixed, and high-volume session history states.

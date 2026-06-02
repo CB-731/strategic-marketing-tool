@@ -1,6 +1,6 @@
 # Current Status — Strategic Marketing Bootcamp
 
-Date: 2026-05-06
+Date: 2026-05-31
 
 ## Completed
 
@@ -118,11 +118,20 @@ Date: 2026-05-06
 - CR-016 completed after the sprint plan.
 - Stage 2 setup popup now uses a single add/edit input with Enter-key support and a compact arrow action button.
 - Stage 2 element rows now show icon-only edit and delete actions, and edit reuses the same top input for updates.
+- CR-017 completed after the sprint plan.
+- GWS session normalization now persists `pauseCount` and `achievedTasks`.
+- Session finalization now computes achieved outcomes from checklist progress made during each session.
+- GWS dashboard session details now show planned vs actual task comparison with match/gap visuals.
+- Dashboard metrics now include total time, session count, pause count, project breakdown, and cadence trend.
+- Dashboard CSV export now includes pause count plus planned/achieved task columns.
+- Sprint 12 planning created.
+- Sprint 12 now defines graph-view rollout (Overview, Workload, Cadence), cadence risk signals, and session deletion scope.
+- CR-018 added as the active planned change request for dashboard graph views and visualization tooling.
 
 ## Not Started
 
-- No planned implementation sprint remains.
-- No pending planned change request remains.
+- Sprint 12 implementation has not started yet.
+- CR-018 is pending implementation.
 
 ## Latest Test Result
 
@@ -157,6 +166,8 @@ Date: 2026-05-06
 - CR-014 validation confirms `public/index.html` has no editor diagnostics, the app preview returns HTTP 200, silent refresh helper markers are present, and Drive action refresh markers are present for create, rename, and delete.
 - CR-015 validation confirms `public/index.html` has no editor diagnostics, the app preview returns HTTP 200 from `public/`, Stage 2 modal/reconfigure markers are present, Docs tab create/update/delete helper markers are present, and generated Stage 2 task-tab mapping markers are present.
 - CR-016 validation confirms `public/index.html` has no editor diagnostics, localhost static serving returns HTTP 200, and Stage 2 popup markers for input builder, Enter-key add/save, and icon edit/delete actions are present.
+- CR-017 validation confirms `public/index.html` has no editor diagnostics, dashboard planned-vs-actual comparison markers are present, pause-count persistence markers are present, and cadence/project-breakdown metric markers are present.
+- CR-017 manual runbook coverage for start, pause, close, reopen, finish, reflection, dashboard click-through, resume correctness, and single start-sound playback remains a dedicated manual QA pass.
 - `npm run build` still fails because legacy `src` files contain JSX in `.ts` files.
 - `npm start` still fails because the old generated `dist/main.js` path is unrelated legacy scaffold code.
 - Dependency audit reports 8 high severity vulnerabilities from old server-side dependencies.
@@ -171,6 +182,6 @@ Detailed Sprint 11 findings are recorded in `docs/MANUAL_TEST_REPORT.md`.
 
 ## Immediate Next Step
 
-All planned sprints and planned change requests are complete. Use `docs/CHANGE_REQUESTS.md` for future small edits.
+Launch Sprint 12 by implementing CR-018 in `public/index.html`: add dashboard graph views, shared analytics filters, cadence warning signals, and session deletion with confirmation.
 
 Use `docs/NEXT_PROMPT.md`.

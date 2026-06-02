@@ -112,7 +112,7 @@ Validation:
 
 Recommended launch order:
 
-- No pending planned change requests.
+- CR-018 — GWS graph views, visualization toolkit, and session deletion.
 
 ## CR-004 — Persistent sign-in hardening
 
@@ -748,3 +748,119 @@ Validation:
 - `public/index.html` has no editor diagnostics.
 - Local app server returns HTTP 200 at `http://localhost:4173`.
 - Served source includes Stage 2 popup builder, Enter key handler, and edit/delete icon markers.
+
+## CR-017 — GWS planned-vs-actual dashboard and analytics
+
+Status: Complete
+Priority: High
+Date: 2026-05-31
+
+Problem:
+- GWS history showed raw sessions but did not compare the plan at session start with actual outcomes.
+- Dashboard lacked aggregate insight metrics such as total time, pause behavior, cadence trend, and project task breakdown.
+
+Goal:
+- Show planned vs actual task comparison for each session with visible matches and gaps.
+- Add summary metrics to the dashboard for performance tracking.
+- Record implementation and validation progress in project docs.
+
+Scope:
+- Persist `pauseCount` and achieved-task outcomes in each GWS session.
+- On session close, compute achieved checklist outcomes from checklist delta (start snapshot vs final state).
+- In dashboard details, render two columns:
+	- Planned tasks at start
+	- Actually achieved tasks
+- Mark matches and gaps visually.
+- Add dashboard summary metrics:
+	- Total time
+	- Session count
+	- Pause count
+	- Project breakdown by task
+	- Cadence trend (last 7 days vs previous 7 days)
+- Extend CSV export fields for pause count and planned/achieved task columns.
+
+Scope completed:
+- Added session-level `pauseCount` and `achievedTasks` normalization/persistence.
+- Updated pause flow to increment `pauseCount` per pause action.
+- Updated session finalization to compute achieved tasks from checklist progress made during the session.
+- Added planned-vs-actual comparison UI with visual indicators:
+	- `✓` match
+	- `✕` planned but not achieved gap
+	- `+` achieved but not planned
+- Added dashboard metrics cards for total time, session count, pause count, project breakdown, and cadence trend.
+- Updated dashboard CSV export to include pause count and planned/achieved task fields.
+- Updated `docs/CURRENT_STATUS.md`, `docs/TASK_LOG.md`, and `docs/IMPLEMENTATION_CHECKLIST.md`.
+
+Do not change:
+- Do not alter task unlocking behavior.
+- Do not alter Google Docs tab sync behavior.
+
+Acceptance criteria:
+- Expanded session details show planned tasks and actually achieved tasks side by side.
+- Match and gap states are visually distinct.
+- Dashboard exposes total time, session count, pause count, project breakdown, and cadence trend.
+- Session close captures achieved outcomes from checklist progress during that session.
+- CSV export includes planned/achieved task values and pause count.
+
+Validation:
+- `public/index.html` has no editor diagnostics.
+- Start/pause/resume/end handler paths persist `pauseCount` and active-session updates.
+- Session close path computes checklist delta into `achievedTasks` and finalized `completedChecklistItems`.
+- Dashboard comparison and summary metric markers are present in `public/index.html`.
+- Note: Full browser manual validation flow (start, pause, close, reopen, finish, reflection, and click-through) remains a manual QA run.
+
+## CR-018 — GWS graph views, visualization toolkit, and session deletion
+
+Status: Pending
+Priority: High
+Date: 2026-05-31
+
+Problem:
+- The dashboard currently provides metrics but limited graph-first insight for workload and cadence quality.
+- Users need stronger visualization to spot progress trends, workload imbalance, and cadence mistakes quickly.
+- Users also need the ability to delete unwanted session records.
+
+Goal:
+- Add dedicated graph views for overview, workload, and cadence analysis.
+- Add visual mistake indicators for work rhythm and planning consistency.
+- Add safe session deletion from dashboard history.
+
+Scope:
+- Add dashboard view switcher:
+	- Overview
+	- Workload
+	- Cadence
+- Add graph components (SVG/CSS-based) for:
+	- Time trend
+	- Workload distribution by task
+	- Planned-vs-actual patterns
+	- Cadence comparison (last 7 days vs previous 7 days)
+- Add date-range filters (`7d`, `30d`, `90d`, `all`) used by all views.
+- Add cadence warning signals:
+	- Overrun tendency
+	- Interruption density
+	- Irregular weekly rhythm
+- Add delete-session action with confirmation.
+- Keep dashboard analytics-only (no session control actions).
+- Keep CSV export aligned to active filters.
+
+Do not change:
+- Do not change task unlocking behavior.
+- Do not change Google Docs tab routing behavior.
+- Do not move session start/pause/resume/end controls into dashboard.
+
+Acceptance criteria:
+- Dashboard exposes three analytics views: Overview, Workload, and Cadence.
+- Each view includes at least one graph and one concise interpretation block.
+- Date-range and task/status filters update all graphs and KPI cards consistently.
+- Cadence risks and workload imbalance are visibly flagged.
+- Session deletion is available in dashboard history with confirmation.
+- Metrics and graphs remain consistent after session deletion.
+- CSV export reflects currently filtered data.
+
+Validation plan:
+- `public/index.html` has no editor diagnostics.
+- Graph rendering works for empty state, mixed-state, and high-volume session history.
+- Deleting a session updates lists, KPI cards, and charts without stale data.
+- Dashboard remains analytics-only and timer controls remain in timer UI.
+- Manual QA run covers filter combinations and cadence warning correctness.

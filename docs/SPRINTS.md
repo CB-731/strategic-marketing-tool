@@ -579,3 +579,127 @@ Sprint 11 notes:
 Definition of done:
 
 - All manual tests pass or have documented bugs in `docs/BUGS.md`.
+
+---
+
+## Sprint 12 — GWS Visualization and Session Management
+
+Status: Planned
+
+Goal: Evolve the dashboard into a tracking and visualization workspace with graph views, cadence-risk insights, and session deletion controls.
+
+Tasks:
+
+### Task 12.1 — Session deletion controls
+
+Objective: Allow users to delete historical sessions safely from the dashboard.
+
+Files touched:
+- `public/index.html`
+
+Implementation steps:
+1. Add delete action on each dashboard history row.
+2. Require explicit confirmation before deletion.
+3. Delete selected session from project GWS history.
+4. If deleting active session is allowed, clear active timer/runtime state safely.
+5. Keep summary cards and charts in sync after deletion.
+
+Acceptance criteria:
+- User can delete a selected session from dashboard history.
+- Dashboard metrics refresh immediately after deletion.
+- No timer corruption occurs after deleting session data.
+
+### Task 12.2 — Visualization data model
+
+Objective: Build reusable dashboard analytics datasets from GWS sessions.
+
+Files touched:
+- `public/index.html`
+
+Implementation steps:
+1. Add memoized session aggregations for totals, rates, trends, and distributions.
+2. Add date-range filters (`7d`, `30d`, `90d`, `all`).
+3. Add derived workload and cadence indicators.
+4. Add anomaly flags for cadence mistakes (overrun, interruption, irregular rhythm).
+
+Acceptance criteria:
+- Overview, workload, and cadence datasets are computed from the same source of truth.
+- Filters update all metrics and views consistently.
+
+### Task 12.3 — Overview graph view
+
+Objective: Add high-level performance visualization for quick review.
+
+Files touched:
+- `public/index.html`
+
+Implementation steps:
+1. Add a view switcher with `Overview`, `Workload`, and `Cadence`.
+2. Add overview KPI cards (session count, completion rate, adherence, average focus).
+3. Add trend chart for sessions and focus minutes over time.
+4. Add concise anomaly summary for likely cadence mistakes.
+
+Acceptance criteria:
+- Overview tab shows at least one trend graph plus KPI cards.
+- User can quickly identify progress and completion rate.
+
+### Task 12.4 — Workload graph view
+
+Objective: Visualize time distribution and task imbalance.
+
+Files touched:
+- `public/index.html`
+
+Implementation steps:
+1. Add chart for focus-time distribution by task.
+2. Add planned-vs-actual comparison by task group.
+3. Add workload imbalance indicator for overloaded/underworked tasks.
+
+Acceptance criteria:
+- Workload view highlights where time concentration is too high or too low.
+- Planned-vs-actual differences are visually obvious.
+
+### Task 12.5 — Cadence graph view
+
+Objective: Surface consistency risks and work-rhythm mistakes.
+
+Files touched:
+- `public/index.html`
+
+Implementation steps:
+1. Add cadence chart comparing last 7 days vs previous 7 days.
+2. Add weekly activity matrix or day-level pattern chart.
+3. Add consistency score and risk label.
+4. Add explainable warning messages tied to measurable thresholds.
+
+Acceptance criteria:
+- Cadence view clearly shows rhythm changes and risk direction.
+- User can spot work-cadence mistakes without leaving the dashboard.
+
+### Task 12.6 — Validation, export alignment, and docs
+
+Objective: Ensure visualizations remain consistent, testable, and documented.
+
+Files touched:
+- `public/index.html`
+- `docs/CHANGE_REQUESTS.md`
+- `docs/CURRENT_STATUS.md`
+- `docs/TASK_LOG.md`
+- `docs/IMPLEMENTATION_CHECKLIST.md`
+
+Implementation steps:
+1. Ensure CSV export reflects active filters.
+2. Validate metric parity between cards and chart datasets.
+3. Run manual QA for empty, mixed, and high-volume session states.
+4. Update docs with completed scope and residual risks.
+
+Acceptance criteria:
+- Graphs and KPIs remain consistent under all filters.
+- Validation notes are added to project docs.
+
+Definition of done:
+
+- Dashboard supports overview, workload, and cadence graph views.
+- Session deletion is available with safe behavior.
+- Cadence mistake signals are visible and understandable.
+- Docs and checklist are updated with validation notes.
