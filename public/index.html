@@ -6691,7 +6691,6 @@
                 : (interruptionHeavyCount >= 3
                     ? 'Cadence risk: high interruption density'
                     : (lowOutputCount >= 3 ? 'Cadence risk: under-delivery pattern' : 'Cadence stable this range'));
-            const canStartSession = Boolean(currentTaskDefinition && onStartSession);
 
             const exportCsv = () => {
                 const csvRows = [
@@ -6800,16 +6799,6 @@
                             ))}
                         </div>
                         <div className="gws-dashboard-header-actions">
-                            {!isGwsRunning && !isGwsPaused && (
-                                <button
-                                    className="gws-action-button"
-                                    type="button"
-                                    disabled={!canStartSession}
-                                    onClick={() => onStartSession?.()}
-                                >
-                                    Start Session
-                                </button>
-                            )}
                             {isGwsRunning && (
                                 <button className="gws-action-button is-secondary" type="button" onClick={() => onPauseSession?.()}>
                                     Pause Session
