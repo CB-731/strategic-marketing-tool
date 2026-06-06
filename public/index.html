@@ -1551,6 +1551,10 @@
             background: var(--hover);
         }
 
+        .gws-sidebar-launcher {
+            margin: 0 0 14px;
+        }
+
         .mini-actions,
         .project-switcher,
         .task-pill-grid {
@@ -7728,7 +7732,7 @@
             );
         }
 
-        function GuidancePanel({ currentTask, currentTaskDefinition, onOpenDiagram, onToggleChecklistItem }) {
+        function GuidancePanel({ currentTask, currentTaskDefinition, onOpenDiagram, onToggleChecklistItem, onStartGwsSession }) {
             const [hasDiagramError, setHasDiagramError] = useState(false);
 
             useEffect(() => {
@@ -10604,81 +10608,21 @@
                                 </div>
                             </div>
 
+                            <div className="gws-sidebar-launcher">
+                                <button className="gws-action-button" type="button" onClick={handleOpenGwsWizard}>
+                                    Start GWS
+                                </button>
+                            </div>
+
                             <GuidancePanel
                                 currentTask={currentProject ? currentTask : null}
                                 currentTaskDefinition={currentProject ? currentTaskDefinition : null}
                                 onOpenDiagram={handleOpenDiagram}
                                 onToggleChecklistItem={handleToggleChecklistItem}
+                                onStartGwsSession={handleOpenGwsWizard}
                             />
                         </div>
                     </aside>
-
-                    <div className="gws-floating-wrap" ref={gwsMenuRef}>
-                        {isGwsMenuOpen && (
-                            <div className="gws-popup" role="dialog" aria-modal="false" aria-label="G work session timer">
-                                <p className="gws-popup-title">GWS Timer</p>
-                                <div className="gws-option-row" role="radiogroup" aria-label="Session duration">
-                                    <button
-                                        className={`gws-option-button${gwsMinutes === 60 ? ' is-active' : ''}`}
-                                        type="button"
-                                        role="radio"
-                                        aria-checked={gwsMinutes === 60}
-                                        onClick={() => setGwsMinutes(60)}
-                                    >
-                                        60 min
-                                    </button>
-                                    <button
-                                        className={`gws-option-button${gwsMinutes === 90 ? ' is-active' : ''}`}
-                                        type="button"
-                                        role="radio"
-                                        aria-checked={gwsMinutes === 90}
-                                        onClick={() => setGwsMinutes(90)}
-                                    >
-                                        90 min
-                                    </button>
-                                </div>
-                                <div className="gws-popup-actions">
-                                    <button className="gws-action-button" type="button" onClick={handleStartGwsSession}>
-                                        Start Session
-                                    </button>
-                                    {isGwsRunning && (
-                                        <button className="gws-action-button is-secondary" type="button" onClick={handlePauseGwsSession}>
-                                            Pause Session
-                                        </button>
-                                    )}
-                                    {isGwsPaused && (
-                                        <button className="gws-action-button is-secondary" type="button" onClick={handleResumeGwsSession}>
-                                            Resume Session
-                                        </button>
-                                    )}
-                                    {isGwsPaused && (
-                                        <button className="gws-action-button is-secondary" type="button" onClick={handleStopGwsSession}>
-                                            End Session
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        <button
-                            className={`gws-fab${(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0) ? ' is-running' : ''}${isGwsPaused ? ' is-paused' : ''}`}
-                            type="button"
-                            aria-label="Open G work session timer"
-                            title="G work session timer"
-                            onClick={() => {
-                                if (isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0) {
-                                    setIsGwsMenuOpen((isOpen) => !isOpen);
-                                    return;
-                                }
-
-                                handleOpenGwsWizard();
-                            }}
-                        >
-                            {(isGwsRunning || isGwsPaused || gwsRemainingSeconds > 0)
-                                ? <span className="gws-fab-time">{formatCountdownTime(gwsRemainingSeconds)}</span>
-                                : <span className="gws-fab-icon">⏱</span>}
-                        </button>
-                    </div>
 
                     {diagramLightboxTask && (
                         <DiagramLightbox
