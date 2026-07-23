@@ -6279,6 +6279,61 @@
             );
         }
 
+        function GwsCompletionReviewModal({
+            isOpen,
+            review,
+            onToggleTask,
+            onValidate,
+            onCancel
+        }) {
+            if (!isOpen || !review) {
+                return null;
+            }
+
+            const actualMinutes = Math.max(1, Math.round((Math.max(0, Number(review.actualSeconds) || 0)) / 60));
+
+            return (
+                <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gws-completion-review-title">
+                    <div className="onboarding-modal gws-history-modal">
+                        <h2 id="gws-completion-review-title">Session Review</h2>
+                        <p>Timer ended. Review completed work before validating this session.</p>
+
+                        <div className="delete-modal-warning">
+                            Task: <strong>{review.taskTitle || `Task ${review.taskId || ''}`}</strong>
+                            <br />
+                            Objective: {review.objective || 'No objective was set.'}
+                            <br />
+                            Duration captured: {actualMinutes} minutes
+                        </div>
+
+                        <label className="project-meta">Completed tasks</label>
+                        {Array.isArray(review.reviewItems) && review.reviewItems.length ? (
+                            <div className="gws-checklist" style={{ marginTop: '8px' }}>
+                                {review.reviewItems.map((item, index) => (
+                                    <label className={`gws-checklist-item${item.completed ? ' is-active' : ''}`} key={`${item.label}-${index}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={Boolean(item.completed)}
+                                            onChange={(event) => onToggleTask?.(index, event.target.checked)}
+                                        />
+                                        <span className="custom-checkbox" aria-hidden="true">{item.completed ? '✓' : ''}</span>
+                                        <span>{item.label}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        ) : (
+                            <p>No planned tasks were captured for this session. Validate to save without task-level results.</p>
+                        )}
+
+                        <div className="modal-actions">
+                            <button className="secondary-action" type="button" onClick={onCancel}>Cancel Session</button>
+                            <button className="primary-action" type="button" onClick={onValidate}>Validate Session</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         function GwsHistoryModal({ isOpen, sessions, activeSession, onClose }) {
             if (!isOpen) {
                 return null;
@@ -8273,6 +8328,7 @@
                 distractionsCleared: false,
                 timerMinutes: 60
             }));
+            const [gwsCompletionReview, setGwsCompletionReview] = useState(null);
             const [isGwsDashboardOpen, setIsGwsDashboardOpen] = useState(false);
             const [workspaceTab, setWorkspaceTab] = useState('docs');
             const [creationState, setCreationState] = useState({
@@ -8309,7 +8365,64 @@
                 error: '',
                 assetAssignments: {}
             });
-            const isGwsSessionActive = isGwsRunning || isGwsPaused;
+            const isGwsSessionActive = (isGwsRunning || isGwsPaused) && gwsRemainingSeconds > 0;
+
+            function buildGwsChecklistOutcomes(activeSession, project, achievedTasksOverride) {
+                const latestTask = getProjectTask(project, activeSession.taskId);
+                const latestTaskDefinition = getTaskDefinition(activeSession.taskId, project);
+                const checklistItems = Array.isArray(latestTaskDefinition?.checklist) ? latestTaskDefinition.checklist : [];
+                const latestChecklistState = Array.isArray(latestTask?.checklist) ? latestTask.checklist.map(Boolean) : [];
+                const checklistSnapshot = Array.isArray(activeSession.checklistSnapshot)
+                    ? activeSession.checklistSnapshot.map(Boolean)
+                    : [];
+                const achievedChecklistItems = checklistItems
+                    .filter((item, index) => !Boolean(checklistSnapshot[index]) && Boolean(latestChecklistState[index]))
+                    .map((item) => String(item || '').trim())
+                    .filter(Boolean);
+                const completedChecklistItems = checklistItems
+                    .filter((item, index) => Boolean(latestChecklistState[index]))
+                    .map((item) => String(item || '').trim())
+                    .filter(Boolean);
+                const normalizedOverride = Array.isArray(achievedTasksOverride)
+                    ? achievedTasksOverride.map((item) => String(item || '').trim()).filter(Boolean)
+                    : null;
+
+                return {
+                    achievedTasks: normalizedOverride || achievedChecklistItems,
+                    completedChecklistItems
+                };
+            }
+
+            function buildGwsCompletionReview(activeSession, project) {
+                if (!activeSession || !project) {
+                    return null;
+                }
+
+                const outcomes = buildGwsChecklistOutcomes(activeSession, project);
+                const normalizeTaskKey = (taskName) => String(taskName || '').trim().toLowerCase();
+                const achievedTaskKeys = new Set((outcomes.achievedTasks || []).map((taskName) => normalizeTaskKey(taskName)).filter(Boolean));
+                const plannedTaskLines = Array.isArray(activeSession.plannedTasks)
+                    ? activeSession.plannedTasks.map((item) => String(item || '').trim()).filter(Boolean)
+                    : [];
+                const fallbackTaskLines = plannedTaskLines.length
+                    ? plannedTaskLines
+                    : (outcomes.completedChecklistItems.length ? outcomes.completedChecklistItems : outcomes.achievedTasks);
+                const reviewItems = Array.from(new Set(fallbackTaskLines.map((item) => String(item || '').trim()).filter(Boolean)))
+                    .map((label) => ({
+                        label,
+                        completed: achievedTaskKeys.has(normalizeTaskKey(label))
+                    }));
+
+                return {
+                    sessionId: activeSession.sessionId,
+                    projectId: activeSession.projectId,
+                    taskId: activeSession.taskId,
+                    taskTitle: activeSession.taskTitle,
+                    objective: activeSession.objective,
+                    actualSeconds: Math.max(0, (60 * 60) - Math.max(0, Number(gwsRemainingSeconds) || 0)),
+                    reviewItems
+                };
+            }
 
             const createGwsWizardDraftForTask = (taskDefinition, task, timerMinutes = 60) => {
                 const taskChecklist = Array.isArray(taskDefinition?.checklist) ? taskDefinition.checklist : [];
@@ -8357,7 +8470,7 @@
                 });
             }
 
-            function closeGwsSession(status) {
+            function closeGwsSession(status, options = {}) {
                 const activeSession = gwsActiveSessionRef.current;
 
                 if (!activeSession?.projectId || !activeSession?.sessionId) {
@@ -8370,29 +8483,15 @@
                 const actualSeconds = Math.max(0, plannedSeconds - remainingSeconds);
 
                 updateProjectGws(activeSession.projectId, (currentGws, project) => {
-                    const latestTask = getProjectTask(project, activeSession.taskId);
-                    const latestTaskDefinition = getTaskDefinition(activeSession.taskId, project);
-                    const checklistItems = Array.isArray(latestTaskDefinition?.checklist) ? latestTaskDefinition.checklist : [];
-                    const latestChecklistState = Array.isArray(latestTask?.checklist) ? latestTask.checklist.map(Boolean) : [];
-                    const checklistSnapshot = Array.isArray(activeSession.checklistSnapshot)
-                        ? activeSession.checklistSnapshot.map(Boolean)
-                        : [];
-                    const achievedChecklistItems = checklistItems
-                        .filter((item, index) => !Boolean(checklistSnapshot[index]) && Boolean(latestChecklistState[index]))
-                        .map((item) => String(item || '').trim())
-                        .filter(Boolean);
-                    const completedChecklistItems = checklistItems
-                        .filter((item, index) => Boolean(latestChecklistState[index]))
-                        .map((item) => String(item || '').trim())
-                        .filter(Boolean);
+                    const outcomes = buildGwsChecklistOutcomes(activeSession, project, options.achievedTasksOverride);
 
                     const finalizedSession = normalizeGwsSession({
                         ...activeSession,
                         endAt: endedAt,
                         remainingSeconds,
                         actualSeconds,
-                        completedChecklistItems,
-                        achievedTasks: achievedChecklistItems,
+                        completedChecklistItems: outcomes.completedChecklistItems,
+                        achievedTasks: outcomes.achievedTasks,
                         status
                     });
 
@@ -8702,10 +8801,21 @@
 
                 setIsGwsRunning(false);
                 setIsGwsPaused(false);
-                closeGwsSession('completed');
-                setLockedTaskMessage('GWS complete. Great session.');
+                setGwsRemainingSeconds(0);
+
+                const activeSession = gwsActiveSessionRef.current;
+                const reviewDraft = buildGwsCompletionReview(activeSession, currentProject);
+
+                if (reviewDraft) {
+                    setGwsCompletionReview(reviewDraft);
+                    setLockedTaskMessage('GWS finished. Review and validate your session.');
+                } else {
+                    closeGwsSession('completed');
+                    setLockedTaskMessage('GWS complete. Great session.');
+                }
+
                 playGwsCompletionRingtone(gwsAudioContextRef).catch(() => {});
-            }, [isGwsRunning, gwsRemainingSeconds]);
+            }, [isGwsRunning, gwsRemainingSeconds, currentProject]);
 
             const currentProject = useMemo(() => getCurrentProject(appState), [appState]);
             const currentTask = useMemo(() => getCurrentTask(currentProject), [currentProject]);
@@ -8727,19 +8837,27 @@
                     return;
                 }
 
+                const syncedRemainingSeconds = Math.max(0, Number(activeSession.remainingSeconds) || 0);
+
                 gwsActiveSessionRef.current = activeSession;
                 setGwsMinutes(60);
-                setGwsRemainingSeconds(Math.max(0, Number(activeSession.remainingSeconds) || 0));
+                setGwsRemainingSeconds(syncedRemainingSeconds);
                 setIsGwsWizardOpen(false);
                 setIsGwsMenuOpen(false);
 
-                if (activeSession.status === 'paused') {
+                if (activeSession.status === 'paused' && syncedRemainingSeconds > 0) {
                     setIsGwsRunning(false);
                     setIsGwsPaused(true);
                     return;
                 }
 
-                setIsGwsRunning(true);
+                if (activeSession.status === 'running' && syncedRemainingSeconds > 0) {
+                    setIsGwsRunning(true);
+                    setIsGwsPaused(false);
+                    return;
+                }
+
+                setIsGwsRunning(false);
                 setIsGwsPaused(false);
             }, [
                 currentProject?.gws?.activeSession?.sessionId,
@@ -10361,6 +10479,7 @@
                 setIsGwsWizardOpen(false);
                 setIsGwsMenuOpen(false);
                 setIsGwsHistoryOpen(false);
+                setGwsCompletionReview(null);
                 gwsWizardTaskIdRef.current = null;
             };
 
@@ -10425,9 +10544,74 @@
             const handleStopGwsSession = () => {
                 setIsGwsRunning(false);
                 setIsGwsPaused(false);
+                setGwsCompletionReview(null);
                 closeGwsSession('stopped');
                 setGwsRemainingSeconds(0);
                 setIsGwsMenuOpen(false);
+            };
+
+            const handleToggleGwsCompletionTask = (index, completed) => {
+                const safeIndex = Number(index);
+
+                if (!Number.isInteger(safeIndex)) {
+                    return;
+                }
+
+                setGwsCompletionReview((previousReview) => {
+                    if (!previousReview || !Array.isArray(previousReview.reviewItems) || !previousReview.reviewItems[safeIndex]) {
+                        return previousReview;
+                    }
+
+                    const nextReviewItems = previousReview.reviewItems.map((item, itemIndex) => (
+                        itemIndex === safeIndex
+                            ? { ...item, completed: Boolean(completed) }
+                            : item
+                    ));
+
+                    return {
+                        ...previousReview,
+                        reviewItems: nextReviewItems
+                    };
+                });
+            };
+
+            const handleValidateGwsCompletionReview = () => {
+                const completionReview = gwsCompletionReview;
+
+                if (!completionReview) {
+                    return;
+                }
+
+                const achievedTasksOverride = Array.isArray(completionReview.reviewItems)
+                    ? completionReview.reviewItems
+                        .filter((item) => Boolean(item?.completed))
+                        .map((item) => String(item?.label || '').trim())
+                        .filter(Boolean)
+                    : [];
+
+                closeGwsSession('completed', { achievedTasksOverride });
+                setGwsCompletionReview(null);
+                setLockedTaskMessage('GWS review validated and saved. Great session.');
+                setIsGwsMenuOpen(false);
+            };
+
+            const handleCancelGwsCompletionReview = () => {
+                const completionReview = gwsCompletionReview;
+
+                if (completionReview?.projectId) {
+                    updateProjectGws(completionReview.projectId, (currentGws) => ({
+                        ...currentGws,
+                        activeSession: null
+                    }));
+                }
+
+                gwsActiveSessionRef.current = null;
+                setIsGwsRunning(false);
+                setIsGwsPaused(false);
+                setGwsCompletionReview(null);
+                setGwsRemainingSeconds(0);
+                setIsGwsMenuOpen(false);
+                setLockedTaskMessage('GWS session canceled after review.');
             };
 
             const handleRestartGwsSession = () => {
@@ -10668,7 +10852,7 @@
                             <div className="gws-sidebar-launcher">
                                 {!isGwsSessionActive ? (
                                     <button className="gws-action-button" type="button" onClick={handleOpenGwsWizard}>
-                                        Start GWS
+                                        {currentProject?.gws?.sessions?.length ? 'Start New Session' : 'Start GWS'}
                                     </button>
                                 ) : (
                                     <>
@@ -10793,6 +10977,14 @@
                         onNext={handleGwsWizardNext}
                         onCancel={handleCancelGwsWizard}
                         onStart={handleStartGwsSession}
+                    />
+
+                    <GwsCompletionReviewModal
+                        isOpen={Boolean(gwsCompletionReview)}
+                        review={gwsCompletionReview}
+                        onToggleTask={handleToggleGwsCompletionTask}
+                        onValidate={handleValidateGwsCompletionReview}
+                        onCancel={handleCancelGwsCompletionReview}
                     />
 
                 </main>

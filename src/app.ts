@@ -1,6 +1,8 @@
 import express from 'express';
 import { json } from 'body-parser';
 import { createServer } from 'http';
+import type { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import { Server } from 'socket.io';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
@@ -24,9 +26,10 @@ const auth = getAuth();
 const db = getFirestore();
 
 app.use(json());
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/../public/index.html');
+    res.sendFile(path.resolve(process.cwd(), 'public', 'index.html'));
 });
 
 // Socket.io connection
@@ -40,12 +43,13 @@ io.on('connection', (socket) => {
 
 // Google OAuth 2.0 authentication
 app.get('/auth/google', (req, res) => {
-    const provider = new GoogleAuthProvider();
-    auth.signInWithRedirect(provider);
+    res.status(501).json({
+        message: 'Google auth redirect is not implemented on the server route yet.'
+    });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
