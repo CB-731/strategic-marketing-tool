@@ -1,6 +1,6 @@
 # Next Prompt
 
-Sprint 12 and CR-018 are now planned and ready for implementation. Use this prompt to execute only the launched change request:
+CR-019 (collapsible left sidebar with hover overlay) is the next launched change request. Sprint 12 and CR-018 remain planned afterward. Use this prompt to execute only the launched change request:
 
 ```text
 Read AI_PROJECT_CONTEXT.md and these docs: docs/SPRINTS.md, docs/TASK_LOG.md, docs/DECISIONS.md, docs/BUGS.md, docs/TASK_CONTENT_MATRIX.md, docs/IMPLEMENTATION_CHECKLIST.md, docs/CHANGE_REQUESTS.md.
@@ -20,7 +20,8 @@ Context:
 - CR-012 kept legacy 12-doc projects working through per-task `docId` fallback and clearer recovery copy.
 - CR-013 cleaned up old 12-template creation constants/helpers while keeping legacy per-task `docId` viewing support.
 - CR-014 added silent Google token refresh before Drive create, rename, and delete operations.
-- CR-018 is pending and should be treated as the active launched scope when requested.
+- CR-019 and CR-020 (collapsible left and right sidebars) are implemented; manual browser QA is pending.
+- CR-018 is pending and is deferred until CR-019 is complete.
 - Sprint 11 findings are recorded in docs/MANUAL_TEST_REPORT.md.
 - Known legacy scaffold issues remain documented in docs/BUGS.md and are outside the active browser-only app target unless explicitly selected for cleanup.
 

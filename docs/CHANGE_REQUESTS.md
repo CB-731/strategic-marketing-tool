@@ -112,6 +112,8 @@ Validation:
 
 Recommended launch order:
 
+- CR-020 — Collapsible right sidebar (click only).
+- CR-019 — Collapsible left sidebar.
 - CR-018 — GWS graph views, visualization toolkit, and session deletion.
 
 ## CR-004 — Persistent sign-in hardening
@@ -864,3 +866,95 @@ Validation plan:
 - Deleting a session updates lists, KPI cards, and charts without stale data.
 - Dashboard remains analytics-only and timer controls remain in timer UI.
 - Manual QA run covers filter combinations and cadence warning correctness.
+
+## CR-019 — Collapsible left sidebar
+
+Status: Complete (implemented in `public/index.html`; manual browser QA pending)
+Priority: High
+Date: 2026-10-07
+
+Problem:
+- The left sidebar has a fixed 260px width, which leaves less room for the center Google Docs iframe.
+
+Goal:
+- Let users collapse the left sidebar into a narrow rail so the center panel gets the freed space.
+- Keep task status visible in the rail.
+
+Scope:
+- Add a toggle button at the far right of the sidebar header (`.brand-header`), next to the settings gear (`.stage2-gear-button`).
+- Arrow direction follows the click action: `‹` when expanded (click collapses), `›` when collapsed (click expands). Rotate with a short transition.
+- Collapsed layout:
+	- Rail width about 64px; expanded width stays 260px.
+	- Toggle button sits at the top of the rail with the gear stacked directly under it.
+	- Hide brand title, project names, phase headings, task titles, and the auth footer text.
+	- Show only the tasks of the current project as `N` (task number) plus a status marker: empty checkbox (unlocked), checked checkbox (complete), lock icon (locked, dimmed, not clickable). Highlight the active task.
+	- Unlocked rail items stay clickable and select that task; show the full task title as a tooltip (`title`) on hover and focus.
+- Click only (updated 2026-10-07): hover expansion, overlay, and pin-on-click were removed after testing. The toggle is the only way to expand or collapse.
+- State model:
+	- `isSidebarCollapsed` (persisted).
+	- Persist `isSidebarCollapsed` in `localStorage` (separate key, not inside `smb_state`).
+	- While collapsed, the gear menu opens to the right of the rail over the center panel.
+- Layout:
+	- Drive `.app-shell` `grid-template-columns` from a CSS variable (for example `--left-sidebar-width`), with a roughly 200ms transition.
+	- Center panel takes the freed width when pinned collapsed.
+- Accessibility: toggle has `aria-label` ("Collapse sidebar" / "Expand sidebar"), `aria-expanded`, and is keyboard operable.
+
+Assumptions to confirm during review:
+- Collapsed rail shows task numbers for the current project only, not for other projects.
+- Clicking the toggle changes the collapsed state and the center panel resizes.
+
+Do not change:
+- Do not change task unlocking behavior, project accordion behavior when expanded, or Google Docs tab routing.
+- Do not change the right sidebar.
+- Do not change the gear menu contents.
+
+Acceptance criteria:
+- Toggle button is at the far right of the sidebar header next to the gear when expanded, and stacked above the gear when collapsed.
+- Arrow shows `‹` when expanded and `›` when collapsed.
+- Collapsed rail shows only task numbers with checkbox, checked, or lock markers; titles appear as tooltips.
+- Collapse widens the center panel and iframe; expand restores 260px.
+- Collapsed state persists across reloads.
+- Locked tasks remain non-clickable in both states.
+
+Validation plan:
+- `public/index.html` has no editor diagnostics.
+- Manual check: toggle, gear menu while collapsed, persistence after reload, locked/complete/active markers, iframe width change.
+- Narrow viewport check for the existing responsive rules.
+
+## CR-020 — Collapsible right sidebar (click only)
+
+Status: Complete (implemented in `public/index.html`; manual browser QA pending)
+Priority: High
+Date: 2026-10-07
+
+Problem:
+- The fixed 320px right sidebar takes space from the center Google Docs iframe.
+
+Goal:
+- Let users collapse the right sidebar into a narrow rail that keeps the profile and GWS timer controls visible.
+
+Scope:
+- Toggle button at the top of the right sidebar, on the inner edge (next to the center panel). Arrow is `›` when expanded and `‹` when collapsed.
+- Click only: no hover expansion, no overlay, no pin-on-click.
+- Collapsed rail (about 64px) shows only:
+  - Profile avatar (the Account menu still opens from it and may overflow left over the center panel).
+  - No active session: a compact `▶` start button.
+  - Active session: pause/resume, cancel, restart stacked vertically, with the countdown time below.
+- Expanded state shows the full sidebar unchanged (profile card, GWS launcher, guidance panel).
+- The guidance panel is not rendered while collapsed.
+- Grid column driven by `--right-sidebar-width`; the center panel takes the freed width.
+- Persist the collapsed state in `localStorage` key `smb_right_sidebar_collapsed`.
+- Toggle has `aria-label` and `aria-expanded`.
+
+Do not change:
+- GWS session logic, task unlocking, Docs tab routing, or the left sidebar.
+
+Acceptance criteria:
+- Toggle collapses and expands the right sidebar with a width transition.
+- Collapsed rail shows the avatar and either `▶` or the stacked controls plus time.
+- The center panel widens when collapsed.
+- State persists across reloads.
+
+Validation plan:
+- `public/index.html` has no editor diagnostics.
+- Manual check: toggle, start/pause/resume/cancel/restart while collapsed, profile menu while collapsed, reload persistence.

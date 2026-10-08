@@ -459,12 +459,33 @@
         }
 
         .app-shell {
+            --left-sidebar-expanded-width: 260px;
+            --left-sidebar-collapsed-width: 64px;
+            --left-sidebar-width: var(--left-sidebar-expanded-width);
+            --right-sidebar-expanded-width: 320px;
+            --right-sidebar-collapsed-width: 64px;
+            --right-sidebar-width: var(--right-sidebar-expanded-width);
             display: grid;
-            grid-template-columns: 260px minmax(0, 1fr) 320px;
+            grid-template-columns: var(--left-sidebar-width) minmax(0, 1fr) var(--right-sidebar-width);
             position: relative;
             width: 100%;
             height: 100vh;
             background: var(--bg);
+            transition: grid-template-columns 200ms ease;
+        }
+
+        .app-shell.is-sidebar-collapsed {
+            --left-sidebar-width: var(--left-sidebar-collapsed-width);
+        }
+
+        .app-shell.is-right-sidebar-collapsed {
+            --right-sidebar-width: var(--right-sidebar-collapsed-width);
+        }
+
+        .left-sidebar-slot {
+            position: relative;
+            z-index: 30;
+            min-height: 0;
         }
 
         .app-shell * {
@@ -497,6 +518,11 @@
         }
 
         .left-sidebar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: var(--left-sidebar-expanded-width);
             display: grid;
             grid-template-rows: auto minmax(0, 1fr) auto;
             gap: 16px;
@@ -504,6 +530,18 @@
             background: var(--left-sidebar);
             border-right: 1px solid var(--border);
             overflow: hidden;
+            transition: width 200ms ease, padding 200ms ease, box-shadow 200ms ease;
+        }
+
+        .left-sidebar.is-rail {
+            width: var(--left-sidebar-collapsed-width);
+            padding: 24px 8px;
+            overflow: visible;
+        }
+
+        .left-sidebar.is-rail .stage2-gear-menu {
+            right: auto;
+            left: 0;
         }
 
         .brand-block {
@@ -513,9 +551,98 @@
 
         .brand-header {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-columns: minmax(0, 1fr) auto auto;
             gap: 10px;
             align-items: start;
+        }
+
+        .left-sidebar.is-rail .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .left-sidebar.is-rail .brand-label {
+            display: none;
+        }
+
+        .left-sidebar.is-rail .sidebar-toggle-button {
+            order: -1;
+        }
+
+        .sidebar-toggle-button {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .sidebar-toggle-button:hover,
+        .sidebar-toggle-button:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.4);
+            outline: none;
+        }
+
+        .sidebar-toggle-arrow {
+            display: inline-block;
+            transition: transform 200ms ease;
+        }
+
+        .sidebar-toggle-arrow.is-pinned-open {
+            transform: rotate(180deg);
+        }
+
+        .task-rail {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: stretch;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+
+        .task-rail-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 4px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.025);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .task-rail-button:hover,
+        .task-rail-button:focus-visible {
+            background: var(--hover);
+            border-color: rgba(212, 168, 67, 0.24);
+            outline: none;
+        }
+
+        .task-rail-button.is-active {
+            border-color: rgba(212, 168, 67, 0.5);
+            background: rgba(212, 168, 67, 0.12);
+        }
+
+        .task-rail-button.is-locked {
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.56;
         }
 
         .brand-label {
@@ -910,8 +1037,8 @@
         .auth-refresh-banner {
             position: absolute;
             top: 16px;
-            left: 284px;
-            right: 344px;
+            left: calc(var(--left-sidebar-width) + 24px);
+            right: calc(var(--right-sidebar-width) + 24px);
             z-index: 20;
             display: flex;
             align-items: center;
@@ -1896,6 +2023,56 @@
             padding: 24px 20px;
             background: var(--right-sidebar);
             border-left: 1px solid var(--border);
+        }
+
+        .right-sidebar-toggle-row {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .right-sidebar.is-rail {
+            padding: 24px 8px;
+            overflow: visible;
+        }
+
+        .right-sidebar.is-rail .right-sidebar-toggle-row {
+            justify-content: center;
+        }
+
+        .right-sidebar-toggle-arrow.is-collapsed {
+            transform: rotate(180deg);
+        }
+
+        .right-sidebar.is-rail .right-sidebar-shell {
+            justify-items: center;
+        }
+
+        .right-sidebar.is-rail .right-sidebar-profile {
+            grid-template-columns: minmax(0, 1fr);
+            padding: 0;
+            border: 0;
+            background: none;
+            box-shadow: none;
+        }
+
+        .right-sidebar.is-rail .right-sidebar-profile-copy {
+            display: none;
+        }
+
+        .right-sidebar.is-rail .gws-sidebar-launcher {
+            margin: 0;
+            justify-items: center;
+        }
+
+        .right-sidebar.is-rail .gws-launcher-controls {
+            flex-direction: column;
+            padding: 6px;
+            border-radius: 16px;
+        }
+
+        .right-sidebar.is-rail .gws-launcher-timer {
+            padding: 0;
+            font-size: 11px;
         }
 
         .right-sidebar-shell {
@@ -3037,13 +3214,17 @@
 
         @media (max-width: 1100px) {
             .app-shell {
-                grid-template-columns: 240px minmax(0, 1fr) 300px;
+                --left-sidebar-expanded-width: 240px;
+                --right-sidebar-expanded-width: 300px;
+                grid-template-columns: var(--left-sidebar-width) minmax(0, 1fr) var(--right-sidebar-width);
             }
         }
 
         @media (max-width: 900px) {
             .app-shell {
-                grid-template-columns: 220px minmax(0, 1fr) 280px;
+                --left-sidebar-expanded-width: 220px;
+                --right-sidebar-expanded-width: 280px;
+                grid-template-columns: var(--left-sidebar-width) minmax(0, 1fr) var(--right-sidebar-width);
 
             .gws-dashboard-summary-grid,
             .gws-comparison-grid {
@@ -3058,7 +3239,9 @@
 
         @media (max-width: 760px) {
             .app-shell {
-                grid-template-columns: 210px minmax(360px, 1fr) 260px;
+                --left-sidebar-expanded-width: 210px;
+                --right-sidebar-expanded-width: 260px;
+                grid-template-columns: var(--left-sidebar-width) minmax(360px, 1fr) var(--right-sidebar-width);
             }
 
             .left-sidebar,
@@ -3084,6 +3267,8 @@
         const { useEffect, useMemo, useRef, useState } = React;
 
         const STATE_STORAGE_KEY = 'smb_state';
+        const LEFT_SIDEBAR_COLLAPSED_KEY = 'smb_left_sidebar_collapsed';
+        const RIGHT_SIDEBAR_COLLAPSED_KEY = 'smb_right_sidebar_collapsed';
         const AUTH_STORAGE_KEY = 'smb_auth_token';
         const GOOGLE_OAUTH_CLIENT_ID = '203979048578-9onoru8b2ep1nn0ngi488eibc20auoln.apps.googleusercontent.com';
         const GOOGLE_OAUTH_SCOPES = [
@@ -7349,6 +7534,47 @@
             );
         }
 
+        function CollapsedTaskRail({ project, onSelectTask, onLockedTaskClick }) {
+            if (!project) {
+                return null;
+            }
+
+            return (
+                <nav className="task-rail" aria-label="Tasks">
+                    {getProjectTaskDefinitions(project).map((taskDefinition) => {
+                        const projectTask = getProjectTask(project, taskDefinition.taskId);
+                        const isUnlocked = isTaskUnlocked(project, taskDefinition.taskId);
+                        const isActive = project.lastOpenedTask === taskDefinition.taskId;
+                        const statusIcon = !isUnlocked ? '🔒' : (isTaskComplete(projectTask) ? '✅' : '🔲');
+                        const taskNumber = taskDefinition.displayTaskNumber || taskDefinition.taskId;
+
+                        return (
+                            <button
+                                className={`task-rail-button ${isActive ? 'is-active' : ''} ${isUnlocked ? '' : 'is-locked'}`}
+                                type="button"
+                                key={`rail-task-${taskDefinition.taskId}`}
+                                aria-current={isActive ? 'page' : undefined}
+                                aria-disabled={!isUnlocked}
+                                aria-label={`Task ${taskNumber}: ${taskDefinition.shortTitle}`}
+                                title={isUnlocked ? taskDefinition.fullDocTitle : 'Complete previous tasks to unlock this task.'}
+                                onClick={() => {
+                                    if (!isUnlocked) {
+                                        onLockedTaskClick(taskDefinition.taskId);
+                                        return;
+                                    }
+
+                                    onSelectTask(project.id, taskDefinition.taskId);
+                                }}
+                            >
+                                <span>{taskNumber}</span>
+                                <span className="task-status-icon" aria-hidden="true">{statusIcon}</span>
+                            </button>
+                        );
+                    })}
+                </nav>
+            );
+        }
+
         function ProjectNavigation({
             projects,
             currentProjectId,
@@ -8310,6 +8536,41 @@
             const gwsActiveSessionRef = useRef(null);
             const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
             const [isStage2MenuOpen, setIsStage2MenuOpen] = useState(false);
+            const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+                try {
+                    return window.localStorage.getItem(LEFT_SIDEBAR_COLLAPSED_KEY) === '1';
+                } catch (error) {
+                    return false;
+                }
+            });
+
+            useEffect(() => {
+                try {
+                    window.localStorage.setItem(LEFT_SIDEBAR_COLLAPSED_KEY, isSidebarCollapsed ? '1' : '0');
+                } catch (error) {
+                    // Storage can be unavailable; the toggle still works for this session.
+                }
+            }, [isSidebarCollapsed]);
+
+            const handleToggleSidebar = () => {
+                setIsSidebarCollapsed((previousValue) => !previousValue);
+            };
+
+            const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(() => {
+                try {
+                    return window.localStorage.getItem(RIGHT_SIDEBAR_COLLAPSED_KEY) === '1';
+                } catch (error) {
+                    return false;
+                }
+            });
+
+            useEffect(() => {
+                try {
+                    window.localStorage.setItem(RIGHT_SIDEBAR_COLLAPSED_KEY, isRightSidebarCollapsed ? '1' : '0');
+                } catch (error) {
+                    // Storage can be unavailable; the toggle still works for this session.
+                }
+            }, [isRightSidebarCollapsed]);
             const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
             const [isGwsMenuOpen, setIsGwsMenuOpen] = useState(false);
             const [isGwsHistoryOpen, setIsGwsHistoryOpen] = useState(false);
@@ -10668,7 +10929,7 @@
             }
 
             return (
-                <main className="app-shell">
+                <main className={`app-shell ${isSidebarCollapsed ? 'is-sidebar-collapsed' : ''} ${isRightSidebarCollapsed ? 'is-right-sidebar-collapsed' : ''}`}>
                     {authToken && authNotice && (
                         <div className="auth-refresh-banner" role="status">
                             <span>{authNotice}</span>
@@ -10678,7 +10939,11 @@
                         </div>
                     )}
 
-                    <aside className="left-sidebar" aria-label="Project navigation">
+                    <div className="left-sidebar-slot">
+                    <aside
+                        className={`left-sidebar ${isSidebarCollapsed ? 'is-rail' : ''}`}
+                        aria-label="Project navigation"
+                    >
                         <div className="brand-block">
                             <div className="brand-header">
                                 <h1 className="brand-label">Strategic Marketing Bootcamp</h1>
@@ -10751,9 +11016,20 @@
                                         </div>
                                     )}
                                 </div>
+                                <button
+                                    className="sidebar-toggle-button"
+                                    type="button"
+                                    aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                                    aria-expanded={!isSidebarCollapsed}
+                                    title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                                    onClick={handleToggleSidebar}
+                                >
+                                    <span className={`sidebar-toggle-arrow ${isSidebarCollapsed ? '' : 'is-pinned-open'}`} aria-hidden="true">›</span>
+                                </button>
                             </div>
                         </div>
 
+                        {!isSidebarCollapsed ? (
                         <section className="project-section project-navigation-section" aria-label="Projects">
                             <h2 className="section-heading">Projects</h2>
                             <ProjectNavigation
@@ -10768,8 +11044,16 @@
                                 onDeleteProject={handleDeleteProject}
                             />
                         </section>
+                        ) : (
+                            <CollapsedTaskRail
+                                project={currentProject}
+                                onSelectTask={handleSelectProjectTask}
+                                onLockedTaskClick={handleLockedTaskClick}
+                            />
+                        )}
 
                     </aside>
+                    </div>
 
                     <section className={`center-panel ${currentProject ? '' : 'is-empty'}`} aria-label="Main workspace">
                         <CenterWorkspace
@@ -10795,7 +11079,19 @@
                         />
                     </section>
 
-                    <aside className="right-sidebar" aria-label="Task guidance panel">
+                    <aside className={`right-sidebar ${isRightSidebarCollapsed ? 'is-rail' : ''}`} aria-label="Task guidance panel">
+                        <div className="right-sidebar-toggle-row">
+                            <button
+                                className="sidebar-toggle-button"
+                                type="button"
+                                aria-label={isRightSidebarCollapsed ? 'Expand right sidebar' : 'Collapse right sidebar'}
+                                aria-expanded={!isRightSidebarCollapsed}
+                                title={isRightSidebarCollapsed ? 'Expand right sidebar' : 'Collapse right sidebar'}
+                                onClick={() => setIsRightSidebarCollapsed((previousValue) => !previousValue)}
+                            >
+                                <span className={`sidebar-toggle-arrow right-sidebar-toggle-arrow ${isRightSidebarCollapsed ? 'is-collapsed' : ''}`} aria-hidden="true">›</span>
+                            </button>
+                        </div>
                         <div className="right-sidebar-shell">
                             <div className="right-sidebar-profile">
                                 <div className="right-sidebar-profile-copy">
@@ -10851,9 +11147,21 @@
 
                             <div className="gws-sidebar-launcher">
                                 {!isGwsSessionActive ? (
+                                    isRightSidebarCollapsed ? (
+                                        <button
+                                            className="gws-launcher-icon-button"
+                                            type="button"
+                                            onClick={handleOpenGwsWizard}
+                                            aria-label="Start GWS"
+                                            title="Start GWS"
+                                        >
+                                            ▶
+                                        </button>
+                                    ) : (
                                     <button className="gws-action-button" type="button" onClick={handleOpenGwsWizard}>
                                         {currentProject?.gws?.sessions?.length ? 'Start New Session' : 'Start GWS'}
                                     </button>
+                                    )
                                 ) : (
                                     <>
                                         <div className="gws-launcher-controls" aria-label="GWS session controls">
@@ -10885,13 +11193,14 @@
                                                 ↻
                                             </button>
                                         </div>
-                                        <p className="gws-launcher-timer">
-                                            {isGwsPaused ? 'Paused' : 'Live'} timer: {formatCountdownTime(gwsRemainingSeconds)}
+                                        <p className="gws-launcher-timer" title={isGwsPaused ? 'Paused' : 'Live'}>
+                                            {isRightSidebarCollapsed ? formatCountdownTime(gwsRemainingSeconds) : `${isGwsPaused ? 'Paused' : 'Live'} timer: ${formatCountdownTime(gwsRemainingSeconds)}`}
                                         </p>
                                     </>
                                 )}
                             </div>
 
+                            {!isRightSidebarCollapsed && (
                             <GuidancePanel
                                 currentTask={currentProject ? currentTask : null}
                                 currentTaskDefinition={currentProject ? currentTaskDefinition : null}
@@ -10899,6 +11208,7 @@
                                 onToggleChecklistItem={handleToggleChecklistItem}
                                 onStartGwsSession={handleOpenGwsWizard}
                             />
+                            )}
                         </div>
                     </aside>
 
